@@ -1,16 +1,17 @@
 {
   "pages": [
-    "pages/inviteDetail/main",
     "pages/index/main",
-    "pages/repairDetail/main",
-    "pages/repairApply/main",
-    "pages/infoDetail/main",
-    "pages/invitePerson/main",
-    "pages/repairCommitted/main",
-    "pages/repairReplied/main",
-    "pages/addPerson/main",
+    "pages/ownerLogin/main",
+    "pages/houseHoldLogin/main",
+    
+    "pages/owner/main",
     "pages/houseHold/main",
-    "pages/person/main",
+    "pages/addPerson/main",
+    "pages/repairApply/main",
+    "pages/repairDetail/main",
+    "pages/invitePerson/main",
+    "pages/inviteDetail/main",
+    "pages/infoDetail/main",
     "pages/cars/main",
     "pages/telphone/main"
   ],

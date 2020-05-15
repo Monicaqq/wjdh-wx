@@ -40,51 +40,59 @@
     <div class="main-container">
       <!-- 住户界面 -->
       <div v-if='!isBoss'>
-        <div v-if='currentTab == 1'>
-          <div class="house-lists" v-for='(item, index) in personList' :key='index'>
-            <div class="house-item" @click="toHouseHold">
-              <!-- 左侧用户头像 -->
-              <avator-img round :src='item.avator'></avator-img>
-              <!-- 中间住户信息 -->
-              <div class="house-person">
-                <div class="house-person-up">
-                  <div class="person-name">{{item.personName}}</div>
-                  <div class="person-sex">
-                    <img :src="female" v-if='item.personSex == 0'>
-                    <img :src="male" v-if='item.personSex == 1'>
-                  </div>
-                  <div class="person-role">
-                    <div :class="item.personRole == 3001 ? 'hz' : 'wy'">{{item.personRole}}
+        <div v-if='currentTab == 1' class="scroll-container">
+          <scroll-view class="scroll-view" scroll-y='true'>
+            <div class="house-lists" v-for='(item, index) in personList' :key='index'>
+              <div class="house-item" @click="toHouseHold">
+                <!-- 左侧用户头像 -->
+                <avator-img round :src='item.avator'></avator-img>
+                <!-- 中间住户信息 -->
+                <div class="house-person">
+                  <div class="house-person-up">
+                    <div class="person-name">{{item.personName}}</div>
+                    <div class="person-sex">
+                      <img :src="female" v-if='item.personSex == 0'>
+                      <img :src="male" v-if='item.personSex == 1'>
+                    </div>
+                    <div class="person-role">
+                      <div :class="item.personRole == 3001 ? 'hz' : 'wy'">{{item.personRole}}
+                      </div>
                     </div>
                   </div>
+                  <div class="person-tel">{{item.telephone}}</div>
                 </div>
-                <div class="person-tel">{{item.telephone}}</div>
-              </div>
-              <!-- 右侧 跳转至住户信息界面 -->
-              <div class="toHousePerson">
-                <arrow-btn color='#D2D7F0' @arrowClick='toHouseHold' />
+                <!-- 右侧 跳转至住户信息界面 -->
+                <div class="toHousePerson">
+                  <arrow-btn color='#D2D7F0' @arrowClick='toHouseHold' />
+                </div>
               </div>
             </div>
-          </div>
+          </scroll-view>
         </div>
       </div>
       <!-- 报修界面 -->
-      <div v-if='currentTab == 2'>
-        <div v-for="(item, index) in tabLists" :key="index">
-          <div @click="toRepairDetail">
-            <tab-lists :data='item' isRepair></tab-lists>
+      <div v-if='currentTab == 2' class="scroll-container">
+        <scroll-view scroll-y="true" class="scroll-view">
+          <div v-for="(item, index) in tabLists" :key="index">
+            <div @click="toRepairDetail">
+              <tab-lists :data='item' isRepair></tab-lists>
+            </div>
           </div>
-        </div>
+        </scroll-view>
       </div>
       <!-- 邀请界面 -->
       <div>
         <!-- 如果有邀请权限, 展示邀请界面 -->
-        <div v-if='currentTab == 3'>
+        <div v-if='currentTab == 3' class="scroll-container">
           <div v-if="hasInviteRole">
-            <div v-for="(item, index) in tabLists" :key="index">
-              <div @click="toInviteDetail">
-                <tab-lists :data='item'></tab-lists>
-              </div>
+            <div>
+              <scroll-view scroll-y='true' class="scroll-view">
+                <div v-for="(item, index) in tabLists" :key="index">
+                  <div @click="toInviteDetail">
+                    <tab-lists :data='item'></tab-lists>
+                  </div>
+                </div>
+              </scroll-view>
             </div>
           </div>
           <!-- 无邀请权限界面展示 -->
@@ -96,13 +104,15 @@
         </div>
       </div>
       <!-- 通知界面 -->
-      <div v-if='currentTab == 4'>
-        <div v-for="(item, index) in tabLists" :key="index">
-          <div @click="toInfoDetail">
-            <tab-lists :data='item'></tab-lists>
+      <div v-if='currentTab == 4' class="scroll-container">
+        <scroll-view class="scroll-view" scroll-y='true'>
+          <div v-for="(item, index) in tabLists" :key="index">
+            <div @click="toInfoDetail">
+              <tab-lists :data='item'></tab-lists>
+            </div>
           </div>
+        </scroll-view>
 
-        </div>
       </div>
     </div>
     <!-- 页面下方提交按钮 -->
@@ -147,11 +157,42 @@ export default {
       avator: '../../static/images/user1.png',
       infoImg: '../../static/images/info.png',
       infoText: '小区2020年度物业收取通知小区2020年度物业收取通知',
-      currentTab: 3,
+      currentTab: 2,
       female: '../../static/images/female.png',
       male: '../../static/images/male.png',
       personList: [
         {
+          id: '0',
+          avator: '../../static/images/user1.png',
+          personName: '赵小磊',
+          personSex: 0,
+          personRole: '业主',
+          telephone: '13898929333'
+        },
+        {
+          id: '1',
+          avator: '../../static/images/user1.png',
+          personName: '赵小丫',
+          personSex: 1,
+          personRole: '3001',
+          telephone: '13898929333'
+        },
+        {
+          id: '0',
+          avator: '../../static/images/user1.png',
+          personName: '赵小磊',
+          personSex: 0,
+          personRole: '业主',
+          telephone: '13898929333'
+        },
+        {
+          id: '1',
+          avator: '../../static/images/user1.png',
+          personName: '赵小丫',
+          personSex: 1,
+          personRole: '3001',
+          telephone: '13898929333'
+        }, {
           id: '0',
           avator: '../../static/images/user1.png',
           personName: '赵小磊',
@@ -188,9 +229,41 @@ export default {
           time: '',
           replyState: '0'
         }, {
-          infoMsg: '路灯坏了',
+          infoMsg: '路灯1212坏了',
           repairType: '公共设施',
           time: '',
+          replyState: '0'
+        }, {
+          infoMsg: '路灯212坏了',
+          repairType: '公共设施',
+          time: '2020',
+          replyState: '0'
+        },
+        {
+          infoMsg: '路灯11坏了',
+          repairType: '公共设施',
+          time: '',
+          replyState: '0'
+        }, {
+          infoMsg: '路灯12坏了',
+          repairType: '公共设施',
+          time: '2021qq',
+          replyState: '0'
+        }, {
+          infoMsg: '路灯21坏了',
+          repairType: '公共设施',
+          time: '2020',
+          replyState: '0'
+        },
+        {
+          infoMsg: '路灯21坏了',
+          repairType: '公共设施',
+          time: '',
+          replyState: '0'
+        }, {
+          infoMsg: '路灯aa坏了',
+          repairType: '公共设施',
+          time: '2021',
           replyState: '0'
         }
       ]
@@ -378,6 +451,13 @@ export default {
     background: rgba(255, 255, 255, 1);
     margin: 14px 15px 1px 15px;
     overflow: hidden;
+    .scroll-container {
+      height: 100%;
+      .scroll-view {
+        height: 100%;
+      }
+    }
+
     // 住户列表
     .house-lists {
       display: flex;
@@ -466,5 +546,11 @@ export default {
       bottom: 0;
     }
   }
+  // .scroll-container {
+  //   height: 100%;
+  //   .scroll-view {
+  //     height: 100%;
+  //   }
+  // }
 }
 </style>
