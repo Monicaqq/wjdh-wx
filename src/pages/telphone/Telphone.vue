@@ -9,7 +9,7 @@
     </div>
     <!-- 提交手机号按钮 -->
     <div class="tel-commit">
-      <submit-btn btnText='确定' @submit='submitPhone' active></submit-btn>
+      <submit-btn btnText='确定' @submit='submitPhone' isActive></submit-btn>
     </div>
   </div>
 </template>
@@ -23,7 +23,7 @@ export default {
   },
   data () {
     return {
-      phone: '',
+      phone: '18524256541',
       phoneErrMsg: '',
       phoneErrFlag: false
     }

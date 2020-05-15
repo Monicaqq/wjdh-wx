@@ -12,8 +12,8 @@ export default {
     }
   },
   methods: {
-    arrowClick () {
-      this.$emit('arrowClick')
+    arrowClick (value) {
+      this.$emit('arrowClick', value)
     }
   }
 }

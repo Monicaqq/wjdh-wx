@@ -1,7 +1,14 @@
 {
   "pages": [
-    "pages/addPerson/main",
+    "pages/inviteDetail/main",
     "pages/index/main",
+    "pages/repairDetail/main",
+    "pages/repairApply/main",
+    "pages/infoDetail/main",
+    "pages/invitePerson/main",
+    "pages/repairCommitted/main",
+    "pages/repairReplied/main",
+    "pages/addPerson/main",
     "pages/houseHold/main",
     "pages/person/main",
     "pages/cars/main",

@@ -30,7 +30,7 @@
         <div class="info-text">{{infoText}}</div>
       </div>
       <div class="tabs">
-        <div :class="[tab, currentTab == 1 ? 'select' : '']" @click='tabClick'>住户</div>
+        <div v-if='!isBoss' :class="[tab, currentTab == 1 ? 'select' : '']" @click='tabClick'>住户</div>
         <div :class="[tab, currentTab == 2 ? 'select' : '']" @click='tabClick'>报修</div>
         <div :class="[tab, currentTab == 3 ? 'select' : '']" @click='tabClick'>邀请</div>
         <div :class="[tab, currentTab == 4 ? 'select' : '']" @click='tabClick'>通知</div>
@@ -39,59 +39,93 @@
     <!-- 页面主体列表 -->
     <div class="main-container">
       <!-- 住户界面 -->
-      <div v-if='currentTab == 1'>
-        <div class="house-lists" v-for='(item, index) in personList' :key='index'>
-          <div class="house-item" @click="toHouseHold">
-            <!-- 左侧用户头像 -->
-            <avator-img round :src='item.avator'></avator-img>
-            <!-- 中间住户信息 -->
-            <div class="house-person">
-              <div class="house-person-up">
-                <div class="person-name">{{item.personName}}</div>
-                <div class="person-sex">
-                  <img :src="female" v-if='item.personSex == 0'>
-                  <img :src="male" v-if='item.personSex == 1'>
-                </div>
-                <div class="person-role">
-                  <div :class="item.personRole == 3001 ? 'hz' : 'wy'">{{item.personRole}}
+      <div v-if='!isBoss'>
+        <div v-if='currentTab == 1'>
+          <div class="house-lists" v-for='(item, index) in personList' :key='index'>
+            <div class="house-item" @click="toHouseHold">
+              <!-- 左侧用户头像 -->
+              <avator-img round :src='item.avator'></avator-img>
+              <!-- 中间住户信息 -->
+              <div class="house-person">
+                <div class="house-person-up">
+                  <div class="person-name">{{item.personName}}</div>
+                  <div class="person-sex">
+                    <img :src="female" v-if='item.personSex == 0'>
+                    <img :src="male" v-if='item.personSex == 1'>
+                  </div>
+                  <div class="person-role">
+                    <div :class="item.personRole == 3001 ? 'hz' : 'wy'">{{item.personRole}}
+                    </div>
                   </div>
                 </div>
+                <div class="person-tel">{{item.telephone}}</div>
               </div>
-              <div class="person-tel">{{item.telephone}}</div>
-            </div>
-            <!-- 右侧 跳转至住户信息界面 -->
-            <div class="toHousePerson">
-              <arrow-btn color='#D2D7F0' @arrowClick='toHouseHold' />
+              <!-- 右侧 跳转至住户信息界面 -->
+              <div class="toHousePerson">
+                <arrow-btn color='#D2D7F0' @arrowClick='toHouseHold' />
+              </div>
             </div>
           </div>
         </div>
       </div>
       <!-- 报修界面 -->
-      <div class="repair" v-if='currentTab == 2'>
+      <div v-if='currentTab == 2'>
         <div v-for="(item, index) in tabLists" :key="index">
-          <tab-lists :data='item' isRepair></tab-lists>
+          <div @click="toRepairDetail">
+            <tab-lists :data='item' isRepair></tab-lists>
+          </div>
         </div>
       </div>
       <!-- 邀请界面 -->
-      <div class="repair" v-if='currentTab == 3'>
-        <div v-for="(item, index) in tabLists" :key="index">
-          <tab-lists :data='item'></tab-lists>
+      <div>
+        <!-- 如果有邀请权限, 展示邀请界面 -->
+        <div v-if='currentTab == 3'>
+          <div v-if="hasInviteRole">
+            <div v-for="(item, index) in tabLists" :key="index">
+              <div @click="toInviteDetail">
+                <tab-lists :data='item'></tab-lists>
+              </div>
+            </div>
+          </div>
+          <!-- 无邀请权限界面展示 -->
+          <div v-else>
+            <div class="notInviteRole">
+              <div>您的邀请功能未开启请联系户主</div>
+            </div>
+          </div>
         </div>
       </div>
       <!-- 通知界面 -->
-      <div class="repair" v-if='currentTab == 4'>
+      <div v-if='currentTab == 4'>
         <div v-for="(item, index) in tabLists" :key="index">
-          <tab-lists :data='item'></tab-lists>
+          <div @click="toInfoDetail">
+            <tab-lists :data='item'></tab-lists>
+          </div>
+
         </div>
       </div>
-      <!-- 添加住户按钮 -->
-      <!-- <div class="add-btn">
-        <submit-btn btnText='添加住户'></submit-btn>
-      </div> -->
     </div>
-    <!-- 添加住户按钮 -->
-    <div class="add-btn">
-      <submit-btn btnText='添加住户' @submit='addHousePerson' active></submit-btn>
+    <!-- 页面下方提交按钮 -->
+    <div class="submit-btn">
+      <div class="add-person" v-if='!isBoss'>
+        <submit-btn btnText='添加住户' @submit='addHousePerson' isActive v-if='currentTab == 1'></submit-btn>
+      </div>
+      <div class="repair-btn">
+        <submit-btn btnText='报修' @submit='applyRepair' isActive v-if='currentTab == 2'></submit-btn>
+      </div>
+      <div class="invite-btn" v-if='currentTab == 3'>
+        <!-- 有邀请权限 -->
+        <div v-if="hasInviteRole">
+          <submit-btn btnText='邀请' @submit='invitePerson' isActive></submit-btn>
+        </div>
+        <!-- 无邀请权限 -->
+        <div v-else>
+          <submit-btn btnText='邀请' isShadow></submit-btn>
+        </div>
+      </div>
+      <div class="info-btn" v-if='currentTab == 4'>
+        <submit-btn btnText='通知' isActive></submit-btn>
+      </div>
     </div>
   </div>
 </template>
@@ -106,10 +140,14 @@ export default {
   components: { avatorImg, arrowBtn, submitBtn, tabLists },
   data () {
     return {
+      // 是否是户主
+      isBoss: false,
+      // 是否具有邀请权限
+      hasInviteRole: true,
       avator: '../../static/images/user1.png',
       infoImg: '../../static/images/info.png',
       infoText: '小区2020年度物业收取通知小区2020年度物业收取通知',
-      currentTab: 1,
+      currentTab: 3,
       female: '../../static/images/female.png',
       male: '../../static/images/male.png',
       personList: [
@@ -154,21 +192,6 @@ export default {
           repairType: '公共设施',
           time: '',
           replyState: '0'
-        }, {
-          infoMsg: '路灯坏了',
-          repairType: '公共设施',
-          time: '',
-          replyState: '0'
-        }, {
-          infoMsg: '路灯坏了',
-          repairType: '公共设施',
-          time: '',
-          replyState: '0'
-        }, {
-          infoMsg: '路灯坏了',
-          repairType: '公共设施',
-          time: '',
-          replyState: '0'
         }
       ]
     }
@@ -177,6 +200,8 @@ export default {
     // 切换 tab 标签
     tabClick (e) {
       this.currentTab = e.currentTarget.dataset.eventid
+      // this.btnText = ''
+      // console.log(this.currentTab)
     },
     // 跳转至个人信息页面
     toPersonMsg () {
@@ -191,6 +216,31 @@ export default {
     // 跳转至添加住户界面
     addHousePerson () {
       this.$router.push('../../pages/addPerson/main')
+    },
+    // 报修详情页面
+    toRepairDetail () {
+      this.$router.push('../../pages/repairDetail/main')
+      console.log('去报修详情页')
+    },
+    // 跳转至新增报修界面
+    applyRepair () {
+      console.log('去报修页')
+      this.$router.push('../../pages/repairApply/main')
+    },
+    // 跳转至邀请人员界面
+    invitePerson () {
+      console.log('邀请人员')
+      this.$router.push('../../pages/invitePerson/main')
+    },
+    // 查看邀请的人员信息
+    toInviteDetail () {
+      console.log('查看邀请的详情')
+      this.$router.push('../../pages/inviteDetail/main')
+    },
+    // 跳转至通知详情页面
+    toInfoDetail () {
+      console.log('查看通知详情')
+      this.$router.push('../../pages/infoDetail/main')
     }
   }
 }
@@ -328,6 +378,7 @@ export default {
     background: rgba(255, 255, 255, 1);
     margin: 14px 15px 1px 15px;
     overflow: hidden;
+    // 住户列表
     .house-lists {
       display: flex;
       flex-direction: column;
@@ -340,6 +391,7 @@ export default {
         position: relative;
         height: 74.5px;
         border-bottom: 0.5px solid rgba(210, 215, 240, 1);
+        color: #333;
         .house-person {
           display: flex;
           flex-direction: column;
@@ -393,10 +445,25 @@ export default {
         }
       }
     }
-    // 页面下方按钮样式
-    .add-btn {
-      // position: absolute;
-      // bottom: 18px;
+    // 无邀请权限的界面
+    .notInviteRole {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      font-size: 14px;
+      color: #333;
+      div {
+        margin-top: 88px;
+        width: 130px;
+        text-align: center;
+      }
+    }
+    // 添加用户按钮样式
+    .submit-btn {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
     }
   }
 }

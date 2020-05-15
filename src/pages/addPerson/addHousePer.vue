@@ -25,7 +25,7 @@
           <span class="color333">性别</span>
           <div class="tel-right">
             <input type="text" class="color999" placeholder="请选择性别">
-            <arrow-btn @arrowClick='toTelView' color='#9B9B9B'></arrow-btn>
+            <arrow-btn @arrowClick='chooseSex' color='#9B9B9B'></arrow-btn>
           </div>
         </div>
         <div class="person-IDcard borderB1px person-item">

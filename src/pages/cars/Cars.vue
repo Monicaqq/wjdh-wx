@@ -30,7 +30,7 @@
     </div>
     <!-- 添加车辆提交按钮 -->
     <div class="tel-commit">
-      <submit-btn btnText='增加车辆' @submit='submitCarMsg' active></submit-btn>
+      <submit-btn btnText='增加车辆' @submit='submitCarMsg' isActive></submit-btn>
     </div>
   </div>
 </template>
