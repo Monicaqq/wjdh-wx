@@ -4,8 +4,7 @@
     <!-- 头部用户信息 -->
     <!-- <div class="home-bg"
       style="background: url('../../static/images/bg.png') no-repeat top; background-position: 0 -5px"> -->
-    <div class="user-container"
-      style="background: url('../../static/images/bg.png') no-repeat top; background-position: 0 -5px">
+    <div class="user-container" style="background: url('../../static/images/bg.png') no-repeat top; background-position: 0 -5px">
       <!-- 左侧用户头像 -->
       <div class="user-avator">
         <avator-img round :src='avator'></avator-img>
@@ -30,7 +29,7 @@
         <div class="info-text">{{infoText}}</div>
       </div>
       <div class="tabs">
-        <div v-if='!isBoss' :class="[tab, currentTab == 1 ? 'select' : '']" @click='tabClick'>住户</div>
+        <div v-if='isOwner' :class="[tab, currentTab == 1 ? 'select' : '']" @click='tabClick'>住户</div>
         <div :class="[tab, currentTab == 2 ? 'select' : '']" @click='tabClick'>报修</div>
         <div :class="[tab, currentTab == 3 ? 'select' : '']" @click='tabClick'>邀请</div>
         <div :class="[tab, currentTab == 4 ? 'select' : '']" @click='tabClick'>通知</div>
@@ -39,8 +38,8 @@
     <!-- 页面主体列表 -->
     <div class="main-container">
       <!-- 住户界面 -->
-      <div v-if='!isBoss'>
-        <div v-if='currentTab == 1' class="scroll-container">
+      <!-- <div v-if='isOwner' class="height-1px"> -->
+        <div v-if='currentTab == 1 && isOwner' class="scroll-container">
           <scroll-view class="scroll-view" scroll-y='true'>
             <div class="house-lists" v-for='(item, index) in personList' :key='index'>
               <div class="house-item" @click="toHouseHold">
@@ -69,7 +68,7 @@
             </div>
           </scroll-view>
         </div>
-      </div>
+      <!-- </div> -->
       <!-- 报修界面 -->
       <div v-if='currentTab == 2' class="scroll-container">
         <scroll-view scroll-y="true" class="scroll-view">
@@ -81,25 +80,21 @@
         </scroll-view>
       </div>
       <!-- 邀请界面 -->
-      <div>
-        <!-- 如果有邀请权限, 展示邀请界面 -->
-        <div v-if='currentTab == 3' class="scroll-container">
-          <div v-if="hasInviteRole">
-            <div>
-              <scroll-view scroll-y='true' class="scroll-view">
-                <div v-for="(item, index) in tabLists" :key="index">
-                  <div @click="toInviteDetail">
-                    <tab-lists :data='item'></tab-lists>
-                  </div>
-                </div>
-              </scroll-view>
+      <!-- 如果有邀请权限, 展示邀请界面 -->
+      <div v-if='currentTab == 3' class="scroll-container">
+        <div v-if="hasInviteRole" class="height-1px">
+          <scroll-view scroll-y='true' class="scroll-view">
+            <div v-for="(item, index) in tabLists" :key="index">
+              <div @click="toInviteDetail">
+                <tab-lists :data='item'></tab-lists>
+              </div>
             </div>
-          </div>
-          <!-- 无邀请权限界面展示 -->
-          <div v-else>
-            <div class="notInviteRole">
-              <div>您的邀请功能未开启请联系户主</div>
-            </div>
+          </scroll-view>
+        </div>
+        <!-- 无邀请权限界面展示 -->
+        <div v-else>
+          <div class="notInviteRole">
+            <div>您的邀请功能未开启请联系户主</div>
           </div>
         </div>
       </div>
@@ -117,25 +112,25 @@
     </div>
     <!-- 页面下方提交按钮 -->
     <div class="submit-btn">
-      <div class="add-person" v-if='!isBoss'>
-        <submit-btn btnText='添加住户' @submit='addHousePerson' isActive v-if='currentTab == 1'></submit-btn>
+      <div class="add-person" v-if='isOwner'>
+        <submit-btn btnText='添加住户' @submitClick='addHousePerson' isActive v-if='currentTab == 1'></submit-btn>
       </div>
       <div class="repair-btn">
-        <submit-btn btnText='报修' @submit='applyRepair' isActive v-if='currentTab == 2'></submit-btn>
+        <submit-btn btnText='报修' @submitClick='applyRepair' isActive v-if='currentTab == 2'></submit-btn>
       </div>
       <div class="invite-btn" v-if='currentTab == 3'>
         <!-- 有邀请权限 -->
-        <div v-if="hasInviteRole">
-          <submit-btn btnText='邀请' @submit='invitePerson' isActive></submit-btn>
+        <div v-if="hasInviteRole" class="hasInvite">
+          <submit-btn btnText='邀请' @submitClick='invitePerson' isActive></submit-btn>
         </div>
         <!-- 无邀请权限 -->
         <div v-else>
           <submit-btn btnText='邀请' isShadow></submit-btn>
         </div>
       </div>
-      <div class="info-btn" v-if='currentTab == 4'>
+      <!-- <div class="info-btn" v-if='currentTab == 4'>
         <submit-btn btnText='通知' isActive></submit-btn>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -151,7 +146,7 @@ export default {
   data () {
     return {
       // 是否是户主
-      isBoss: false,
+      isOwner: true,
       // 是否具有邀请权限
       hasInviteRole: true,
       avator: '../../static/images/user1.png',
@@ -278,8 +273,8 @@ export default {
     },
     // 跳转至个人信息页面
     toPersonMsg () {
-      this.$router.push('../../pages/person/main')
-      console.log('去person界面')
+      this.$router.push('../../pages/owner/main')
+      console.log('去户主个人信息界面')
     },
     // 跳转至住户界面
     toHouseHold (e) {
@@ -334,7 +329,7 @@ export default {
     flex-direction: row;
     position: relative;
     // background: rgb(8, 35, 185);
-    // background: ('../../static/images/bg.png') no-repeat 375px 290px;
+    // background: url('~@/assets/images/bg.png') no-repeat top;
     background-size: 100% 100%;
     padding-bottom: 23px;
     .user-avator {
@@ -457,7 +452,6 @@ export default {
         height: 100%;
       }
     }
-
     // 住户列表
     .house-lists {
       display: flex;
@@ -482,8 +476,6 @@ export default {
             flex-direction: row;
             justify-content: center;
             align-items: center;
-            .person-name {
-            }
             .person-sex {
               height: 13px;
               width: 13px;
@@ -546,11 +538,8 @@ export default {
       bottom: 0;
     }
   }
-  // .scroll-container {
-  //   height: 100%;
-  //   .scroll-view {
-  //     height: 100%;
-  //   }
-  // }
+  .height-1px {
+    height: calc(100% - 1px);
+  }
 }
 </style>

@@ -1,4 +1,4 @@
-// 动态切换页面底部的标题
+﻿// 动态切换页面底部的标题
 export function setNavigationBarTitle (title) {
   mpvue.setNavigationBarTitle({
     title

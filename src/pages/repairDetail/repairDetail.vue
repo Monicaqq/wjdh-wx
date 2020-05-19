@@ -5,19 +5,34 @@
       <!-- 左侧维修状态 -->
       <div class="repair-detail-text">
         <!-- 状态为已提交 -->
-        <div class="repair-committed" v-if="repairState === 1">
+        <div class="repair-detail" v-if="repairState === 1">
           <div class="state">已提交</div>
           <div class="info">请耐心等待物业处理</div>
         </div>
         <!-- 状态为已回复 -->
-        <div class="repair-replied" v-else>
+        <div class="repair-detail" v-if='repairState == 2'>
           <div class="state">已回复</div>
           <div class="info">“已交给相关人员处理，请耐心等待工作人员联系”</div>
+        </div>
+        <!-- 状态为已处理 -->
+        <div class="repair-detail" v-if="repairState == 3">
+          <div class="state">已处理</div>
+          <div class="info">“您已确认该报修已被处理”</div>
+        </div>
+        <!-- 状态已取消 -->
+        <div class="repair-detail" v-if="repairState == 4">
+          <div class="state">已取消</div>
+          <div class="info">“您已取消该报修”</div>
         </div>
       </div>
       <!-- 右侧图片 -->
       <div class="repair-detail-img">
-        <img :src="repairBg">
+        <div v-if='repairState == 3'>
+          <img :src="repairBg2" class="bg2">
+        </div>
+        <div v-else>
+          <img :src="repairBg1" class="bg1">
+        </div>
       </div>
     </div>
     <!-- 维修详情中间的类型、详细区域 -->
@@ -38,12 +53,11 @@
       </div>
     </div>
     <!-- 底部 处理、取消按钮 -->
-    <div class="repair-detail-footer">
-      <!-- 维修状态为已提交, 按钮文本为待处理 -->
-      <button class="btn left" v-if="repairState === 0">待处理</button>
-      <!-- 维修状态为已回复, 按钮文本为已处理 -->
-      <button class="btn left " v-else>已处理</button>
-      <button class="btn right" @click="cancle">取消</button>
+    <div class="repair-detail-footer" v-if="repairState === 1 || repairState == 2">
+      <!-- 维修状态为已提交或已回复, 按钮文本为已处理 -->
+      <!-- 已处理按钮 将已提交或已回复的维修状态切换为已处理 -->
+      <button class="btn left" @click="handledRepair">已处理</button>
+      <button class="btn right" @click="cancleRepair">取消</button>
     </div>
   </div>
 </template>
@@ -58,13 +72,18 @@ export default {
   data () {
     return {
       repairType: '公共设施',
-      repairState: 0,
-      repairBg: '../../static/images/repairBg.png'
+      repairState: 3,
+      repairBg1: '../../static/images/repairBg1.png',
+      repairBg2: '../../static/images/repairBg2.png'
     }
   },
   methods: {
-    cancle () {
-      this.$router.go(-1)
+    handledRepair () {
+      console.log('确认该维修信息已被处理？')
+    },
+    cancleRepair () {
+      // 更改已提交或已回复的维修状态
+      console.log('确认取消该维修信息吗？')
     }
   }
 }
@@ -80,6 +99,7 @@ export default {
   .repair-detail-header {
     display: flex;
     flex-direction: row;
+    position: relative;
     width: 100%;
     height: 105px;
     background: rgba(160, 175, 255, 1);
@@ -89,8 +109,7 @@ export default {
       padding-left: 15px;
       margin-top: 15px;
       width: 55%;
-      .repair-committed,
-      .repair-replied {
+      .repair-detail {
         margin-bottom: 10px;
         font-size: 14px;
         color: #fff;
@@ -100,12 +119,20 @@ export default {
       }
     }
     .repair-detail-img {
+      display: flex;
       margin: auto 0;
       text-align: center;
       width: 45%;
-      img {
+      .bg1 {
         width: 68px;
         height: 64px;
+      }
+      .bg2 {
+        position: absolute;
+        bottom: 0px;
+        right: 42px;
+        height: 79px;
+        width: 74px;
       }
     }
   }

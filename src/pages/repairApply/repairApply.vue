@@ -7,9 +7,6 @@
         <!-- <span>公共设施</span> -->
         <arrow-btn color='#D2D7F0' @arrowClick='chooseType'></arrow-btn>
       </div>
-      <!-- <div class="arrow-btn">
-        <arrow-btn color='#D2D7F0' @arrowClick='chooseType'></arrow-btn>
-      </div> -->
     </div>
     <div class="apply-detail">
       <span>详细</span>
@@ -18,7 +15,7 @@
       </div>
     </div>
     <div class="submit-btn">
-      <submit-btn btnText='提交' @submit='applyRepair' isActive></submit-btn>
+      <submit-btn btnText='提交' @submitClick='applyRepair' isActive></submit-btn>
     </div>
   </div>
 </template>
@@ -39,6 +36,17 @@ export default {
   },
   methods: {
     chooseType () {
+      let that = this
+      wx.showActionSheet({
+        itemList: ['公共设施', '个人设施'],
+        success (res) {
+          if (res.tapIndex === 0) {
+            that.repairType = '公共设施'
+          } else {
+            that.repairType = '个人设施'
+          }
+        }
+      })
       console.log('选择报修类型')
     },
     applyRepair () {

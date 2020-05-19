@@ -17,11 +17,11 @@ function resolve (dir) {
 function getEntry (rootSrc) {
   var map = {};
   glob.sync(rootSrc + '/pages/**/main.js')
-  .forEach(file => {
-    var key = relative(rootSrc, file).replace('.js', '');
-    map[key] = file;
-  })
-   return map;
+    .forEach(file => {
+      var key = relative(rootSrc, file).replace('.js', '');
+      map[key] = file;
+    })
+  return map;
 }
 
 const appEntry = { app: resolve('./src/main.js') }
@@ -46,7 +46,8 @@ let baseWebpackConfig = {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue': 'mpvue',
-      '@': resolve('src')
+      '@': resolve('src'),
+      'images': resolve('static/images')
     },
     symlinks: false,
     aliasFields: ['mpvue', 'weapp', 'browser'],
@@ -75,7 +76,7 @@ let baseWebpackConfig = {
           'babel-loader',
           {
             loader: 'mpvue-loader',
-            options: Object.assign({checkMPEntry: true}, vueLoaderConfig)
+            options: Object.assign({ checkMPEntry: true }, vueLoaderConfig)
           },
         ]
       },
@@ -102,6 +103,10 @@ let baseWebpackConfig = {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[ext]')
         }
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       }
     ]
   },
@@ -125,7 +130,7 @@ let baseWebpackConfig = {
         ignore: ['.*']
       }
     ])
-  ]
+  ],
 }
 
 // 针对百度小程序，由于不支持通过 miniprogramRoot 进行自定义构建完的文件的根路径

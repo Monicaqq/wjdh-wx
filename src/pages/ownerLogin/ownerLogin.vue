@@ -7,21 +7,30 @@
       <div class="login-input">
         <div class="account-input">
           <span>账号/手机号</span>
-          <input type="text" v-model="loginForm.account" @focus="onAccountFocus" @blur="onAccountBlur" name="account"
+          <input type="text"  placeholder-style="color: #BCC2E1" v-model="loginForm.account" @focus="onAccountFocus" @blur="onAccountBlur" name="account"
             placeholder="请输入">
         </div>
+        <!-- 输入框聚焦失焦下划线样式 -->
         <div :class="isAccountFocus ? 'borderBlue' : 'borderWhite'">
         </div>
         <div class="password-input">
           <span>密码/身份证后4位</span>
-          <input type="text" password v-model="loginForm.password" @focus="onPasswdFocus" @blur="onPasswdBlur"
+          <input type="text" password  placeholder-style="color: #BCC2E1" v-model="loginForm.password" @focus="onPasswdFocus" @blur="onPasswdBlur"
             name="password" placeholder="请输入">
         </div>
+        <!-- 输入框聚焦失焦下划线样式 -->
         <div :class="isPasswdFocus ? 'borderBlue' : 'borderWhite'">
         </div>
       </div>
-      <div class="login-btn">
-        <submit-btn isShadow btnText='登录'></submit-btn>
+      <!-- 判断登录按钮功能是否启动 -->
+      <div>
+        <div class="login-btn" v-if='ActiveLoginBtn'>
+          <!-- <button formType='submit'>登录</button> -->
+          <submit-btn btnText='登录' isActive></submit-btn>
+        </div>
+        <div class="login-btn" v-else>
+          <submit-btn btnText='登录' isShadow></submit-btn>
+        </div>
       </div>
     </form>
     <div class="invite-login">
@@ -47,6 +56,13 @@ export default {
       isPasswdFocus: false
     }
   },
+  computed: {
+    ActiveLoginBtn () {
+      if (this.loginForm.account && this.loginForm.password) {
+        return true
+      }
+    }
+  },
   methods: {
     // 输入框聚焦和失焦
     onAccountFocus () {
@@ -61,6 +77,11 @@ export default {
     onPasswdBlur () {
       this.isPasswdFocus = false
     },
+    // 账号密码登录
+    formSubmit () {
+      console.log('用户名密码登录')
+    },
+
     // 邀请码登录
     invitedLogin () {
       this.$router.replace('../../pages/houseHoldLogin/main')
@@ -88,13 +109,16 @@ export default {
     .login-input {
       margin-left: 37px;
       margin-right: 37px;
+      height: 100px;
       font-size: 14px;
       color: #333;
       .account-input,
       .password-input {
         display: flex;
         flex-direction: row;
-        margin-bottom: 19px;
+        align-items: center;
+        padding-bottom: 19px;
+        font-size: 14px;
         span {
           margin-right: 11px;
           white-space: nowrap;

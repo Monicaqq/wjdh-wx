@@ -1,7 +1,8 @@
 <template>
   <div class="submit-btn">
-    <button :class="['btn',isActive ? 'isActive' : 'unactive', isShadow ? 'isShadow' : '']"
-      @click="submit">{{btnText}}</button>
+    <button
+      :class="['btn',isActive ? 'isActive' : 'unactive', isShadow ? 'isShadow' : '']"
+      @click="submitClick" formType='submit'>{{btnText}}</button>
   </div>
 </template>
 <script>
@@ -15,11 +16,19 @@ export default {
     isShadow: {
       type: Boolean,
       default: false
+    },
+    isLogin: {
+      type: Boolean,
+      default: true
+    },
+    formType: {
+      type: String,
+      default: 'submit'
     }
   },
   methods: {
-    submit () {
-      this.$emit('submit')
+    submitClick () {
+      this.$emit('submitClick')
     }
   }
 }
@@ -54,7 +63,7 @@ export default {
   }
   .isShadow {
     color: #fff;
-    background:rgba(210,215,240,1);
+    background: rgba(210, 215, 240, 1);
     border: none;
   }
 }

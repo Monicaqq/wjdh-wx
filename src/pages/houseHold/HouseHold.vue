@@ -5,7 +5,7 @@
     <person-msg></person-msg>
     <!-- 删除住户按钮 -->
     <div class="submit-btn">
-      <submit-btn btnText='删除' @submit='delHousePerson'></submit-btn>
+      <submit-btn btnText='删除' @submitClick='delHousePerson'></submit-btn>
     </div>
   </div>
 </template>

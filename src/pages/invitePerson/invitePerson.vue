@@ -30,7 +30,7 @@
     </div>
     <!-- 新增邀请人按钮 -->
     <div class="submit-btn">
-      <submit-btn btnText='确定' @submit='invitePerson' isActive></submit-btn>
+      <submit-btn btnText='确定' @submitClick='invitePerson' isActive></submit-btn>
     </div>
   </div>
 </template>
@@ -113,7 +113,17 @@ export default {
     },
     // 选择性别
     chooseSex () {
-      console.log('选择性别')
+      let that = this
+      wx.showActionSheet({
+        itemList: ['男', '女'],
+        success (res) {
+          if (res.tapIndex === 0) {
+            that.houseHoldForm.sex = '男'
+          } else {
+            that.houseHoldForm.sex = '女'
+          }
+        }
+      })
     },
     // 提交邀请数据
     invitePerson () {

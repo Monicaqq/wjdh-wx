@@ -10,7 +10,7 @@
         <div class="person-photo borderB1px person-item">
           <span class="color333">照片</span>
           <div class="photo-right">
-            <avator-img round :src='perPhoto'></avator-img>
+            <avator-img round :src='houseHoldForm.perPhoto'></avator-img>
             <div class="arrow-btn">
               <arrow-btn @arrowClick='addAvator' color='#9B9B9B'></arrow-btn>
             </div>
@@ -18,25 +18,25 @@
         </div>
         <div class="person-name borderB1px person-item">
           <span class="color333">姓名</span>
-          <input type="text" class="color999" placeholder="请输入姓名" v-model="name" maxlength="6" @input="inputName"
-            @blur='onNameBlur' confirm-type="done" @confirm='onConfirm'>
+          <input type="text" class="color999" placeholder="请输入姓名" v-model="houseHoldForm.name" maxlength="6"
+            @input="inputName" @blur='onNameBlur' confirm-type="done" @confirm='onConfirm'>
         </div>
         <div class="person-sex borderB1px person-item">
           <span class="color333">性别</span>
           <div class="tel-right">
-            <input type="text" class="color999" placeholder="请选择性别">
+            <input type="text" class="color999" placeholder="请选择性别" v-model="houseHoldForm.sex">
             <arrow-btn @arrowClick='chooseSex' color='#9B9B9B'></arrow-btn>
           </div>
         </div>
         <div class="person-IDcard borderB1px person-item">
           <span class="color333">身份证号</span>
-          <input type="text" class="color999" placeholder="请输入身份证号" v-model="idCard" @input="inputIdCard" maxlength="18"
-            @blur="onIdCardBlur" confirm-type="done" @confirm='onConfirm'>
+          <input type="text" class="color999" placeholder="请输入身份证号" v-model="houseHoldForm.idCard" @input="inputIdCard"
+            maxlength="18" @blur="onIdCardBlur" confirm-type="done" @confirm='onConfirm'>
         </div>
         <div class="person-tel person-item">
           <span class="color333">手机号</span>
-          <input type="text" class="color999" placeholder="请输入手机号" v-model="phone" @input="inputPhone" maxlength="11"
-            confirm-type="done" @confirm='onConfirm' @blur="onPhoneBlur">
+          <input type="text" class="color999" placeholder="请输入手机号" v-model="houseHoldForm.phone" @input="inputPhone"
+            maxlength="11" confirm-type="done" @confirm='onConfirm' @blur="onPhoneBlur">
           <!-- <div class="err" v-if="phoneErrFlag"><span>{{phoneErrMsg}}</span></div> -->
         </div>
       </div>
@@ -52,7 +52,7 @@
         <div class="person-sex borderB1px person-item">
           <span class="color333">人员类型</span>
           <div class="tel-right">
-            <input type="text" class="color999" placeholder="请选择人员类型">
+            <input type="text" class="color999" v-model="houseHoldForm.type" placeholder="请选择人员类型">
             <arrow-btn @arrowClick='choosePersonType' color='#9B9B9B'></arrow-btn>
           </div>
         </div>
@@ -70,7 +70,7 @@
     </div>
     <!-- 新增住户按钮 -->
     <div class="submit-btn">
-      <submit-btn btnText='确定' @submit='addHouserPerson' active></submit-btn>
+      <submit-btn btnText='确定' @submitClick='addHouserPerson' isActive></submit-btn>
     </div>
   </div>
 </template>
@@ -90,10 +90,15 @@ export default {
   },
   data () {
     return {
-      perPhoto: '../../static/images/timg.jpg',
-      name: '',
-      idCard: '',
-      phone: ''
+      houseHoldForm: {
+        perPhoto: '../../static/images/timg.jpg',
+        name: '',
+        sex: '',
+        idCard: '',
+        phone: '',
+        type: ''
+      }
+
     }
   },
   mounted () {
@@ -108,7 +113,7 @@ export default {
       this.name = e.mp.detail.value.trim()
       var nameReg = /^[\u4E00-\u9FA5]{2,4}$/
       if (this.name.length === 0) {
-        showToast('请输入姓名')
+        showToast('请选择姓名')
       } else if (!nameReg.test(this.name)) {
         this.name = ''
         showToast('姓名仅支持2-4个中文字符')
@@ -169,11 +174,31 @@ export default {
     },
     // 选择性别
     chooseSex () {
-      console.log('选择性别')
+      let that = this
+      wx.showActionSheet({
+        itemList: ['男', '女'],
+        success (res) {
+          if (res.tapIndex === 0) {
+            that.houseHoldForm.sex = '男'
+          } else {
+            that.houseHoldForm.sex = '女'
+          }
+        }
+      })
     },
     // 选择人员类型
     choosePersonType () {
-      console.log('选择人员类型')
+      let that = this
+      wx.showActionSheet({
+        itemList: ['户主', '租户'],
+        success (res) {
+          if (res.tapIndex === 0) {
+            that.houseHoldForm.type = '户主'
+          } else {
+            that.houseHoldForm.type = '租户'
+          }
+        }
+      })
     },
     // 去车辆界面
     toCarView () {

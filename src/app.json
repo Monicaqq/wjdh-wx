@@ -1,9 +1,9 @@
 {
   "pages": [
-    "pages/index/main",
-    "pages/ownerLogin/main",
     "pages/houseHoldLogin/main",
+    "pages/index/main",
     
+    "pages/ownerLogin/main",
     "pages/owner/main",
     "pages/houseHold/main",
     "pages/addPerson/main",
