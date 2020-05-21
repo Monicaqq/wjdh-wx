@@ -1,22 +1,24 @@
 <template>
   <div class="repair-apply-container">
-    <div class="apply-type">
-      <span>类型</span>
-      <div class="repair-type">
-        <input type="text" v-model="repairType">
-        <!-- <span>公共设施</span> -->
-        <arrow-btn color='#D2D7F0' @arrowClick='chooseType'></arrow-btn>
+    <form @submit="applyRepair">
+      <div class="apply-type">
+        <span>类型</span>
+        <div class="repair-type">
+          <input type="text" v-model="repairType" @click="chooseType">
+          <!-- <span>公共设施</span> -->
+          <arrow-btn color='#D2D7F0' @arrowClick='chooseType'></arrow-btn>
+        </div>
       </div>
-    </div>
-    <div class="apply-detail">
-      <span>详细</span>
-      <div class="detail-text">
-        <input type="text" v-model="repairDetail" placeholder="请输入报修详细信息" maxlength="200">
+      <div class="apply-detail">
+        <span>详细</span>
+        <div class="detail-text">
+          <input type="text" v-model="repairDetail" placeholder="请输入报修详细信息" maxlength="200">
+        </div>
       </div>
-    </div>
-    <div class="submit-btn">
-      <submit-btn btnText='提交' @submitClick='applyRepair' isActive></submit-btn>
-    </div>
+      <div class="submit-btn">
+        <submit-btn btnText='提交' isActive></submit-btn>
+      </div>
+    </form>
   </div>
 </template>
 <script>

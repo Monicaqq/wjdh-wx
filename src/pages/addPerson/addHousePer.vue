@@ -1,77 +1,79 @@
 <template>
   <!-- 个人信息组件 -->
   <div class="person-msg-container">
-    <div class="person-msg">
-      <div class="title-label">
-        个人信息
+    <form @submit="addHouserPerson">
+      <div class="person-msg">
+        <div class="title-label">
+          个人信息
+        </div>
+        <!-- 个人信息列表 -->
+        <div class="person-lists">
+          <div class="person-photo borderB1px person-item">
+            <span class="color333">照片</span>
+            <div class="photo-right" @click="chooseImage">
+              <avator-img round :src='houseHoldForm.perPhoto'></avator-img>
+              <div class="arrow-btn">
+                <arrow-btn @arrowClick='addAvator' color='#9B9B9B'></arrow-btn>
+              </div>
+            </div>
+          </div>
+          <div class="person-name borderB1px person-item">
+            <span class="color333">姓名</span>
+            <input type="text" class="color999" placeholder="请输入姓名" v-model="houseHoldForm.name" maxlength="6"
+              @input="inputName" @blur='onNameBlur' confirm-type="done" @confirm='onConfirm'>
+          </div>
+          <div class="person-sex borderB1px person-item">
+            <span class="color333">性别</span>
+            <div class="tel-right">
+              <input type="text" class="color999" placeholder="请选择性别" @click="chooseSex" v-model="houseHoldForm.sex">
+              <arrow-btn @arrowClick='chooseSex' color='#9B9B9B'></arrow-btn>
+            </div>
+          </div>
+          <div class="person-IDcard borderB1px person-item">
+            <span class="color333">身份证号</span>
+            <input type="text" class="color999" placeholder="请输入身份证号" v-model="houseHoldForm.idCard"
+              @input="inputIdCard" maxlength="18" @blur="onIdCardBlur" confirm-type="done" @confirm='onConfirm'>
+          </div>
+          <div class="person-tel person-item">
+            <span class="color333">手机号</span>
+            <input type="text" class="color999" placeholder="请输入手机号" v-model="houseHoldForm.phone" @input="inputPhone"
+              maxlength="11" confirm-type="done" @confirm='onConfirm' @blur="onPhoneBlur">
+          </div>
+        </div>
       </div>
-      <!-- 个人信息列表 -->
-      <div class="person-lists">
-        <div class="person-photo borderB1px person-item">
-          <span class="color333">照片</span>
-          <div class="photo-right">
-            <avator-img round :src='houseHoldForm.perPhoto'></avator-img>
-            <div class="arrow-btn">
-              <arrow-btn @arrowClick='addAvator' color='#9B9B9B'></arrow-btn>
+      <!-- 住户信息 -->
+      <div class="housePer-msg">
+        <div class="title-label">
+          住户信息
+        </div>
+        <!-- 住户信息列表 -->
+        <div class="housePer-lists">
+          <!-- 人员类型 -->
+          <div class="person-sex borderB1px person-item">
+            <span class="color333">人员类型</span>
+            <div class="tel-right">
+              <input type="text" class="color999" @click="choosePersonType" v-model="houseHoldForm.type"
+                placeholder="请选择人员类型">
+              <arrow-btn @arrowClick='choosePersonType' color='#9B9B9B'></arrow-btn>
+            </div>
+          </div>
+          <!-- 车辆 -->
+          <div class="person-sex person-item">
+            <span class="color333">车辆</span>
+            <div class="tel-right">
+              <span class="color666">0</span>
+              <div class="arrow-btn">
+                <arrow-btn @arrowClick='toCarView' color='#9B9B9B'></arrow-btn>
+              </div>
             </div>
           </div>
         </div>
-        <div class="person-name borderB1px person-item">
-          <span class="color333">姓名</span>
-          <input type="text" class="color999" placeholder="请输入姓名" v-model="houseHoldForm.name" maxlength="6"
-            @input="inputName" @blur='onNameBlur' confirm-type="done" @confirm='onConfirm'>
-        </div>
-        <div class="person-sex borderB1px person-item">
-          <span class="color333">性别</span>
-          <div class="tel-right">
-            <input type="text" class="color999" placeholder="请选择性别" v-model="houseHoldForm.sex">
-            <arrow-btn @arrowClick='chooseSex' color='#9B9B9B'></arrow-btn>
-          </div>
-        </div>
-        <div class="person-IDcard borderB1px person-item">
-          <span class="color333">身份证号</span>
-          <input type="text" class="color999" placeholder="请输入身份证号" v-model="houseHoldForm.idCard" @input="inputIdCard"
-            maxlength="18" @blur="onIdCardBlur" confirm-type="done" @confirm='onConfirm'>
-        </div>
-        <div class="person-tel person-item">
-          <span class="color333">手机号</span>
-          <input type="text" class="color999" placeholder="请输入手机号" v-model="houseHoldForm.phone" @input="inputPhone"
-            maxlength="11" confirm-type="done" @confirm='onConfirm' @blur="onPhoneBlur">
-          <!-- <div class="err" v-if="phoneErrFlag"><span>{{phoneErrMsg}}</span></div> -->
-        </div>
       </div>
-    </div>
-    <!-- 住户信息 -->
-    <div class="housePer-msg">
-      <div class="title-label">
-        住户信息
+      <!-- 新增住户按钮 -->
+      <div class="submit-btn">
+        <submit-btn btnText='确定' isActive></submit-btn>
       </div>
-      <!-- 住户信息列表 -->
-      <div class="housePer-lists">
-        <!-- 人员类型 -->
-        <div class="person-sex borderB1px person-item">
-          <span class="color333">人员类型</span>
-          <div class="tel-right">
-            <input type="text" class="color999" v-model="houseHoldForm.type" placeholder="请选择人员类型">
-            <arrow-btn @arrowClick='choosePersonType' color='#9B9B9B'></arrow-btn>
-          </div>
-        </div>
-        <!-- 车辆 -->
-        <div class="person-sex person-item">
-          <span class="color333">车辆</span>
-          <div class="tel-right">
-            <span class="color666">0</span>
-            <div class="arrow-btn">
-              <arrow-btn @arrowClick='toCarView' color='#9B9B9B'></arrow-btn>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- 新增住户按钮 -->
-    <div class="submit-btn">
-      <submit-btn btnText='确定' @submitClick='addHouserPerson' isActive></submit-btn>
-    </div>
+    </form>
   </div>
 </template>
 <script>
@@ -91,20 +93,32 @@ export default {
   data () {
     return {
       houseHoldForm: {
-        perPhoto: '../../static/images/timg.jpg',
+        perPhoto: '../../static/images/avator.png',
         name: '',
         sex: '',
         idCard: '',
         phone: '',
         type: ''
       }
-
     }
   },
   mounted () {
     setNavigationBarTitle('添加住户')
   },
   methods: {
+    // 选择人像照片
+    chooseImage () {
+      let that = this
+      wx.chooseImage({
+        count: 1,
+        sizeType: ['original', 'compressed'],
+        sourceType: ['album', 'camera'],
+        success (res) {
+          // tempFilePath可以作为img标签的src属性显示图片
+          that.houseHoldForm.perPhoto = res.tempFilePaths
+        }
+      })
+    },
     // 姓名输入框校验
     inputName () {
 
@@ -222,7 +236,6 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    // position: relative;
     align-items: center;
     height: 44.5px;
     line-height: 44.5px;

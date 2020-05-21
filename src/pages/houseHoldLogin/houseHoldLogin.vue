@@ -54,8 +54,8 @@
             <div :class="isInviteInputFocus ? 'borderBlue' : 'borderWhite'"></div>
           </div>
           <!-- 步骤一按钮 -->
-          <div class="step1-btn" style="margin-top: 135px">
-            <submit-btn btnText='下一步' isActive @submitClick='toStep2'></submit-btn>
+          <div class="step1-btn margin37" style="margin-top: 135px">
+            <button class="nextStepBtn" @click="toStep2">下一步</button>
           </div>
           <div class="account-login margin37">
             <span @click="accountLogin">账号密码登录</span>
@@ -113,20 +113,21 @@
         <div class="step3" v-if="isStep3">
           <!-- 步骤三添加图片 -->
           <div class="person-img">
-            <!-- style="background: url('../../static/images/default.png') no-repeat center center; background-size: 100% 100%;" -->
-            <div class="bg-img">
-              <div class="camera-bg" @click="chooseImage">
-                <!-- <input type="file"> -->
+            <!-- 展示头像 -->
+            <div class="houseHold-img" v-if="houseHoldLoginForm.houseHoldImg">
+              <img :src="houseHoldLoginForm.houseHoldImg" @click="previewImage">
+            </div>
+            <!-- 展示添加头像背景图 -->
+            <div class="bg-img" v-else>
+              <img :src="defaultImg">
+              <div class="camera-bg" @click="addPersonImg">
                 <img :src="cameraImg">
               </div>
             </div>
           </div>
           <!-- 步骤三文字备注 -->
           <div class="info-text margin37">
-            <!-- <div> -->
-              <!-- <span>*</span> -->
-              <span><text style="color: #F7483B">*</text>1、只能是本人照片</span>
-            <!-- </div> -->
+            <span><text style="color: #F7483B">*</text>1、只能是本人照片</span>
             <span>2、不可戴眼镜、帽子</span>
             <span>3、正面照</span>
           </div>
@@ -143,7 +144,9 @@
   </div>
 </template>
 <script>
-import { setNavigationBarTitle } from '../../api/wechat'
+import { setNavigationBarTitle, showToast } from '../../api/wechat'
+// import { chooseImage } from '../../utils/common'
+import { isName, isIdCard, isPhone } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
 export default {
   components: { submitBtn },
@@ -160,6 +163,10 @@ export default {
       isHouseHoldTelFocus: false,
       isHouseHoldIdCardFocus: false,
       isHouseHoldSexFocus: false,
+      houseHoldNameFlag: false,
+      houseHoldTelFlag: false,
+      houseHoldIdCardFlag: false,
+      houseHoldSexFlag: false,
       houseHoldLoginForm: {
         // 邀请码
         inviteCode: '',
@@ -169,6 +176,7 @@ export default {
         houseHoldSex: '',
         houseHoldImg: ''
       },
+      defaultImg: '../../static/images/default.png',
       cameraImg: '../../static/images/camera.png',
       choiceIcon: '../../static/images/choice.png'
     }
@@ -192,24 +200,45 @@ export default {
       this.isHouseHoldNameFocus = true
     },
     // 姓名输入框失焦
-    onHouseHoldNameBlur () {
+    onHouseHoldNameBlur (e) {
       this.isHouseHoldNameFocus = false
+      this.houseHoldLoginForm.houseHoldName = e.mp.detail.value
+      const nameResult = isName(this.houseHoldLoginForm.houseHoldName)
+      if (nameResult) {
+        showToast(nameResult)
+      } else {
+        this.houseHoldNameFlag = true
+      }
     },
     // 手机号聚焦
     onHouseHoldTelFocus () {
       this.isHouseHoldTelFocus = true
     },
     // 手机号失焦
-    onHouseHoldTelBlur () {
+    onHouseHoldTelBlur (e) {
       this.isHouseHoldTelFocus = false
+      this.houseHoldLoginForm.houseHoldTel = e.mp.detail.value
+      const telResult = isPhone(this.houseHoldLoginForm.houseHoldTel)
+      if (telResult) {
+        showToast(telResult)
+      } else {
+        this.houseHoldTelFlag = true
+      }
     },
     // 身份证号聚焦
     onHouseHoldIdCardFocus () {
       this.isHouseHoldIdCardFocus = true
     },
     // 身份证号失焦
-    onHouseHoldIdCardBlur () {
+    onHouseHoldIdCardBlur (e) {
       this.isHouseHoldIdCardFocus = false
+      this.houseHoldLoginForm.houseHoldIdCard = e.mp.detail.value
+      const idCardResult = isIdCard(this.houseHoldLoginForm.houseHoldIdCard)
+      if (idCardResult) {
+        showToast(idCardResult)
+      } else {
+        this.houseHoldIdCardFlag = true
+      }
     },
     // 性别聚焦
     onHouseHoldSexFocus () {
@@ -229,74 +258,57 @@ export default {
     // 性别失焦
     onHouseHoldSexBlur () {
       this.isHouseHoldSexFocus = false
-    },
-    // 去步骤三
-    toStep3 () {
-      console.log('step3页面')
-      this.isStep2 = false
-      this.isStep3 = true
+      if (this.houseHoldLoginForm.houseHoldSex) {
+        this.houseHoldSexFlag = true
+      } else {
+        showToast('请选择性别')
+      }
     },
     // 去步骤二
     toStep2 () {
-      console.log('step2页面')
-      this.isStep1 = false
-      this.isStep2 = true
+      if (this.houseHoldLoginForm.inviteCode) {
+        this.isStep1 = false
+        this.isStep2 = true
+      } else {
+        showToast('请输入邀请码')
+      }
+    },
+    // 去步骤三
+    toStep3 () {
+      if (!this.houseHoldNameFlag) {
+        showToast('请检查姓名是否正确')
+      } else if (!this.houseHoldTelFlag) {
+        showToast('请检查手机号是否正确')
+      } else if (!this.houseHoldIdCardFlag) {
+        showToast('请检查身份证号是否正确')
+      } else if (!this.houseHoldSexFlag) {
+        showToast('请选择性别')
+      } else {
+        this.isStep2 = false
+        this.isStep3 = true
+      }
     },
     // 添加人像
     addPersonImg () {
-      console.log('添加人像')
-    },
-    // 邀请码成功
-    inviteCodeFormSubmit () {
-      console.log('邀请码登录')
-    },
-    // 上传图片
-    chooseImage () {
       let that = this
       wx.chooseImage({
         count: 1,
         sizeType: ['original', 'compressed'],
         sourceType: ['album', 'camera'],
         success (res) {
-          // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
+          // tempFilePath可以作为img标签的src属性显示图片
           that.houseHoldLoginForm.houseHoldImg = res.tempFilePaths
-          wx.showLoading({
-            title: '上传中...'
-          })
-          // 上传操作
-          that.upLoad(that.houseHoldLoginForm.houseHoldImg)
-        },
-        fail: function () {
-          console.log('上传照片失败')
-        },
-        complete: function () {
-          console.log('上传照片成功')
         }
       })
+      console.log('添加人像')
     },
-    // 上传图片
-    upLoad (imgPath) {
-      let that = this
-      wx.uploadFile({
-        url: '上传接口',
-        filePath: that.houseHoldLoginForm.houseHoldImg,
-        name: 'file',
-        success (res) {
-          console.log('上传成功')
-          console.log(that.houseHoldLoginForm.houseHoldImg)
-        },
-        fail (res) {
-          console.log(res)
-          wx.hideLoading()
-          wx.showModal({
-            title: '错误提示',
-            content: '上传图片失败',
-            success (res) {
-              console.log(res)
-            }
-          })
-        }
-      })
+    // 邀请码成功
+    inviteCodeFormSubmit () {
+      if (this.houseHoldLoginForm.houseHoldImg) {
+        console.log('邀请码登录')
+      } else {
+        showToast('请上传人像照片')
+      }
     },
     // 预览图片
     previewImage (e) {
@@ -312,7 +324,7 @@ export default {
             })
           } else {
             // 选择删除
-            that.that.houseHoldLoginForm.houseHoldImg = ''
+            that.houseHoldLoginForm.houseHoldImg = ''
           }
         }
       })
@@ -416,6 +428,19 @@ export default {
   .household-login-box {
     margin-top: 80px;
     .login-form {
+      .step1-btn,
+      .step2-btn {
+        margin-bottom: 20px;
+        .nextStepBtn {
+          width: 100%;
+          height: 45px;
+          border-radius: 22.5px;
+          font-size: 16px;
+          color: rgba(255, 255, 255, 1);
+          line-height: 45px;
+          background: rgba(102, 125, 250, 1);
+        }
+      }
       // 步骤一
       .step1 {
         display: flex;
@@ -451,18 +476,6 @@ export default {
             }
           }
         }
-        .step2-btn {
-          margin-bottom: 20px;
-          .nextStepBtn {
-            width: 100%;
-            height: 45px;
-            border-radius: 22.5px;
-            font-size: 16px;
-            color: rgba(255, 255, 255, 1);
-            line-height: 45px;
-            background: rgba(102, 125, 250, 1);
-          }
-        }
       }
       .step3 {
         width: 100%;
@@ -477,6 +490,14 @@ export default {
           margin: 0 auto;
           background: rgba(237, 239, 250, 1);
           border-radius: 3px;
+          .houseHold-img {
+            img {
+              width: 100%;
+              height: 100%;
+            }
+            width: 100%;
+            height: 100%;
+          }
           .bg-img {
             display: flex;
             flex-direction: column;
@@ -484,9 +505,11 @@ export default {
             justify-content: center;
             width: 80px;
             height: 97px;
-            background: url('~@/assets/images/default.png') no-repeat center
-              center;
-            background-size: 100% 100%;
+            img {
+              position: absolute;
+              width: 80px;
+              height: 97px;
+            }
             .camera-bg {
               display: flex;
               flex-direction: column;

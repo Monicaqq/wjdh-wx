@@ -3,6 +3,7 @@
     <!-- 二维码展示 -->
     <div class="qr-code">
       <img :src="qrCode" mode='aspectFit'>
+
       <span v-if="!isOvertime">有效期24小时</span>
       <span v-if="isOvertime">已过期</span>
     </div>
@@ -33,7 +34,7 @@
     </div>
     <!-- 保存二维码按钮 -->
     <div class="qrcode-btn" v-if="isOvertime">
-      <submit-btn btnText='保存二维码' isActive></submit-btn>
+      <submit-btn btnText='保存二维码' isActive @submitClick="saveQrCode"></submit-btn>
     </div>
   </div>
 </template>
@@ -53,13 +54,12 @@ export default {
       idCard: '321023192003330003',
       isOvertime: true
     }
+  },
+  methods: {
+    saveQrCode () {
+      console.log('保存二维码至手机相册')
+    }
   }
-  // computed: {
-  //   idCardHidden () {
-  //     let idcard = hidden(this.idCard, 3, 3)
-  //     return idcard
-  //   }
-  // }
 }
 </script>
 <style lang="scss" scoped>

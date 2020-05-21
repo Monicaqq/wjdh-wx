@@ -9,12 +9,13 @@
     </div>
     <!-- 提交手机号按钮 -->
     <div class="tel-commit">
-      <submit-btn btnText='确定' @submit='submitPhone' isActive></submit-btn>
+      <submit-btn btnText='确定' @submitClick='submitPhone' isActive></submit-btn>
     </div>
   </div>
 </template>
 <script>
 import { setNavigationBarTitle } from '../../api/wechat'
+import { isPhone } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
 export default {
   components: { submitBtn },
@@ -39,19 +40,11 @@ export default {
     // 失去焦点
     onBlur (e) {
       this.phone = e.mp.detail.value
-      let telReg = /^1[3-9][0-9]{9}$/
-      if (this.phone.length === 0) {
-        this.phoneErrMsg = '请输入手机号'
+      const phoneResult = isPhone(this.phone)
+      if (phoneResult) {
+        // showToast(phoneResult)
+        this.phoneErrMsg = phoneResult
         this.phoneErrFlag = true
-        return false
-      } else if (!telReg.test(this.phone)) {
-        this.phoneErrMsg = '请输入正确的手机号'
-        this.phoneErrFlag = true
-        this.phone = ''
-        return false
-      } else {
-        this.phoneErrMsg = ''
-        this.phoneErrFlag = false
       }
     },
     // 虚拟键盘 点击 '完成'触发
@@ -69,7 +62,9 @@ export default {
     },
     // 提交手机号
     submitPhone () {
-      console.log('提交手机号')
+      if (!this.phoneErrFlag) {
+        console.log('提交手机号')
+      }
     }
   }
 }
@@ -100,7 +95,7 @@ export default {
       position: absolute;
       bottom: -32px;
       right: 0;
-      color: #CC3333;
+      color: #cc3333;
     }
   }
   .tel-commit {

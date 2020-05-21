@@ -2,18 +2,18 @@
   "pages": [
     "pages/houseHoldLogin/main",
     "pages/index/main",
-    
+    "pages/invitePerson/main",
+    "pages/addPerson/main",
     "pages/ownerLogin/main",
     "pages/owner/main",
     "pages/houseHold/main",
-    "pages/addPerson/main",
+    
     "pages/repairApply/main",
     "pages/repairDetail/main",
-    "pages/invitePerson/main",
     "pages/inviteDetail/main",
     "pages/infoDetail/main",
-    "pages/cars/main",
-    "pages/telphone/main"
+    "pages/telphone/main",
+    "pages/cars/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

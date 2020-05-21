@@ -15,7 +15,7 @@
     <div class="cars-input">
       <div class="car-msg">
         <!-- 选择车辆类型, 默认列表第一个 -->
-        <div class="car-type">{{carsType[0]}}</div>
+        <div class="car-type" @click="chooseCarType">{{carsType}}</div>
         <!-- 点击图标, 展示所有类型, 供选择 -->
         <div class="choose-icon">
           <div class="triangle"></div>
@@ -30,13 +30,14 @@
     </div>
     <!-- 添加车辆提交按钮 -->
     <div class="tel-commit">
-      <submit-btn btnText='增加车辆' @submit='submitCarMsg' isActive></submit-btn>
+      <submit-btn btnText='增加车辆' @submitClick='submitCarMsg' isActive></submit-btn>
     </div>
   </div>
 </template>
 <script>
 import { setNavigationBarTitle } from '../../api/wechat'
 import submitBtn from '@/components/submitBtn'
+import { isCarNum, carNumFormat } from '../../utils/index'
 export default {
   components: { submitBtn },
   mounted () {
@@ -48,14 +49,14 @@ export default {
         [
           {
             carsType: '普通乘用车',
-            carsNumber: '苏A 12345'
+            carsNumber: '苏A12345'
           },
           {
             carsType: '货车',
-            carsNumber: '苏A 54321'
+            carsNumber: '苏A54321'
           }
         ],
-      carsType: ['普通乘用车', '大货车', '公用车'],
+      carsType: '普通乘用车',
       addCarFlag: false,
       carNum: '',
       carNumErrFlag: false,
@@ -74,20 +75,27 @@ export default {
     // 输入框失去焦点, 验证车牌号,
     onBlur (e) {
       this.carNum = e.mp.detail.value
-      const carReg = /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$/
-      if (this.carNum.length === 0) {
-        this.carNumErrMsg = '请输入车牌号'
+      const carResult = isCarNum(this.carNum)
+      if (carResult) {
+        this.carNumErrMsg = carResult
         this.carNumErrFlag = true
-        return false
-      } else if (!carReg.test(this.carNum)) {
-        this.carNumErrMsg = '请输入正确车牌号'
-        this.carNumErrFlag = true
-        this.carNum = ''
-        return false
       } else {
-        this.carNumErrMsg = ''
-        this.carNumErrFlag = false
+        this.carNum = carNumFormat(this.carNum)
       }
+    },
+    // 选择车辆类型
+    chooseCarType (res) {
+      let that = this
+      wx.showActionSheet({
+        itemList: ['普通乘用车', '大货车', '公用车'],
+        success (res) {
+          if (res.tapIndex === 0) {
+            that.carsType = '普通乘用车'
+          } else {
+            that.carsType = '大货车'
+          }
+        }
+      })
     },
     // 对输入框关键字赋值
     setValue (v) {
@@ -99,7 +107,9 @@ export default {
     },
     // 增加车辆按钮
     submitCarMsg () {
-      console.log('提交车辆')
+      if (this.carsType && this.carNum && !this.carNumErrFlag) {
+        console.log('提交车辆')
+      }
     }
   }
 }
@@ -142,7 +152,7 @@ export default {
         .err {
           position: absolute;
           right: 0;
-          color: #CC3333;
+          color: #cc3333;
         }
       }
     }
