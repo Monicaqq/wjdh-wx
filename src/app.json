@@ -2,13 +2,11 @@
   "pages": [
     "pages/index/main",
     "pages/houseHoldLogin/main",
-    
     "pages/invitePerson/main",
     "pages/addPerson/main",
     "pages/ownerLogin/main",
     "pages/owner/main",
     "pages/houseHold/main",
-    
     "pages/repairApply/main",
     "pages/repairDetail/main",
     "pages/inviteDetail/main",
