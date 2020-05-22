@@ -1,5 +1,8 @@
 <template>
   <div class="owner-login-container">
+    <div class="nav-bar">
+      <van-nav-bar title-class='nav-title' title="登录"></van-nav-bar>
+    </div>
     <div class="login-title">
       欢迎登陆
     </div>
@@ -7,16 +10,16 @@
       <div class="login-input">
         <div class="account-input">
           <span>账号/手机号</span>
-          <input type="text"  placeholder-style="color: #BCC2E1" v-model="loginForm.account" @focus="onAccountFocus" @blur="onAccountBlur" name="account"
-            placeholder="请输入">
+          <input type="text" placeholder-style="color: #BCC2E1" v-model="loginForm.account" @focus="onAccountFocus"
+            @blur="onAccountBlur" name="account" placeholder="请输入">
         </div>
         <!-- 输入框聚焦失焦下划线样式 -->
         <div :class="isAccountFocus ? 'borderBlue' : 'borderWhite'">
         </div>
         <div class="password-input">
           <span>密码/身份证后4位</span>
-          <input type="text" password  placeholder-style="color: #BCC2E1" v-model="loginForm.password" @focus="onPasswdFocus" @blur="onPasswdBlur"
-            name="password" placeholder="请输入">
+          <input type="text" password placeholder-style="color: #BCC2E1" v-model="loginForm.password"
+            @focus="onPasswdFocus" @blur="onPasswdBlur" name="password" placeholder="请输入">
         </div>
         <!-- 输入框聚焦失焦下划线样式 -->
         <div :class="isPasswdFocus ? 'borderBlue' : 'borderWhite'">
@@ -39,12 +42,11 @@
   </div>
 </template>
 <script>
-import { setNavigationBarTitle } from '../../api/wechat'
 import submitBtn from '@/components/submitBtn'
 export default {
   components: { submitBtn },
   mounted () {
-    setNavigationBarTitle('登录')
+    Object.assign(this.$data, this.$options.data())
   },
   data () {
     return {
@@ -59,7 +61,10 @@ export default {
   computed: {
     ActiveLoginBtn () {
       if (this.loginForm.account && this.loginForm.password) {
+        // that.ActiveLoginBtn = true
         return true
+      } else {
+        return false
       }
     }
   },
@@ -79,7 +84,9 @@ export default {
     },
     // 账号密码登录
     formSubmit () {
-      console.log('用户名密码登录')
+      if (this.loginForm.account && this.loginForm.password) {
+        console.log('用户名密码登录')
+      }
     },
 
     // 邀请码登录
@@ -128,11 +135,11 @@ export default {
         margin-top: 31px;
       }
       .borderBlue {
-        height: 1px;
+        height: 1.2px;
         background: #667dfa;
       }
       .borderWhite {
-        height: 1px;
+        height: 1.2px;
         background: #d2d7f0;
       }
     }

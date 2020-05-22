@@ -1,10 +1,11 @@
 <template>
   <div class="repair-apply-container">
+    <nav-bar navTitle='报修'></nav-bar>
     <form @submit="applyRepair">
       <div class="apply-type">
         <span>类型</span>
         <div class="repair-type">
-          <input type="text" v-model="repairType" @click="chooseType">
+          <input type="text" v-model="repairType" @click="chooseType" disabled>
           <!-- <span>公共设施</span> -->
           <arrow-btn color='#D2D7F0' @arrowClick='chooseType'></arrow-btn>
         </div>
@@ -24,11 +25,11 @@
 <script>
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
-import { setNavigationBarTitle } from '../../api/wechat'
+import navBar from '@/components/navBar'
 export default {
-  components: { arrowBtn, submitBtn },
+  components: { arrowBtn, submitBtn, navBar },
   mounted () {
-    setNavigationBarTitle('报修')
+    Object.assign(this.$data, this.$options.data())
   },
   data () {
     return {
@@ -96,6 +97,9 @@ export default {
       background: #f7f8fa;
       padding: 5px 10px;
       line-height: 30px;
+      input {
+        height: 20px;
+      }
     }
   }
   .submit-btn {

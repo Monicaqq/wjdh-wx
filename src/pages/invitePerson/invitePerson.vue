@@ -1,5 +1,6 @@
 <template>
   <div class="invite-person-container">
+    <nav-bar navTitle='邀请'></nav-bar>
     <div class="title-label">
       被邀人信息
     </div>
@@ -14,14 +15,15 @@
         <div class="person-sex borderB1px person-item">
           <span class="color333">性别</span>
           <div class="tel-right">
-            <input type="text" class="color999" placeholder="请选择性别" v-model="invitedPersonMsg.sex" @click="chooseSex">
+            <input type="text" class="color999" placeholder="请选择性别" v-model="invitedPersonMsg.sex" @click="chooseSex"
+              disabled>
             <arrow-btn @arrowClick='chooseSex' color='#9B9B9B'></arrow-btn>
           </div>
         </div>
         <div class="person-IDcard borderB1px person-item">
           <span class="color333">身份证号</span>
-          <input type="text" class="color999" placeholder="请输入身份证号" v-model="invitedPersonMsg.idCard" @input="inputIdCard" maxlength="18"
-            @blur="onIdCardBlur" confirm-type="done" @confirm='onConfirm'>
+          <input type="text" class="color999" placeholder="请输入身份证号" v-model="invitedPersonMsg.idCard"
+            @input="inputIdCard" maxlength="18" @blur="onIdCardBlur" confirm-type="done" @confirm='onConfirm'>
         </div>
         <div class="person-tel person-item">
           <span class="color333">手机号</span>
@@ -37,14 +39,15 @@
   </div>
 </template>
 <script>
-import { setNavigationBarTitle, showToast } from '../../api/wechat'
+import { showToast } from '../../api/wechat'
 import { isName, isIdCard, isPhone, hidden } from '../../utils/index'
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
+import navBar from '@/components/navBar'
 export default {
-  components: { arrowBtn, submitBtn },
+  components: { arrowBtn, submitBtn, navBar },
   mounted () {
-    setNavigationBarTitle('邀请')
+    Object.assign(this.$data, this.$options.data())
   },
   data () {
     return {
@@ -162,6 +165,9 @@ export default {
     height: 44.5px;
     line-height: 44.5px;
     text-align: right;
+    input {
+      height: 100%;
+    }
   }
   .color999 {
     color: #999;

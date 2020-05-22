@@ -1,5 +1,6 @@
 <template>
   <div class="repair-detail-container">
+    <nav-bar navTitle='详情'></nav-bar>
     <!-- 维修详情头部区域 -->
     <div class="repair-detail-header">
       <!-- 左侧维修状态 -->
@@ -62,12 +63,11 @@
   </div>
 </template>
 <script>
-import { setNavigationBarTitle } from '../../api/wechat'
 import arrowBtn from '@/components/arrowBtn'
+import navBar from '@/components/navBar'
 export default {
-  components: { arrowBtn },
+  components: { arrowBtn, navBar },
   mounted () {
-    setNavigationBarTitle('详情')
   },
   data () {
     return {

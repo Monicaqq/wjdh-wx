@@ -1,5 +1,6 @@
 <template>
   <div class="invite-detail-container">
+     <nav-bar navTitle='邀请'></nav-bar>
     <!-- 二维码展示 -->
     <div class="qr-code">
       <img :src="qrCode" mode='aspectFit'>
@@ -39,13 +40,12 @@
   </div>
 </template>
 <script>
-import { setNavigationBarTitle } from '../../api/wechat'
 // import hidden from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
+import navBar from '@/components/navBar'
 export default {
-  components: { submitBtn },
+  components: { submitBtn, navBar },
   mounted () {
-    setNavigationBarTitle('邀请')
     // this.idCard = hidden(this.idCard, 3, 3)
   },
   data () {

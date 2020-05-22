@@ -1,6 +1,7 @@
 <template>
   <!-- 通知详情界面 -->
   <div class="info-detail-container">
+    <nav-bar navTitle='详细'></nav-bar>
     <!-- 通知详情标题 -->
     <div class="info-title">
       <span>标题</span>
@@ -19,11 +20,9 @@
   </div>
 </template>
 <script>
-import { setNavigationBarTitle } from '../../api/wechat'
+import navBar from '@/components/navBar'
 export default {
-  mounted () {
-    setNavigationBarTitle('详细')
-  }
+  components: { navBar }
 }
 </script>
 <style lang="scss" scoped>

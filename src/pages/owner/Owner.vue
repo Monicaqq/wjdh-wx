@@ -1,19 +1,19 @@
 <template>
   <!-- 个人信息界面 -->
   <div class="person-container">
+    <nav-bar navTitle='个人信息'></nav-bar>
     <!-- 个人信息 + 住户信息 -->
     <person-msg isPerson></person-msg>
   </div>
 </template>
 <script>
-import { setNavigationBarTitle } from '../../api/wechat'
 import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import personMsg from '@/components/personMsg'
+import navBar from '@/components/navBar'
 export default {
-  components: { avatorImg, arrowBtn, personMsg },
+  components: { avatorImg, arrowBtn, personMsg, navBar },
   mounted () {
-    setNavigationBarTitle('个人信息')
   },
   data () {
     return {
@@ -24,6 +24,10 @@ export default {
     }
   },
   methods: {
+    // 返回上一页
+    onClickLeft () {
+      this.$router.go(-1)
+    },
     // 跳转至手机号界面
     toTelView () {
       this.$router.push('../../pages/telphone/main')

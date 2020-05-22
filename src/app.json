@@ -1,9 +1,10 @@
 {
   "pages": [
-    "pages/index/main",
     "pages/houseHoldLogin/main",
-    "pages/invitePerson/main",
+    "pages/index/main",
+    
     "pages/addPerson/main",
+    "pages/invitePerson/main",
     "pages/ownerLogin/main",
     "pages/owner/main",
     "pages/houseHold/main",
@@ -18,12 +19,12 @@
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "仙林悦城",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "navigationStyle": "custom"
   },
   "usingComponents": {
     "van-icon": "/vant-weapp/dist/icon/index",
-    "van-tab": "/vant-weapp/dist/tab/index",
-    "van-tabs": "/vant-weapp/dist/tabs/index",
+    "van-nav-bar": "/vant-weapp/dist/nav-bar/index",
     "van-field": "/vant-weapp/dist/field/index",
     "van-notify": "/vant-weapp/dist/notify/index"
   }

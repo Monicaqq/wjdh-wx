@@ -1,6 +1,7 @@
 <template>
   <!-- 手机号页面 -->
   <div class="telphone-container">
+    <nav-bar navTitle='手机号'></nav-bar>
     <div class="tel-input">
       <span>手机号</span>
       <input type="text" v-model="phone" @input="inputPhone" maxlength="11" confirm-type="done" @confirm='onConfirm'
@@ -14,13 +15,13 @@
   </div>
 </template>
 <script>
-import { setNavigationBarTitle } from '../../api/wechat'
 import { isPhone } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
+import navBar from '@/components/navBar'
 export default {
-  components: { submitBtn },
+  components: { submitBtn, navBar },
   mounted () {
-    setNavigationBarTitle('手机号')
+    Object.assign(this.$data, this.$options.data())
   },
   data () {
     return {
@@ -30,6 +31,10 @@ export default {
     }
   },
   methods: {
+    // 返回上一页
+    onClickLeft () {
+      this.$router.go(-1)
+    },
     inputPhone (e) {
       this.phoneErrMsg = ''
       let filtered = e.target.value.replace(/^0|[^\d]/g, '')
@@ -89,6 +94,7 @@ export default {
     border-bottom: 0.5px solid #d2d7f0;
     line-height: 44.5px;
     input {
+      height: 100%;
       text-align: right;
     }
     .err {

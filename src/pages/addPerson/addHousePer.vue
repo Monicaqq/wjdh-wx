@@ -1,6 +1,7 @@
 <template>
   <!-- 个人信息组件 -->
   <div class="person-msg-container">
+    <nav-bar navTitle='添加住户'></nav-bar>
     <form @submit="addHouserPerson">
       <div class="person-msg">
         <div class="title-label">
@@ -10,8 +11,14 @@
         <div class="person-lists">
           <div class="person-photo borderB1px person-item">
             <span class="color333">照片</span>
-            <div class="photo-right" @click="chooseImage">
-              <avator-img round :src='houseHoldForm.perPhoto'></avator-img>
+            <div class="photo-right">
+              <!-- 已选中图片 -->
+              <div v-if='houseHoldForm.perPhoto' @click="previewImage">
+                <avator-img round :src='houseHoldForm.perPhoto'></avator-img>
+              </div>
+              <div v-else @click="chooseImage">
+                <avator-img round :src='defaultImg'></avator-img>
+              </div>
               <div class="arrow-btn">
                 <arrow-btn @arrowClick='addAvator' color='#9B9B9B'></arrow-btn>
               </div>
@@ -25,7 +32,8 @@
           <div class="person-sex borderB1px person-item">
             <span class="color333">性别</span>
             <div class="tel-right">
-              <input type="text" class="color999" placeholder="请选择性别" @click="chooseSex" v-model="houseHoldForm.sex">
+              <input type="text" class="color999" placeholder="请选择性别" @click="chooseSex" v-model="houseHoldForm.sex"
+                disabled>
               <arrow-btn @arrowClick='chooseSex' color='#9B9B9B'></arrow-btn>
             </div>
           </div>
@@ -53,17 +61,17 @@
             <span class="color333">人员类型</span>
             <div class="tel-right">
               <input type="text" class="color999" @click="choosePersonType" v-model="houseHoldForm.type"
-                placeholder="请选择人员类型">
+                placeholder="请选择人员类型" disabled>
               <arrow-btn @arrowClick='choosePersonType' color='#9B9B9B'></arrow-btn>
             </div>
           </div>
           <!-- 车辆 -->
           <div class="person-sex person-item">
             <span class="color333">车辆</span>
-            <div class="tel-right">
+            <div class="tel-right" @click="toCarView">
               <span class="color666">0</span>
               <div class="arrow-btn">
-                <arrow-btn @arrowClick='toCarView' color='#9B9B9B'></arrow-btn>
+                <arrow-btn color='#9B9B9B'></arrow-btn>
               </div>
             </div>
           </div>
@@ -77,12 +85,13 @@
   </div>
 </template>
 <script>
-import { setNavigationBarTitle, showToast } from '../../api/wechat'
+import { showToast } from '../../api/wechat'
 import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
+import navBar from '@/components/navBar'
 export default {
-  components: { avatorImg, arrowBtn, submitBtn },
+  components: { avatorImg, arrowBtn, submitBtn, navBar },
   props: {
     personMsg: {},
     isPerson: {
@@ -92,8 +101,9 @@ export default {
   },
   data () {
     return {
+      defaultImg: '../../static/images/avator.png',
       houseHoldForm: {
-        perPhoto: '../../static/images/avator.png',
+        perPhoto: '',
         name: '',
         sex: '',
         idCard: '',
@@ -103,7 +113,7 @@ export default {
     }
   },
   mounted () {
-    setNavigationBarTitle('添加住户')
+    Object.assign(this.$data, this.$options.data())
   },
   methods: {
     // 选择人像照片
@@ -116,6 +126,25 @@ export default {
         success (res) {
           // tempFilePath可以作为img标签的src属性显示图片
           that.houseHoldForm.perPhoto = res.tempFilePaths
+        }
+      })
+    },
+    // 预览图片
+    previewImage (e) {
+      let that = this
+      wx.showActionSheet({
+        itemList: ['预览', '删除'],
+        success (res) {
+          // 选择预览
+          if (res.tapIndex === 0) {
+            wx.previewImage({
+              current: e.currentTarget.id,
+              urls: that.houseHoldForm.perPhoto
+            })
+          } else {
+            // 选择删除
+            that.houseHoldForm.perPhoto = ''
+          }
         }
       })
     },
@@ -240,6 +269,9 @@ export default {
     height: 44.5px;
     line-height: 44.5px;
     text-align: right;
+    input {
+      height: 100%;
+    }
   }
   .color999 {
     color: #999;

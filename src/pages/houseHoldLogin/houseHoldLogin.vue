@@ -1,5 +1,8 @@
 <template>
   <div class="household-login-container">
+    <div class="nav-bar">
+      <van-nav-bar title-class='nav-title' title="登录"></van-nav-bar>
+    </div>
     <!-- 步骤条视图展示 -->
     <div class="steps-container">
       <!-- 步骤条上方图标展示 -->
@@ -95,7 +98,7 @@
                 <span>性别</span>
                 <input type="text" name="houseHoldSex" placeholder-style="color: #BCC2E1"
                   v-model="houseHoldLoginForm.houseHoldSex" @focus="onHouseHoldSexFocus" @blur="onHouseHoldSexBlur"
-                  placeholder="请选择性别">
+                  placeholder="请选择性别" disabled @click="chooseSex">
               </div>
               <div :class="isHouseHoldSexFocus ? 'borderBlue' : 'borderWhite'"></div>
             </div>
@@ -144,14 +147,14 @@
   </div>
 </template>
 <script>
-import { setNavigationBarTitle, showToast } from '../../api/wechat'
+import { showToast } from '../../api/wechat'
 // import { chooseImage } from '../../utils/common'
 import { isName, isIdCard, isPhone } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
 export default {
   components: { submitBtn },
   mounted () {
-    setNavigationBarTitle('登录')
+    Object.assign(this.$data, this.$options.data())
   },
   data () {
     return {
@@ -243,17 +246,6 @@ export default {
     // 性别聚焦
     onHouseHoldSexFocus () {
       this.isHouseHoldSexFocus = true
-      let that = this
-      wx.showActionSheet({
-        itemList: ['男', '女'],
-        success (res) {
-          if (res.tapIndex === 0) {
-            that.houseHoldLoginForm.houseHoldSex = '男'
-          } else {
-            that.houseHoldLoginForm.houseHoldSex = '女'
-          }
-        }
-      })
     },
     // 性别失焦
     onHouseHoldSexBlur () {
@@ -263,6 +255,22 @@ export default {
       } else {
         showToast('请选择性别')
       }
+    },
+    // 选择性别
+    chooseSex () {
+      this.isHouseHoldSexFocus = true
+      let that = this
+      wx.showActionSheet({
+        itemList: ['男', '女'],
+        success (res) {
+          if (res.tapIndex === 0) {
+            that.houseHoldLoginForm.houseHoldSex = '男'
+          } else {
+            that.houseHoldLoginForm.houseHoldSex = '女'
+          }
+          that.isHouseHoldSexFocus = false
+        }
+      })
     },
     // 去步骤二
     toStep2 () {
@@ -320,7 +328,7 @@ export default {
           if (res.tapIndex === 0) {
             wx.previewImage({
               current: e.currentTarget.id,
-              urls: that.files
+              urls: that.houseHoldLoginForm.houseHoldImg
             })
           } else {
             // 选择删除
@@ -346,11 +354,11 @@ export default {
     margin-right: 37px;
   }
   .borderBlue {
-    height: 1px;
+    height: 1.2px;
     background: #667dfa;
   }
   .borderWhite {
-    height: 1px;
+    height: 1.2px;
     background: #d2d7f0;
   }
   .steps-container {
@@ -371,7 +379,6 @@ export default {
     .steps-icon-container {
       display: flex;
       flex-direction: row;
-      // justify-content: space-between;
       align-items: center;
       margin: 0 auto;
       .icon-container {
@@ -379,23 +386,23 @@ export default {
         flex-direction: row;
         align-items: center;
         justify-content: center;
+        // box-sizing: border-box;
         .icon-active {
           display: flex;
           flex-direction: column;
           justify-content: center;
           align-items: center;
+          box-sizing: border-box;
+          width: 20px;
+          height: 20px;
+          background: rgba(255, 255, 255, 1);
+          border: 1px solid rgba(102, 125, 250, 1);
+          border-radius: 50%;
           img {
             width: 14px;
             height: 14px;
           }
         }
-      }
-      .icon-active {
-        width: 18px;
-        height: 18px;
-        background: rgba(255, 255, 255, 1);
-        border: 1px solid rgba(102, 125, 250, 1);
-        border-radius: 50%;
       }
       .icon-unactive {
         width: 15px;
@@ -411,7 +418,6 @@ export default {
       margin-top: 10px;
     }
     .link-dot {
-      // width: 100%;
       width: 80px;
       height: 1px;
       border-bottom: 1px dotted rgba(102, 125, 250, 1);

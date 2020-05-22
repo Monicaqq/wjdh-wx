@@ -12,7 +12,7 @@ export default {
 
     let logs
     if (mpvuePlatform === 'my') {
-      logs = mpvue.getStorageSync({key: 'logs'}).data || []
+      logs = mpvue.getStorageSync({ key: 'logs' }).data || []
       logs.unshift(Date.now())
       mpvue.setStorageSync({
         key: 'logs',
@@ -30,9 +30,19 @@ export default {
 }
 </script>
 
-<style>
-page, html, body {
+<style lang='scss'>
+page,
+html,
+body {
   height: 100%;
+}
+.nav-bar {
+  .nav-title {
+    font-size: 18px;
+    font-family: PingFang SC;
+    font-weight: bold;
+    color: rgba(51, 51, 51, 1);
+  }
 }
 .container {
   height: 100%;

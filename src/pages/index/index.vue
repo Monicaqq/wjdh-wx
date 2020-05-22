@@ -1,9 +1,11 @@
 <template>
   <!-- 首页 -->
   <div class="home-container">
+    <div class="nav-bar">
+      <van-nav-bar title-class='nav-title' title="仙林悦城"></van-nav-bar>
+    </div>
+    <!-- <van-nav-bar class="nav-bar" title=""></van-nav-bar> -->
     <!-- 头部用户信息 -->
-    <!-- <div class="home-bg"
-      style="background: url('../../static/images/bg.png') no-repeat top; background-position: 0 -5px"> -->
     <div>
       <!-- 背景图片 -->
       <img :src="bgImg">
@@ -17,7 +19,7 @@
         <div class="user-info">
           <div class="user-name-role">
             <div class="name">王逸飞</div>
-            <div class="role"><span>户主</span></div>
+            <div class="role"><span>{{role}}</span></div>
           </div>
           <div class="user-address">仙林悦城A区3栋2单元102室仙林悦城A区3栋2单元102室</div>
         </div>
@@ -58,9 +60,7 @@
                     <img :src="female" v-if='item.personSex == 0'>
                     <img :src="male" v-if='item.personSex == 1'>
                   </div>
-                  <div class="person-role">
-                    <div :class="item.personRole == 3001 ? 'hz' : 'wy'">{{item.personRole}}
-                    </div>
+                  <div :class="['person-role', item.personRole == 3001 ? 'hz' : 'wy']">{{item.personRole}}
                   </div>
                 </div>
                 <div class="person-tel">{{item.telephone}}</div>
@@ -141,17 +141,24 @@
 </template>
 
 <script>
-// import Dialog from 'path/to/@vant/weapp/dist/icon/dialog';
 import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
 import tabLists from '@/components/tabLists'
+import { getOwnerData } from '../../api/index'
 export default {
   components: { avatorImg, arrowBtn, submitBtn, tabLists },
+  mounted () {
+    if (!this.isOwner) {
+      this.currentTab = 2
+      this.role = '业主'
+    }
+  },
   data () {
     return {
       // 是否是户主
       isOwner: true,
+      role: '户主',
       // 是否具有邀请权限
       hasInviteRole: true,
       bgImg: '../../static/images/bg.png',
@@ -279,6 +286,13 @@ export default {
     },
     // 跳转至个人信息页面
     toPersonMsg () {
+      getOwnerData()
+        .then(res => {
+          console.log(res)
+        })
+        .catch(() => {
+          console.log('请求失败')
+        })
       this.$router.push('../../pages/owner/main')
       console.log('去户主个人信息界面')
     },
@@ -394,7 +408,7 @@ export default {
       position: absolute;
       right: 15px;
       top: 52.5px;
-      z-index: 100
+      z-index: 100;
     }
   }
   // 通知样式
@@ -409,7 +423,6 @@ export default {
       display: flex;
       flex-direction: row;
       position: relative;
-      // background: ('../../static/images/info.png');
       .info-icon {
         width: 32.5px;
         height: 12px;
@@ -507,19 +520,18 @@ export default {
             .person-role {
               width: 35px;
               height: 15px;
-              // background: rgba(255, 236, 203, 1);
               border-radius: 5px;
               font-size: 10.5px;
               line-height: 15px;
               text-align: center;
-              .hz {
-                background: rgba(255, 236, 203, 1);
-                color: rgba(158, 87, 25, 1);
-              }
-              .wy {
-                background: rgba(223, 245, 236, 1);
-                color: rgba(7, 132, 81, 1);
-              }
+            }
+            .hz {
+              background: rgba(255, 236, 203, 1);
+              color: rgba(158, 87, 25, 1);
+            }
+            .wy {
+              background: rgba(223, 245, 236, 1);
+              color: rgba(7, 132, 81, 1);
             }
           }
           .person-tel {

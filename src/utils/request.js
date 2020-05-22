@@ -1,4 +1,4 @@
-import { response } from 'express'
+// import { response } from 'express'
 
 // 初始化 flyio 对象
 function createFly () {
@@ -9,7 +9,10 @@ function createFly () {
     return null
   }
 }
-
+// 处理异常
+function handleError (err) {
+  console.log(err)
+}
 // 处理 get 请求
 export function get (url, params = {}, showError = true) {
   const fly = createFly()
@@ -17,21 +20,22 @@ export function get (url, params = {}, showError = true) {
     return new Promise((resolve, reject) => {
       fly.get(url, params)
         .then(response => {
-          if (response && response.data && response.data.error_code === 0) {
-            resolve(response)
-          } else {
-            if (showError) {
-              const msg = (response && response.data && response.data.msg) || '请求失败'
-              mpvue.showToast({
-                title: msg,
-                duration: 2000
-              })
-            }
-          }
+          // if (response && response.data && response.data.error_code === 0) {
+          //   resolve(response)
+          // } else {
+          //   if (showError) {
+          //     const msg = (response && response.data && response.data.msg) || '请求失败'
+          //     mpvue.showToast({
+          //       title: msg,
+          //       duration: 2000
+          //     })
+          //   }
+          // }
           resolve(response)
         })
         .catch(err => {
           console.log(err)
+          handleError(err)
           reject(err)
         })
     })

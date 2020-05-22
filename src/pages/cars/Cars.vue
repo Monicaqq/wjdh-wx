@@ -1,6 +1,7 @@
 <template>
   <!-- 手机号页面 -->
   <div class="cars-container">
+    <nav-bar navTitle='车辆'></nav-bar>
     <!-- 车牌列表 -->
     <div class="cars-list" v-for="(item, index) in carsList" :key="index">
       <div class="car-msg">
@@ -35,13 +36,13 @@
   </div>
 </template>
 <script>
-import { setNavigationBarTitle } from '../../api/wechat'
 import submitBtn from '@/components/submitBtn'
 import { isCarNum, carNumFormat } from '../../utils/index'
+import navBar from '@/components/navBar'
 export default {
-  components: { submitBtn },
+  components: { submitBtn, navBar },
   mounted () {
-    setNavigationBarTitle('车辆')
+    Object.assign(this.$data, this.$options.data())
   },
   data () {
     return {
@@ -64,6 +65,10 @@ export default {
     }
   },
   methods: {
+    // 返回上一页
+    onClickLeft () {
+      this.$router.go(-1)
+    },
     // 监听车牌号输入框
     inputCarNum (e) {
       this.carNumErrMsg = ''
@@ -148,6 +153,7 @@ export default {
         color: #666;
         input {
           width: 80px;
+          height: 100%;
         }
         .err {
           position: absolute;

@@ -30,9 +30,9 @@
         </div>
         <div class="person-tel person-item">
           <span class="color333">手机号</span>
-          <div class="tel-right">
+          <div class="tel-right" @click="toTelView">
             <span class="color666">1983343433</span>
-            <arrow-btn @arrowClick='toTelView' color='#9B9B9B'></arrow-btn>
+            <arrow-btn color='#9B9B9B'></arrow-btn>
           </div>
         </div>
       </div>
@@ -63,9 +63,9 @@
         <!-- 车辆 -->
         <div class="person-tel person-item">
           <span class="color333">车辆</span>
-          <div class="tel-right">
+          <div class="tel-right" @click="toCarView">
             <span class="color666">0</span>
-            <arrow-btn @arrowClick='toCarView' color='#9B9B9B'></arrow-btn>
+            <arrow-btn color='#9B9B9B'></arrow-btn>
           </div>
         </div>
       </div>
