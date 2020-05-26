@@ -3,10 +3,8 @@
     "pages/index/main",
     "pages/ownerLogin/main",
     "pages/houseHoldLogin/main",
-        
     "pages/addPerson/main",
     "pages/invitePerson/main",
-    
     "pages/owner/main",
     "pages/houseHold/main",
     "pages/repairApply/main",

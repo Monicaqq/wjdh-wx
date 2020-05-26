@@ -64,8 +64,6 @@ export default {
   position: relative;
   flex-direction: column;
   height: 100%;
-  margin-left: 15px;
-  margin-right: 15px;
   background: rgba(255, 255, 255, 1);
   border-top: 0.5px solid #eee;
   color: #333;
@@ -76,6 +74,8 @@ export default {
     justify-content: space-between;
     align-items: center;
     height: 44px;
+    margin-left: 15px;
+    margin-right: 15px;
     line-height: 44px;
     border-bottom: 0.5px solid #eee;
     .repair-type {
@@ -90,9 +90,12 @@ export default {
     }
   }
   .apply-detail {
-    margin: 15px 0;
+    margin: 15px 15px;
+    // margin-left: 15px;
+    // margin-right: 15px;
     .detail-text {
       height: 100px;
+
       margin-top: 16px;
       background: #f7f8fa;
       padding: 5px 10px;

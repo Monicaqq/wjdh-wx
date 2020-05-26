@@ -3,53 +3,52 @@
   <div class="home-container">
     <!-- 用户授权 -->
     <auth v-if="!isAuth" @getUserInfo="init"></auth>
-    <div v-if="isAuth">
-      <div class="nav-bar">
-        <van-nav-bar title-class='nav-title' title="仙林悦城"></van-nav-bar>
-      </div>
-
-      <!-- 头部用户信息 -->
-      <div>
-        <!-- 背景图片 -->
+    <div class="nav-bar">
+      <van-nav-bar title-class='nav-title' title="仙林悦城"></van-nav-bar>
+    </div>
+    <!-- 头部用户信息 -->
+    <div>
+      <!-- 背景图片 -->
+      <img :src="bgImg">
+      <div class="user-container">
         <img :src="bgImg">
-        <div class="user-container">
-          <img :src="bgImg">
-          <!-- 左侧用户头像 -->
-          <div class="user-avator">
-            <avator-img round :src='avator'></avator-img>
-          </div>
-          <!-- 右侧 用户名、角色、地址 -->
-          <div class="user-info">
-            <div class="user-name-role">
-              <div class="name">王逸飞</div>
-              <div class="role"><span>{{role}}</span></div>
-            </div>
-            <div class="user-address">仙林悦城A区3栋2单元102室仙林悦城A区3栋2单元102室</div>
-          </div>
-          <!-- 跳转至用户详情箭头 -->
-          <div class="toPersonMsg">
-            <arrow-btn @arrowClick='toPersonMsg' />
-          </div>
+        <!-- 左侧用户头像 -->
+        <div class="user-avator">
+          <avator-img round :src='avator'></avator-img>
         </div>
-        <!-- 通知、导航 -->
-        <div class="info-tabs-container">
-          <div class="info">
-            <img class="info-icon" :src='infoImg' />
-            <div class="info-text">{{infoText}}</div>
+        <!-- 右侧 用户名、角色、地址 -->
+        <div class="user-info">
+          <div class="user-name-role">
+            <div class="name">王逸飞</div>
+            <div class="role"><span>{{role}}</span></div>
           </div>
-          <div class="tabs">
-            <div v-if='isOwner' :class="[tab, currentTab == 1 ? 'select' : '']" @click='tabClick'>住户</div>
-            <div :class="[tab, currentTab == 2 ? 'select' : '']" @click='tabClick'>报修</div>
-            <div :class="[tab, currentTab == 3 ? 'select' : '']" @click='tabClick'>邀请</div>
-            <div :class="[tab, currentTab == 4 ? 'select' : '']" @click='tabClick'>通知</div>
-          </div>
+          <div class="user-address">仙林悦城A区3栋2单元102室仙林悦城A区3栋2单元102室</div>
+        </div>
+        <!-- 跳转至用户详情箭头 -->
+        <div class="toPersonMsg">
+          <arrow-btn @arrowClick='toPersonMsg' />
         </div>
       </div>
-      <!-- 页面主体列表 -->
-      <div class="main-container">
+      <!-- 通知、导航 -->
+      <div class="info-tabs-container">
+        <div class="info">
+          <img class="info-icon" :src='infoImg' />
+          <div class="info-text">{{infoText}}</div>
+        </div>
+        <div class="tabs">
+          <div v-if='isOwner' :class="[tab, currentTab == 0 ? 'select' : '']" @click='tabClick' data-id='0'>住户</div>
+          <div :class="[tab, currentTab == 1 ? 'select' : '']" @click='tabClick' data-id='1'>报修</div>
+          <div :class="[tab, currentTab == 2 ? 'select' : '']" @click='tabClick' data-id='2'>邀请</div>
+          <div :class="[tab, currentTab == 3 ? 'select' : '']" @click='tabClick' data-id='3'>通知</div>
+        </div>
+      </div>
+    </div>
+    <!-- 页面主体列表 -->
+    <div class="main-container">
+      <div class="main-content">
         <!-- 住户界面 -->
         <!-- <div v-if='isOwner' class="height-1px"> -->
-        <div v-if='currentTab == 1 && isOwner' class="scroll-container">
+        <div v-if='currentTab == 0 && isOwner' class="scroll-container">
           <scroll-view class="scroll-view" scroll-y='true'>
             <div class="house-lists" v-for='(item, index) in personList' :key='index'>
               <div class="house-item" @click="toHouseHold">
@@ -78,7 +77,7 @@
         </div>
         <!-- </div> -->
         <!-- 报修界面 -->
-        <div v-if='currentTab == 2' class="scroll-container">
+        <div v-if='currentTab == 1' class="scroll-container">
           <scroll-view scroll-y="true" class="scroll-view">
             <div v-for="(item, index) in tabLists" :key="index">
               <div @click="toRepairDetail">
@@ -89,7 +88,7 @@
         </div>
         <!-- 邀请界面 -->
         <!-- 如果有邀请权限, 展示邀请界面 -->
-        <div v-if='currentTab == 3' class="scroll-container">
+        <div v-if='currentTab == 2' class="scroll-container">
           <div v-if="hasInviteRole" class="height-1px">
             <scroll-view scroll-y='true' class="scroll-view">
               <div v-for="(item, index) in tabLists" :key="index">
@@ -107,7 +106,7 @@
           </div>
         </div>
         <!-- 通知界面 -->
-        <div v-if='currentTab == 4' class="scroll-container">
+        <div v-if='currentTab == 3' class="scroll-container">
           <scroll-view class="scroll-view" scroll-y='true'>
             <div v-for="(item, index) in tabLists" :key="index">
               <div @click="toInfoDetail">
@@ -120,12 +119,12 @@
       <!-- 页面下方提交按钮 -->
       <div class="submit-btn">
         <div class="add-person" v-if='isOwner'>
-          <submit-btn btnText='添加住户' @submitClick='addHousePerson' isActive v-if='currentTab == 1'></submit-btn>
+          <submit-btn btnText='添加住户' @submitClick='addHousePerson' isActive v-if='currentTab == 0'></submit-btn>
         </div>
         <div class="repair-btn">
-          <submit-btn btnText='报修' @submitClick='applyRepair' isActive v-if='currentTab == 2'></submit-btn>
+          <submit-btn btnText='报修' @submitClick='applyRepair' isActive v-if='currentTab == 1'></submit-btn>
         </div>
-        <div class="invite-btn" v-if='currentTab == 3'>
+        <div class="invite-btn" v-if='currentTab == 2'>
           <!-- 有邀请权限 -->
           <div v-if="hasInviteRole" class="hasInvite">
             <submit-btn btnText='邀请' @submitClick='invitePerson' isActive></submit-btn>
@@ -135,9 +134,6 @@
             <submit-btn btnText='邀请' isShadow></submit-btn>
           </div>
         </div>
-        <!-- <div class="info-btn" v-if='currentTab == 4'>
-        <submit-btn btnText='通知' isActive></submit-btn>
-      </div> -->
       </div>
     </div>
   </div>
@@ -156,7 +152,7 @@ export default {
   mounted () {
     this.init()
     if (!this.isOwner) {
-      this.currentTab = 2
+      this.currentTab = 1
       this.role = '业主'
     }
   },
@@ -173,7 +169,7 @@ export default {
       avator: '../../static/images/user1.png',
       infoImg: '../../static/images/info.png',
       infoText: '小区2020年度物业收取通知小区2020年度物业收取通知',
-      currentTab: 1,
+      currentTab: 0,
       female: '../../static/images/female.png',
       male: '../../static/images/male.png',
       personList: [
@@ -327,6 +323,7 @@ export default {
             onOpenIdComplete(openId, userInfo)
             console.log('已获得openId')
           }
+          console.log(userInfo)
         },
         () => {
           console.log('获取用户信息失败')
@@ -336,9 +333,10 @@ export default {
 
     // 切换 tab 标签
     tabClick (e) {
-      this.currentTab = e.currentTarget.dataset.eventid
+      this.currentTab = e.currentTarget.dataset.id
       // this.btnText = ''
-      // console.log(this.currentTab)
+      console.log(e)
+      console.log(this.currentTab)
     },
     // 跳转至个人信息页面
     toPersonMsg () {
@@ -402,6 +400,9 @@ export default {
     width: 100%;
     height: 109px;
     position: absolute;
+  }
+  .nav-bar {
+    height: 64px;
   }
   // 用户信息样式
   .user-container {
@@ -524,94 +525,99 @@ export default {
   }
   // 页面主体样式
   .main-container {
-    height: 100%;
+    height: calc(100% - 265px);
     position: relative;
-    background: rgba(255, 255, 255, 1);
-    margin: 14px 15px 1px 15px;
-    overflow: hidden;
-    .scroll-container {
-      height: 100%;
-      .scroll-view {
+    .main-content {
+      height: calc(100% - 90px);
+      // height: 100%;
+      position: relative;
+      background: rgba(255, 255, 255, 1);
+      margin: 14px 15px 1px 15px;
+      overflow: hidden;
+      .scroll-container {
         height: 100%;
+        .scroll-view {
+          height: 100%;
+        }
       }
-    }
-    // 住户列表
-    .house-lists {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-content: center;
-      .house-item {
+      // 住户列表
+      .house-lists {
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        position: relative;
-        height: 74.5px;
-        border-bottom: 0.5px solid rgba(210, 215, 240, 1);
-        color: #333;
-        .house-person {
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+        .house-item {
           display: flex;
-          flex-direction: column;
-          margin-left: 11.5px;
-          font-size: 14px;
-          .house-person-up {
+          flex-direction: row;
+          align-items: center;
+          position: relative;
+          height: 74.5px;
+          border-bottom: 0.5px solid rgba(210, 215, 240, 1);
+          color: #333;
+          .house-person {
             display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            .person-sex {
-              position: relative;
-              height: 13px;
-              width: 13px;
-              line-height: 13px;
-              img {
-                height: 100%;
-                width: 100%;
+            flex-direction: column;
+            margin-left: 11.5px;
+            font-size: 14px;
+            .house-person-up {
+              display: flex;
+              flex-direction: row;
+              justify-content: center;
+              align-items: center;
+              .person-sex {
+                position: relative;
+                height: 13px;
+                width: 13px;
+                line-height: 13px;
+                img {
+                  height: 100%;
+                  width: 100%;
+                }
+              }
+              .person-sex {
+                margin-left: 4px;
+                margin-right: 4.5px;
+              }
+              .person-role {
+                width: 35px;
+                height: 15px;
+                border-radius: 5px;
+                font-size: 10.5px;
+                line-height: 15px;
+                text-align: center;
+              }
+              .hz {
+                background: rgba(255, 236, 203, 1);
+                color: rgba(158, 87, 25, 1);
+              }
+              .wy {
+                background: rgba(223, 245, 236, 1);
+                color: rgba(7, 132, 81, 1);
               }
             }
-            .person-sex {
-              margin-left: 4px;
-              margin-right: 4.5px;
-            }
-            .person-role {
-              width: 35px;
-              height: 15px;
-              border-radius: 5px;
-              font-size: 10.5px;
-              line-height: 15px;
-              text-align: center;
-            }
-            .hz {
-              background: rgba(255, 236, 203, 1);
-              color: rgba(158, 87, 25, 1);
-            }
-            .wy {
-              background: rgba(223, 245, 236, 1);
-              color: rgba(7, 132, 81, 1);
+            .person-tel {
+              margin-top: 8px;
             }
           }
-          .person-tel {
-            margin-top: 8px;
+          .toHousePerson {
+            position: absolute;
+            right: 0;
           }
-        }
-        .toHousePerson {
-          position: absolute;
-          right: 0;
         }
       }
-    }
-    // 无邀请权限的界面
-    .notInviteRole {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 100%;
-      font-size: 14px;
-      color: #333;
-      div {
-        margin-top: 88px;
-        width: 130px;
-        text-align: center;
+      // 无邀请权限的界面
+      .notInviteRole {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        font-size: 14px;
+        color: #333;
+        div {
+          margin-top: 88px;
+          width: 130px;
+          text-align: center;
+        }
       }
     }
     // 添加用户按钮样式

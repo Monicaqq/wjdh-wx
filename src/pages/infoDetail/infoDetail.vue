@@ -14,7 +14,7 @@
       <span>内容</span>
       <div class="content-text">
         3栋旁边路灯坏了，晚上不亮回家不方便3栋旁边路灯坏了，晚上不亮回家不方便3栋旁边路灯坏了，晚上不亮回家不方便
-       方便3栋旁边路灯坏了，晚上不亮回家不方便3栋旁边路灯坏了，晚上不亮回家不方便
+        方便3栋旁边路灯坏了，晚上不亮回家不方便3栋旁边路灯坏了，晚上不亮回家不方便
       </div>
     </div>
   </div>
@@ -30,13 +30,13 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-  margin-left: 15px;
-  margin-right: 15px;
   background: rgba(255, 255, 255, 1);
   border-top: 0.5px solid #eeeeee;
   color: #333;
   font-size: 14px;
   .info-title {
+    margin-left: 15px;
+    margin-right: 15px;
     margin-top: 17px;
     .title-text {
       margin-top: 10px;
@@ -46,6 +46,8 @@ export default {
     }
   }
   .info-content {
+    margin-left: 15px;
+    margin-right: 15px;
     margin-top: 13px;
     margin-bottom: 17px;
     height: 100%;
