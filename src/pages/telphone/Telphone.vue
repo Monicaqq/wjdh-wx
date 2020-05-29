@@ -16,6 +16,7 @@
 </template>
 <script>
 import { isPhone } from '../../utils/index'
+// import { showToast } from '../../api/wechat'
 import submitBtn from '@/components/submitBtn'
 import navBar from '@/components/navBar'
 export default {
@@ -27,7 +28,23 @@ export default {
     return {
       phone: '18524256541',
       phoneErrMsg: '',
-      phoneErrFlag: false
+      phoneErrFlag: false,
+      isCheckedImg: '../../static/images/isChecked.png',
+      notCheckedImg: '../../static/images/notChecked.png',
+      addCarIcon: '../../static/images/addCarIcon.png',
+      radios: [
+        {
+          label: '有车',
+          value: '1',
+          isChecked: true
+        },
+        {
+          label: '',
+          value: '2',
+          isChecked: false
+        }
+      ],
+      isShowInput: true
     }
   },
   methods: {

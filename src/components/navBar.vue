@@ -7,7 +7,7 @@
 <script>
 export default {
   mounted () {
-    console.log(this.title)
+    // console.log(this.title)
   },
   props: {
     // nav-bar 标题, 从父组件获取

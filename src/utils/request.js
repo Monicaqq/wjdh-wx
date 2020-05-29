@@ -16,6 +16,11 @@ function handleError (err) {
 // 处理 get 请求
 export function get (url, params = {}, showError = true) {
   const fly = createFly()
+  fly.interceptors.request.use((request) => {
+    request.headers = {
+      'Content-Type': 'application/json'
+    }
+  })
   if (fly) {
     return new Promise((resolve, reject) => {
       fly.get(url, params)
@@ -48,13 +53,16 @@ export function post (url, params = {}, showError = true) {
     return new Promise((resolve, reject) => {
       fly.post(url, params)
         .then(response => {
-          if (response && response.length > 0 && response.data.error_code === 0) {
+          const res = response.data
+          if (res && res.code === 200) {
+            // console.log('res...', response)
             resolve(response)
           } else {
             if (showError) {
-              const msg = (response && response.data && response.data.msg) || '请求失败'
+              const msg = (res && res.message) || '请求失败'
               mpvue.showToast({
                 title: msg,
+                icon: 'none',
                 duration: 2000
               })
             }

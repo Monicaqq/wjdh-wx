@@ -1,8 +1,12 @@
 {
   "pages": [
-    "pages/index/main",
+   
     "pages/ownerLogin/main",
+    "pages/index/main",
     "pages/houseHoldLogin/main",
+    
+    "pages/cars/main",
+    "pages/telphone/main",
     "pages/addPerson/main",
     "pages/invitePerson/main",
     "pages/owner/main",
@@ -10,9 +14,9 @@
     "pages/repairApply/main",
     "pages/repairDetail/main",
     "pages/inviteDetail/main",
-    "pages/infoDetail/main",
-    "pages/telphone/main",
-    "pages/cars/main"
+    "pages/infoDetail/main"
+    
+    
   ],
   "window": {
     "backgroundTextStyle": "light",

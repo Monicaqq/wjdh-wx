@@ -1,23 +1,29 @@
 // 获取请求数据
-import { get } from '../utils/request'
-// const baseUrl = 'http://192.168.1.104:8015'
-const API_URL = 'https://test.youbaobao.xyz:18081'
-const APP_ID = 'wx531763b0ca4d661f'
-const APP_SECRET = 'b0fde5ac6a9c5e3538dd17d047d9bc49'
+import { post } from '../utils/request'
+const API_URL = 'http://192.168.1.101:8011'
+// const API_URL = 'http://192.168.1.141:8848/face-community-server'
+// const APP_ID = 'wx0dca6b0ff2113744'
+// const APP_SECRET = '7d6f8947fdc99e7bf1c7874f21d024ac'
 
-// 获取户主用户数据(模拟请求)
-export function getOwnerData () {
-  return get(`${API_URL}/book/home/recommend/v2`)
+// 微信绑定
+export function bindWechat (params) {
+  return post(`${API_URL}/app/bind`, params)
+}
+// 隐藏登录获取token
+export function loginWechat (params) {
+
 }
 
-// 获取 openId
-export function getOpenId (code) {
-  // openId: 微信小程序的appId,
-  // code: 通过 mpvue.login 获取的
-  // secret： 小程序的secret key
-  return get(`${API_URL}/openId/get`, {
-    appId: APP_ID,
-    secret: APP_SECRET,
-    code
-  })
+// 邀请码验证
+export function checkCode (params) {
+  return post(`${API_URL}/roomInviteCode/checkCode`, params)
+}
+
+// 身份证号、手机号 人员查询 (无该人员, 进行注册; 有,则跳转至授权页)
+export function selectPerson (params) {
+  return post(`${API_URL}/appPerson/selectPerson`, params)
+}
+// 提交注册
+export function personSave (params) {
+  return post(`${API_URL}/appPerson/personSave`, params)
 }

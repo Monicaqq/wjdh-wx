@@ -1,64 +1,15 @@
-﻿import { getOpenId } from '../api/index'
-// 获取用户设置, 判断用户是否授权
-// auth 作为权限判断, authSetting 中包括 scope.userInfo 和 scope.userLocation
-export function getSetting (auth, onSucess, onFail) {
-  mpvue.getSetting({
-    withSubscription: true,
-    success (res) {
-      if (res.authSetting[`scope.${auth}`]) {
-        onSucess(res)
-      } else {
-        onFail(res)
-      }
-      console.log(res)
-    },
-    fail (err) {
-      console.log(err)
-    }
-  })
-}
-// 授权成功后, 获取用户信息
-export function getUserInfo (onSuccess, onFail) {
-  mpvue.getUserInfo({
-    success (res) {
-      console.log(res)
-      let userInfo = res.userInfo
-      if (userInfo) {
-        onSuccess(userInfo)
-      } else {
-        onFail(res)
-      }
-    },
-    fail (res) {
-      console.log(res)
-    }
-  })
-}
-
-// 获取 openId: getSetting() -----> getUserInfo(), openId 存在 userInfo 中
-export function getUserOpenId (callback) {
+﻿// 获取code
+export function getCode (onSuccess, onFail) {
   mpvue.login({
     success (res) {
-      if (res.code) {
-        // 调用 getOpenId 请求时, 将自己的code 传过去, 作为 getOpenId 的其中一个参数
-        const code = res.code
-        getOpenId(code).then(res => {
-          // 将获取的 openId 存放到缓存中
-          console.log(res)
-          const { data: { data: { openid } } } = res
-          setStorageSync('openId', openid)
-          // 存储到缓存中再进行回调函数验证是否存在openId
-          callback && callback(openid)
-          console.log('openid:', openid)
-        })
-          .catch(err => {
-            // 直接抛出异常
-            console.log(err)
-          })
+      // console.log(res)
+      let code = res.code
+      if (code) {
+        console.log(code)
+        onSuccess(code)
       } else {
-        console.log(res)
+        onFail(res)
       }
-      console.log(res)
     },
     fail (err) {
       console.log(err)

@@ -1,16 +1,16 @@
 <template>
   <div class="owner-login-container">
     <div class="nav-bar">
-      <van-nav-bar title-class='nav-title' title="登录"></van-nav-bar>
+      <van-nav-bar title-class='nav-title' title="微信授权"></van-nav-bar>
     </div>
     <div class="login-title">
-      欢迎登陆
+      欢迎授权登录
     </div>
     <form @submit='formSubmit' class="form-submit">
       <div class="login-input">
         <div class="account-input">
           <span>账号/手机号</span>
-          <input type="text" placeholder-style="color: #BCC2E1" v-model="loginForm.account" @focus="onAccountFocus"
+          <input type="text" placeholder-style="color: #BCC2E1" v-model="username" @focus="onAccountFocus"
             @blur="onAccountBlur" name="account" placeholder="请输入">
         </div>
         <!-- 输入框聚焦失焦下划线样式 -->
@@ -18,8 +18,8 @@
         </div>
         <div class="password-input">
           <span>密码/身份证后4位</span>
-          <input type="text" password placeholder-style="color: #BCC2E1" v-model="loginForm.password"
-            @focus="onPasswdFocus" @blur="onPasswdBlur" name="password" placeholder="请输入">
+          <input type="text" password placeholder-style="color: #BCC2E1" v-model="password" @focus="onPasswdFocus"
+            @blur="onPasswdBlur" name="password" placeholder="请输入">
         </div>
         <!-- 输入框聚焦失焦下划线样式 -->
         <div :class="isPasswdFocus ? 'borderBlue' : 'borderWhite'">
@@ -43,24 +43,26 @@
 </template>
 <script>
 import submitBtn from '@/components/submitBtn'
+import { getCode } from '../../api/wechat'
+import { bindWechat } from '../../api/index'
 export default {
   components: { submitBtn },
   mounted () {
+    this.getCode()
     Object.assign(this.$data, this.$options.data())
   },
   data () {
     return {
-      loginForm: {
-        account: '',
-        password: ''
-      },
       isAccountFocus: false,
-      isPasswdFocus: false
+      isPasswdFocus: false,
+      username: '',
+      password: '',
+      code: ''
     }
   },
   computed: {
     ActiveLoginBtn () {
-      if (this.loginForm.account && this.loginForm.password) {
+      if (this.username && this.password) {
         // that.ActiveLoginBtn = true
         return true
       } else {
@@ -69,24 +71,54 @@ export default {
     }
   },
   methods: {
+    // 获取code
+    getCode () {
+      let that = this
+      getCode(
+        (code) => {
+          that.code = code
+          console.log('that.code', that.code)
+        }, () => {
+          console.log('获取code失败')
+        })
+    },
     // 输入框聚焦和失焦
     onAccountFocus () {
       this.isAccountFocus = true
     },
     onAccountBlur () {
       this.isAccountFocus = false
+      console.log(this.username)
     },
     onPasswdFocus () {
       this.isPasswdFocus = true
     },
     onPasswdBlur () {
       this.isPasswdFocus = false
+      console.log(this.password)
     },
     // 账号密码登录
     formSubmit () {
-      if (this.loginForm.account && this.loginForm.password) {
-        console.log('用户名密码登录')
-      }
+      let that = this
+      bindWechat({
+        'data': {
+          'username': that.username,
+          'password': that.password,
+          'code': that.code
+        }
+      })
+        .then(response => {
+          console.log('RES', response)
+          console.log('授权验证')
+        })
+        .catch(err => {
+          console.log(err)
+          // console.log(that.username, that.code)
+        })
+      // if (this.loginForm.account && this.loginForm.password) {
+
+      //   console.log('用户名密码登录')
+      // }
     },
 
     // 邀请码登录

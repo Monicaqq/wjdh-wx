@@ -2,7 +2,7 @@
   <!-- 首页 -->
   <div class="home-container">
     <!-- 用户授权 -->
-    <auth v-if="!isAuth" @getUserInfo="init"></auth>
+    <!-- <auth v-if="!isAuth" @getUserInfo="init"></auth> -->
     <div class="nav-bar">
       <van-nav-bar title-class='nav-title' title="仙林悦城"></van-nav-bar>
     </div>
@@ -145,8 +145,7 @@ import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
 import tabLists from '@/components/tabLists'
-import { getOwnerData } from '../../api/index'
-import { getSetting, getUserInfo, getUserOpenId, setStorageSync, getStorageSync } from '../../api/wechat'
+// import { setStorageSync, getStorageSync } from '../../api/wechat'
 export default {
   components: { auth, avatorImg, arrowBtn, submitBtn, tabLists },
   mounted () {
@@ -159,7 +158,7 @@ export default {
   data () {
     return {
       // 是否授权
-      isAuth: false,
+      // isAuth: false,
       // 是否是户主
       isOwner: true,
       role: '户主',
@@ -282,55 +281,6 @@ export default {
     }
   },
   methods: {
-    init () {
-      // 授权成功后获再取用户信息
-      this.getSetting()
-    },
-    //  获取用户配置
-    getSetting () {
-      // 传递参数 userInfo 验证是否
-      getSetting('userInfo',
-        () => {
-          this.isAuth = true
-          // showLoading('正在加载')
-          this.getUserInfo()
-          console.log('授权成功')
-        },
-        () => {
-          // 未获取授权
-          this.isAuth = false
-          console.log('授权失败')
-        })
-    },
-    // 获取用户信息
-    getUserInfo () {
-      // 定义 onOpenIdComplete 为一个函数, 作为 getUserOpenId 的回调函数
-      const onOpenIdComplete = (openId, userInfo) => {
-
-      }
-      getUserInfo(
-        (userInfo) => {
-          console.log(userInfo)
-          setStorageSync('userInfo', userInfo)
-          const openId = getStorageSync('openId')
-          console.log('openId:', openId)
-          if (!openId && openId.length === 0) {
-            // openId 从 getUserOpenId 请求中获取
-            // openId 传给回调函数 onOpenIdComplete
-            getUserOpenId(openId => onOpenIdComplete(openId, userInfo))
-            console.log('请求openId')
-          } else {
-            onOpenIdComplete(openId, userInfo)
-            console.log('已获得openId')
-          }
-          console.log(userInfo)
-        },
-        () => {
-          console.log('获取用户信息失败')
-        })
-    },
-    // 点击"授权登录"按钮, 初始化用户授权信息, 判断用户是否授权
-
     // 切换 tab 标签
     tabClick (e) {
       this.currentTab = e.currentTarget.dataset.id
@@ -340,15 +290,15 @@ export default {
     },
     // 跳转至个人信息页面
     toPersonMsg () {
-      getOwnerData()
-        .then(res => {
-          console.log(res)
-        })
-        .catch(() => {
-          console.log('请求失败')
-        })
-      this.$router.push('../../pages/owner/main')
-      console.log('去户主个人信息界面')
+      // getOwnerData()
+      //   .then(res => {
+      //     console.log(res)
+      //   })
+      //   .catch(() => {
+      //     console.log('请求失败')
+      //   })
+      // this.$router.push('../../pages/owner/main')
+      // console.log('去户主个人信息界面')
     },
     // 跳转至住户界面
     toHouseHold (e) {

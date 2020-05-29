@@ -101,11 +101,66 @@
                   placeholder="请选择性别" disabled @click="chooseSex">
               </div>
               <div :class="isHouseHoldSexFocus ? 'borderBlue' : 'borderWhite'"></div>
+              <!-- 车辆输入框 -->
+              <div class="houseHoldCarInput">
+                <!-- 有车 无车 按钮 -->
+                <div class="car-radio">
+                  <div class="radio-box" v-for="(item, index) in radios" :key="index">
+                    <div class="isChecked" @click="check(index)">
+                      <img :src="isCheckedImg" v-if="item.isChecked">
+                      <img :src="notCheckedImg" v-else>
+                      <label>{{item.label}}</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 有车,车牌号输入框 -->
+          <div class="car-input-wrapper" v-if="isShowInput">
+            <scroll-view class="scroll-view" scroll-y='true'>
+              <div class="cars-input">
+                <!-- 渲染车辆信息 -->
+                <div v-if="houseHoldCar.length !== 0">
+                  <div v-for="(item, index) in houseHoldCar" :key="index">
+                    <div class="car-msg">
+                      <div class="car-type">{{item.carType}}</div>
+                      <div class="choose-icon">
+                        <div class="triangle"></div>
+                      </div>
+                      <div class="car-number">{{item.carNum}}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="car-msg">
+                  <!-- 选择车辆类型, 默认列表第一个 -->
+                  <div class="car-type" @click="chooseCarType">
+                    <input type="text" v-model='carType'>
+                  </div>
+                  <!-- 点击图标, 展示所有类型, 供选择 -->
+                  <div class="choose-icon">
+                    <div class="triangle"></div>
+                  </div>
+                  <!-- 车辆输入框 -->
+                  <div class="car-number">
+                    <input type="text" placeholder="请输入车辆" v-model="newCarObj.carNum" @input="inputCarNum" maxlength="8"
+                      confirm-type="done" @confirm='onConfirm' @change='onChange' @focus="onHouseHoldCarNumFocus"
+                      @blur="onHouseHoldCarBlur" placeholder-style="color: #BCC2E1">
+                  </div>
+                </div>
+              </div>
+            </scroll-view>
+          </div>
+          <!-- 增加 按钮 -->
+          <div class="add-car-wrapper" v-if="isShowInput">
+            <div class="add-car-btn" @click="addCar">
+              <img :src="addCarIcon">
+              <span>增加</span>
             </div>
           </div>
           <!-- 步骤二按钮 -->
           <div class="step2-btn margin37" style="margin-top: 32px">
-            <!-- <submit-btn btnText='下一步2' isActive @submitClick="toStep3"></submit-btn> -->
             <button class="nextStepBtn" @click="toStep3">下一步</button>
           </div>
           <div class="account-login margin37">
@@ -149,13 +204,21 @@
 <script>
 import { showToast } from '../../api/wechat'
 // import { chooseImage } from '../../utils/common'
-import { isName, isIdCard, isPhone } from '../../utils/index'
+import { isName, isIdCard, isPhone, isCarNum } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
+import { checkCode, selectPerson } from '../../api/index'
 export default {
   components: { submitBtn },
   mounted () {
     Object.assign(this.$data, this.$options.data())
   },
+  // watch: {
+  //   // 监听车辆数组的变化
+  //   'houseHoldLoginForm.houseHoldCar' (curArr) {
+  //     this.houseHoldLoginForm.houseHoldCar = curArr
+  //     console.log(curArr)
+  //   }
+  // },
   data () {
     return {
       isStep1: true,
@@ -166,10 +229,39 @@ export default {
       isHouseHoldTelFocus: false,
       isHouseHoldIdCardFocus: false,
       isHouseHoldSexFocus: false,
+      isHouseHoldCarNumFocus: false,
       houseHoldNameFlag: false,
       houseHoldTelFlag: false,
       houseHoldIdCardFlag: false,
       houseHoldSexFlag: false,
+      houseHoldCarFlag: false,
+      isCheckedImg: '../../static/images/isChecked.png',
+      notCheckedImg: '../../static/images/notChecked.png',
+      addCarIcon: '../../static/images/addCarIcon.png',
+      isShowInput: true,
+      radios: [
+        {
+          label: '有车',
+          value: '1',
+          isChecked: true
+        },
+        {
+          label: '',
+          value: '2',
+          isChecked: false
+        }
+      ],
+      carType: '普通乘用车',
+      newCarObj: {},
+      houseHoldCar: [
+        {
+          carType: '普通乘用车',
+          carNum: '苏K12222'
+        }, {
+          carType: '普通乘用车',
+          carNum: '苏K12223'
+        }
+      ],
       houseHoldLoginForm: {
         // 邀请码
         inviteCode: '',
@@ -177,6 +269,13 @@ export default {
         houseHoldTel: '',
         houseHoldIdCard: '',
         houseHoldSex: '',
+        hasCar: '',
+        // houseHoldCar: [
+        //   {
+        //   carType: '普通乘用车',
+        //   carNum: '苏K·12222'
+        // }
+        // ],
         houseHoldImg: ''
       },
       defaultImg: '../../static/images/default.png',
@@ -272,14 +371,179 @@ export default {
         }
       })
     },
+    // 是否有车
+    check (index) {
+      this.radios.forEach((item) => {
+        item.isChecked = false
+      })
+      this.houseHoldLoginForm.hasCar = this.radios[index].value
+      if (this.radios[index].value !== '1') {
+        this.isShowInput = false
+      } else {
+        this.isShowInput = true
+      }
+      this.radios[index].isChecked = true
+      console.log(this.houseHoldLoginForm.hasCar)
+    },
+    // 选择车辆类型
+    chooseCarType (res) {
+      let that = this
+      wx.showActionSheet({
+        itemList: ['普通乘用车', '大货车'],
+        success (res) {
+          if (res.tapIndex === 0) {
+            that.carType = '普通乘用车'
+          } else {
+            that.carType = '大货车'
+          }
+        }
+      })
+    },
+    // 监听车牌号输入框
+    inputCarNum (e) {
+      // this.carNumErrMsg = ''
+      // let filtered = e.target.value
+      // if (this.phone !== filtered) {
+      //   this.phone = filtered
+      // }
+    },
+    // 车牌号聚焦
+    onHouseHoldCarNumFocus () {
+      this.isHouseHoldCarNumFocus = true
+    },
+    // 输入框失去焦点, 验证车牌号,
+    onHouseHoldCarBlur (e) {
+      let that = this
+      this.newCarObj.carNum = e.mp.detail.value
+      let carResult = isCarNum(this.newCarObj.carNum)
+      if (carResult) {
+        showToast(carResult)
+        that.carNumErrMsg = carResult
+        that.carNumErrFlag = true
+      } else {
+        that.houseHoldCarFlag = true
+        that.newCarObj.carNum = that.newCarObj.carNum
+        that.newCarObj['carType'] = that.carType
+      }
+    },
+    // 点击 增加车辆 按钮, 将新增的一条车辆信息push 到 车辆数组
+    addCar () {
+      var that = this
+      // if (!this.newCarObj.carNum) {
+      //   showToast('请输入车牌号')
+      // } else {
+      //   let carResult = isCarNum(that.newCarObj.carNum)
+      //   if (!carResult) {
+      //     that.newCarObj.carNum = carNumFormat(that.newCarObj.carNum)
+      //     that.houseHoldCar.push(that.newCarObj)
+      //     that.newCarObj = {}
+      //     that.carType = '普通乘用车'
+      //   } else {
+      //     showToast(carResult)
+      //   }
+      // }
+      // 未输入车牌号
+      if (!this.newCarObj.carNum) {
+        showToast('请输入车牌号')
+      } else {
+        // 已输入车牌号
+        var carResult = isCarNum(that.newCarObj.carNum)
+        // 输入了正确的车牌号
+        if (!carResult) {
+          // let arr = [{'color': 'red', 'age': 18}]
+          // for (let obj of arr) {
+          //   console.log(obj)
+          // }
+          // 存在车辆信息, 验证唯一性 循环车辆数组
+          if (that.houseHoldCar.length > 0) {
+            for (let carItem of that.houseHoldCar) {
+              console.log('houseCar', that.houseHoldCar)
+              console.log('carItem0..', carItem)
+              if (that.newCarObj.carType === carItem.carType && that.newCarObj.carNum === carItem.carNum) {
+                showToast('您输入的车辆信息已存在')
+                that.newCarObj.carType = ''
+                that.newCarObj.carNum = ''
+                return false
+              } else {
+                // that.newCarObj.carNum = carNumFormat(that.newCarObj.carNum)
+                // that.newCarObj.carNum = that.newCarObj.carNum
+                // that.newCarObj['carType'] = that.carType
+                that.houseHoldCar.push(that.newCarObj)
+                console.log(that.houseHoldCar)
+                that.newCarObj = {}
+                that.carType = '普通乘用车'
+                return false
+              }
+            }
+            // that.newCarObj = {}
+            // that.carType = '普通乘用车'
+          } else {
+            that.houseHoldCar.push(that.newCarObj)
+            that.newCarObj = {}
+            that.carType = '普通乘用车'
+          }
+          console.log('newCarObj', that.newCarObj)
+        } else {
+          // 车牌号格式错误, 报错
+          showToast(carResult)
+        }
+      }
+      // if (that.houseHoldCar) {
+      //   for (let i = 0; i < that.houseHoldCar.length; i++) {
+      //     if (that.houseHoldCar[i].carType === that.newCarObj.carType && that.houseHoldCar[i].carNum === that.newCarObj.carNum) {
+      //       showToast('您输入的车牌号已存在')
+      //     } else {
+      //       that.houseHoldCar.push(that.newCarObj)
+      //       that.newCarObj = {}
+      //       that.carType = '普通乘用车'
+      //     }
+      //   }
+      // }
+
+      // let arrLength = that.houseHoldLoginForm.houseHoldCar.length
+      // that.$set(that.houseHoldLoginForm.houseHoldCar, arrLength, that.newCarObj)
+      // that.carType = '普通乘用车'
+      this.houseHoldLoginForm['houseHoldCar'] = this.houseHoldCar
+      console.log('addcar:', this.houseHoldCar)
+    },
     // 去步骤二
+    // 点击下一步 会发送请求, 邀请码作为请求参数 验证是否存在邀请码
+    // 邀请码存在 1.有人员信息, 渲染人员信息和照片 2.无人员信息, 自己输入
     toStep2 () {
+      // 验证邀请码是否存在
+      let that = this
       if (this.houseHoldLoginForm.inviteCode) {
-        this.isStep1 = false
-        this.isStep2 = true
+        checkCode({
+          'data': {
+            'inviteCode': that.houseHoldLoginForm.inviteCode
+          }
+        }).then(res => {
+          const data = res.data
+          // console.log('data', data)
+          if (data.code === 200) {
+            // 通过身份证手机号查询人员是否存在
+            selectPerson({
+
+            })
+            if (data.data.id) {
+              this.$router.push('../../pages/ownerLogin/main')
+            } else {
+              that.isStep1 = false
+              that.isStep2 = true
+              console.log(res)
+            }
+          }
+        })
       } else {
         showToast('请输入邀请码')
       }
+
+      // if (this.houseHoldLoginForm.inviteCode) {
+      //   this.isStep1 = false
+      //   this.isStep2 = true
+      // } else {
+      //   showToast('请输入邀请码')
+      // }
     },
     // 去步骤三
     toStep3 () {
@@ -370,6 +634,10 @@ export default {
     font-size: 13px;
     color: #667dfa;
   }
+  .marginBottom {
+    height: 35px;
+    background: rgba(245, 246, 252, 1);
+  }
   // 步骤条视图区域
   .steps-container {
     display: flex;
@@ -432,8 +700,11 @@ export default {
   }
   // 每一步表单
   .household-login-box {
-    margin-top: 80px;
+    height: 100%;
+    margin-top: 31px;
+    color: #333;
     .login-form {
+      height: 100%;
       .step1-btn,
       .step2-btn {
         margin-bottom: 20px;
@@ -451,6 +722,7 @@ export default {
       .step1 {
         display: flex;
         flex-direction: column;
+        margin-top: 80px;
         .step1-input {
           display: flex;
           flex-direction: row;
@@ -459,26 +731,128 @@ export default {
           font-size: 14px;
           color: #333;
           span {
+            width: 20%;
             margin-right: 10.5px;
           }
-          .placeholderStyle {
-            color: red;
+          input {
+            width: 80%;
           }
         }
       }
       .step2 {
+        height: 100%;
         .step2-input {
           .houseHoldInput {
             display: flex;
             flex-direction: row;
             position: relative;
             align-items: center;
-            margin-top: 16px;
-            margin-bottom: 15px;
-            font-size: 14px;
+            margin-top: 12px;
+            margin-bottom: 10px;
+            font-size: 13.5px;
             input {
               position: absolute;
               left: 83px;
+              height: 100%;
+            }
+          }
+          .houseHoldCarInput {
+            display: flex;
+            flex-direction: column;
+            margin-top: 16px;
+            .car-radio {
+              display: flex;
+              flex-direction: row;
+              margin-bottom: 10px;
+              .radio-box {
+                font-size: 14px;
+                .isChecked {
+                  margin-right: 43px;
+                  img {
+                    height: 11px;
+                    width: 11px;
+                    margin-right: 3.5px;
+                  }
+                }
+              }
+            }
+          }
+        }
+        .car-input-wrapper {
+          height: 18%;
+          margin-left: 15px;
+          margin-right: 15px;
+          background: rgba(245, 246, 252, 1);
+          // 车辆列表渲染
+          .scroll-view {
+            height: 100%;
+            .cars-input {
+              height: 100%;
+              position: relative;
+              // .cars-list {
+              // display: flex;
+              // flex-direction: column;
+              .car-msg {
+                display: flex;
+                flex-direction: row;
+                position: relative;
+                align-items: center;
+                height: 44.5px;
+                margin-left: 23px;
+                margin-right: 23px;
+                font-size: 14px;
+                border-bottom: 0.5px solid #d2d7f0;
+                .car-type {
+                  width: 70px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  color: #333;
+                }
+                .car-number {
+                  display: flex;
+                  flex-direction: row;
+                  color: #666;
+                  input {
+                    width: 80px;
+                    height: 100%;
+                  }
+                  .err {
+                    position: absolute;
+                    right: 0;
+                    color: #cc3333;
+                  }
+                }
+              }
+            }
+          }
+        }
+        // 添加车辆样式
+        .add-car-wrapper {
+          position: relative;
+          height: 30px;
+          margin-left: 15px;
+          margin-right: 15px;
+          background: rgba(245, 246, 252, 1);
+          .add-car-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            bottom: 5px;
+            right: 23px;
+            width: 45px;
+            height: 18px;
+            background: rgba(255, 255, 255, 1);
+            border-radius: 9px;
+            color: #667dfa;
+            img {
+              width: 7px;
+              height: 7px;
+              margin-right: 4px;
+            }
+            span {
+              font-size: 11px;
             }
           }
         }
