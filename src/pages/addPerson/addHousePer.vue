@@ -1,7 +1,7 @@
 <template>
   <!-- 个人信息组件 -->
   <div class="person-msg-container">
-    <nav-bar navTitle='添加住户'></nav-bar>
+    <nav-bar navTitle='添加住户' @clickLeft='goBack'></nav-bar>
     <form @submit="addHouserPerson">
       <div class="person-msg">
         <div class="title-label">
@@ -13,10 +13,10 @@
             <span class="color333">照片</span>
             <div class="photo-right">
               <!-- 已选中图片 -->
-              <div v-if='houseHoldForm.perPhoto' @click="previewImage">
-                <avator-img round :src='houseHoldForm.perPhoto'></avator-img>
+              <div v-if='tempPhoto' @click="previewImage">
+                <avator-img round :src='tempPhoto'></avator-img>
               </div>
-              <div v-else @click="chooseImage">
+              <div v-else @click="choosePersonImg">
                 <avator-img round :src='defaultImg'></avator-img>
               </div>
               <div class="arrow-btn">
@@ -26,25 +26,25 @@
           </div>
           <div class="person-name borderB1px person-item">
             <span class="color333">姓名</span>
-            <input type="text" class="color999" placeholder="请输入姓名" v-model="houseHoldForm.name" maxlength="6"
+            <input type="text" class="color999" placeholder="请输入姓名" v-model="personName" maxlength="6"
               @input="inputName" @blur='onNameBlur' confirm-type="done" @confirm='onConfirm'>
           </div>
           <div class="person-sex borderB1px person-item">
             <span class="color333">性别</span>
             <div class="tel-right">
-              <input type="text" class="color999" placeholder="请选择性别" @click="chooseSex" v-model="houseHoldForm.sex"
-                disabled>
+              <input type="text" class="color999" placeholder="请选择性别" @click="chooseSex" v-model="personSex" disabled
+                @blur="onSexBlur">
               <arrow-btn @arrowClick='chooseSex' color='#9B9B9B'></arrow-btn>
             </div>
           </div>
           <div class="person-IDcard borderB1px person-item">
             <span class="color333">身份证号</span>
-            <input type="text" class="color999" placeholder="请输入身份证号" v-model="houseHoldForm.idCard"
-              @input="inputIdCard" maxlength="18" @blur="onIdCardBlur" confirm-type="done" @confirm='onConfirm'>
+            <input type="text" class="color999" placeholder="请输入身份证号" v-model="cardNum" @input="inputIdCard"
+              maxlength="18" @blur="onCardNumBlur" confirm-type="done" @confirm='onConfirm'>
           </div>
           <div class="person-tel person-item">
             <span class="color333">手机号</span>
-            <input type="text" class="color999" placeholder="请输入手机号" v-model="houseHoldForm.phone" @input="inputPhone"
+            <input type="text" class="color999" placeholder="请输入手机号" v-model="phoneNum" @input="inputPhone"
               maxlength="11" confirm-type="done" @confirm='onConfirm' @blur="onPhoneBlur">
           </div>
         </div>
@@ -60,8 +60,8 @@
           <div class="person-sex borderB1px person-item">
             <span class="color333">人员类型</span>
             <div class="tel-right">
-              <input type="text" class="color999" @click="choosePersonType" v-model="houseHoldForm.type"
-                placeholder="请选择人员类型" disabled>
+              <input type="text" class="color999" @click="choosePersonRegion" v-model="personRegion"
+                placeholder="请选择人员类型" disabled @blur="onPersonRegionBlur">
               <arrow-btn @arrowClick='choosePersonType' color='#9B9B9B'></arrow-btn>
             </div>
           </div>
@@ -69,9 +69,38 @@
           <div class="person-sex person-item">
             <span class="color333">车辆</span>
             <div class="tel-right" @click="toCarView">
-              <span class="color666">0</span>
+              <span class="color666">{{carLen}}</span>
               <div class="arrow-btn">
                 <arrow-btn color='#9B9B9B'></arrow-btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 权限信息 -->
+      <div class="housePer-msg">
+        <div class="title-label">
+          权限信息
+        </div>
+        <!-- 权限信息列表 -->
+        <div class="housePer-lists">
+          <!-- 进出权限 -->
+          <div class="person-sex borderB1px person-item">
+            <span class="color333">进出权限</span>
+            <div class="tel-right">
+              <input type="text" class="color999" @click="choosePassRole" v-model="passRole" placeholder="请选择进出权限"
+                disabled @blur="onPersonRegionBlur">
+              <arrow-btn @arrowClick='choosePassRole' color='#9B9B9B'></arrow-btn>
+            </div>
+          </div>
+          <!-- 邀请权限 -->
+          <div class="person-sex person-item">
+            <span class="color333">邀请权限</span>
+            <div class="tel-right">
+              <input type="text" class="color999" @click="chooseInviteRole" v-model="inviteRole" placeholder="请选择邀请权限"
+                disabled @blur="onPersonRegionBlur">
+              <div class="arrow-btn">
+                <arrow-btn color='#9B9B9B' @arrowClick='chooseInviteRole'></arrow-btn>
               </div>
             </div>
           </div>
@@ -85,7 +114,9 @@
   </div>
 </template>
 <script>
-import { showToast } from '../../api/wechat'
+import { showToast, chooseWxImage, transformBase64, getStorageSync } from '../../api/wechat'
+import { isName, isIdCard, isPhone } from '../../utils/index'
+import { faceDetect, addPerson } from '../../api/index'
 import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
@@ -102,31 +133,90 @@ export default {
   data () {
     return {
       defaultImg: '../../static/images/avator.png',
-      houseHoldForm: {
-        perPhoto: '',
-        name: '',
-        sex: '',
-        idCard: '',
-        phone: '',
-        type: ''
-      }
+      regPhoto: '',
+      tempPhoto: '',
+      personName: '',
+      personSexNum: '',
+      personSex: '',
+      personSexFlag: false,
+      cardNum: '',
+      phoneNum: '',
+      personRegion: '',
+      personRegionCode: '',
+      passRole: '',
+      isPass: '',
+      inviteRole: '',
+      isInvitation: '',
+      roomId: '',
+      carLen: '',
+      regPhotoFlag: false,
+      nameFlag: false,
+      sexFlag: false,
+      cardNumFlag: false,
+      phoneNumFlag: false,
+      personRegionFlag: false,
+      passFlag: false,
+      inviteFlag: false
     }
   },
-  mounted () {
+  created () {
+    const personDetail = getStorageSync('personMess')
+    // this.carLen = car.length
+    this.roomId = personDetail.rooms[0].roomId
+  },
+  // watch: {
+  //   $route (to, from) {
+  //     console.log('to:', to.path, 'from:', from.path)
+  //   }
+  // },
+  // mounted () {
+  //   const car = JSON.parse(this.$route.query.car)
+  //   console.log('car', car)
+  // },
+  destory () {
     Object.assign(this.$data, this.$options.data())
   },
   methods: {
     // 选择人像照片
-    chooseImage () {
+    choosePersonImg () {
       let that = this
-      wx.chooseImage({
-        count: 1,
-        sizeType: ['original', 'compressed'],
-        sourceType: ['album', 'camera'],
+      wx.showActionSheet({
+        itemList: ['从手机相册选择', '拍照'],
         success (res) {
-          // tempFilePath可以作为img标签的src属性显示图片
-          that.houseHoldForm.perPhoto = res.tempFilePaths
+          if (!res.cancel) {
+            if (res.tapIndex === 0) {
+              that.chooseWxImg('album')
+            } else if (res.tapIndex === 1) {
+              that.chooseWxImg('camera')
+            }
+          }
         }
+      })
+    },
+    // 上传头像照片
+    chooseWxImg (type) {
+      let that = this
+      chooseWxImage(type, (res) => {
+        // console.log('imgPath', res)
+        // 将 url 图片改为 base64
+        transformBase64(res[0], (res) => {
+          // console.log('imgBase64', res)
+          // const tempPhoto = 'data:image/png;base64,' + res.data
+          const tempPhoto = res.data
+          // 上传图片后进行人脸检测
+          faceDetect({
+            'data': {
+              'photo': tempPhoto
+            }
+          }).then(res => {
+            console.log('照片检查', res)
+            if (res.data.code === 200) {
+              that.regPhotoFlag = true
+              that.regPhoto = tempPhoto
+              that.tempPhoto = 'data:image/png;base64,' + tempPhoto
+            }
+          })
+        })
       })
     },
     // 预览图片
@@ -152,54 +242,49 @@ export default {
     inputName () {
 
     },
+    // 姓名失焦
     onNameBlur (e) {
-      this.name = e.mp.detail.value.trim()
-      var nameReg = /^[\u4E00-\u9FA5]{2,4}$/
-      if (this.name.length === 0) {
-        showToast('请选择姓名')
-      } else if (!nameReg.test(this.name)) {
-        this.name = ''
-        showToast('姓名仅支持2-4个中文字符')
+      let that = this
+      this.personName = e.mp.detail.value
+      const nameResult = isName(this.personName)
+      if (nameResult) {
+        showToast(nameResult)
+      } else {
+        that.nameFlag = true
       }
     },
     // 身份证号校验
     inputIdCard (e) {
 
     },
-    onIdCardBlur (e) {
-      this.idCard = e.mp.detail.value
-      // const isCard = isCardId(this.idCard)
-      // console.log(isCard)
-      const idCardReg = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
-      // const idReg = /^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$/
-      if (this.idCard.length === 0) {
-        showToast('请输入身份证号')
-        return false
-      } else if (!idCardReg.test(this.idCard)) {
-        showToast('请输入正确的身份证号')
-        this.idCard = ''
-        return false
+    // 身份证号失焦
+    onCardNumBlur (e) {
+      let that = this
+      this.cardNum = e.mp.detail.value
+      const idCardResult = isIdCard(this.cardNum)
+      if (idCardResult) {
+        showToast(idCardResult)
+      } else {
+        that.cardNumFlag = true
       }
     },
     // 手机号校验
     // 监听 手机 input 输入框
     inputPhone (e) {
       let filtered = e.target.value.replace(/^0|[^\d]/g, '')
-      if (this.phone !== filtered) {
-        this.phone = filtered
+      if (this.phoneNum !== filtered) {
+        this.phoneNum = filtered
       }
     },
-    // 失去焦点
+    // 手机号失去焦点
     onPhoneBlur (e) {
-      this.phone = e.mp.detail.value
-      let telReg = /^1[3-9][0-9]{9}$/
-      if (this.phone.length === 0) {
-        showToast('请输入手机号')
-        return false
-      } else if (!telReg.test(this.phone)) {
-        showToast('请输入正确的手机号')
-        this.phone = ''
-        return false
+      let that = this
+      this.phoneNum = e.mp.detail.value
+      const telResult = isPhone(this.phoneNum)
+      if (telResult) {
+        showToast(telResult)
+      } else {
+        that.phoneNumFlag = true
       }
     },
     // 虚拟键盘 点击 '完成'触发
@@ -219,36 +304,137 @@ export default {
     chooseSex () {
       let that = this
       wx.showActionSheet({
-        itemList: ['男', '女'],
+        itemList: ['未知', '男', '女'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.houseHoldForm.sex = '男'
-          } else {
-            that.houseHoldForm.sex = '女'
+            that.personSex = '未知'
+            that.personSexNum = res.tapIndex
+            that.sexFlag = true
+          } else if (res.tapIndex === 1) {
+            that.personSex = '男'
+            that.personSexNum = res.tapIndex
+            that.sexFlag = true
+          } else if (res.tapIndex === 2) {
+            that.personSex = '女'
+            that.personSexNum = res.tapIndex
+            that.sexFlag = true
           }
         }
       })
     },
     // 选择人员类型
-    choosePersonType () {
+    choosePersonRegion () {
       let that = this
       wx.showActionSheet({
-        itemList: ['户主', '租户'],
+        itemList: ['物业', '业主', '租户'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.houseHoldForm.type = '户主'
-          } else {
-            that.houseHoldForm.type = '租户'
+            that.personRegion = '物业'
+            that.personRegionCode = res.tapIndex
+            that.personRegionFlag = true
+          } else if (res.tapIndex === 1) {
+            that.personRegion = '业主'
+            that.personRegionCode = res.tapIndex
+            that.personRegionFlag = true
+          } else if (res.tapIndex === 2) {
+            that.personRegion = '租户'
+            that.personRegionCode = res.tapIndex
+            that.personRegionFlag = true
           }
+          // that.personRegionFlag = false
         }
       })
     },
     // 去车辆界面
     toCarView () {
-      this.$router.push('../../pages/cars/main')
+      this.$router.push('../../pages/houseHoldCar/main')
+    },
+    // 选择进出权限
+    choosePassRole () {
+      let that = this
+      wx.showActionSheet({
+        itemList: ['不可进出', '可进出'],
+        success (res) {
+          if (res.tapIndex === 0) {
+            that.passRole = '不可进出'
+            that.isPass = res.tapIndex
+            that.passFlag = true
+          } else if (res.tapIndex === 1) {
+            that.passRole = '可进出'
+            that.isPass = res.tapIndex
+            that.passFlag = true
+          }
+        }
+      })
+    },
+    // 选择邀请权限
+    chooseInviteRole () {
+      let that = this
+      wx.showActionSheet({
+        itemList: ['禁止邀请访客', '允许邀请访客'],
+        success (res) {
+          if (res.tapIndex === 0) {
+            that.inviteRole = '禁止邀请访客'
+            that.isInvitation = res.tapIndex
+            that.inviteFlag = true
+          } else if (res.tapIndex === 1) {
+            that.inviteRole = '允许邀请访客'
+            that.isInvitation = res.tapIndex
+            that.inviteFlag = true
+          }
+        }
+      })
     },
     addHouserPerson () {
-      console.log('添加住户')
+      let that = this
+      this.car = getStorageSync('car')
+      if (!this.regPhotoFlag) {
+        showToast('请上传人像照片')
+      } else if (!this.nameFlag) {
+        showToast('请检查姓名是否正确')
+      } else if (!this.sexFlag) {
+        showToast('请选择性别')
+      } else if (!this.cardNumFlag) {
+        showToast('请检查身份证号是否正确')
+      } else if (!this.phoneNumFlag) {
+        showToast('请检查手机号是否正确')
+      } else if (!this.personRegionFlag) {
+        showToast('请选择人员类型')
+      } else if (!this.passFlag) {
+        showToast('请选择进出权限')
+      } else if (!this.inviteFlag) {
+        showToast('请选择邀请权限')
+      } else {
+        addPerson({
+          'data': {
+            'rooms': [
+              {
+                'roomId': that.roomId,
+                'personRegioncode': that.personRegionCode
+              }],
+            'personName': that.personName,
+            'personSex': that.personSexNum,
+            'cardNum': that.cardNum,
+            'phoneNum': that.phoneNum,
+            'regPhoto': that.regPhoto,
+            'car': that.car,
+            'isPass': that.isPass,
+            'isInvitation': that.isInvitation
+          }
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.$router.push('../../pages/index/main')
+            wx.clearStorage('car')
+            console.log('addPerson', res)
+          } else {
+            showToast(res.data.message)
+          }
+        })
+      }
+    },
+    goBack () {
+      this.$router.push('../../pages/index/main')
+      // this.$router.go(-1)
     }
   }
 }

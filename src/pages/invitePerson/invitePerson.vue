@@ -1,6 +1,6 @@
 <template>
   <div class="invite-person-container">
-    <nav-bar navTitle='邀请'></nav-bar>
+    <nav-bar navTitle='邀请' @clickLeft='goBack'></nav-bar>
     <div class="title-label">
       被邀人信息
     </div>
@@ -9,26 +9,25 @@
       <div class="person-lists">
         <div class="person-name borderB1px person-item">
           <span class="color333">姓名</span>
-          <input type="text" class="color999" placeholder="请输入姓名" v-model="invitedPersonMsg.name" maxlength="6"
-            @input="inputName" @blur='onNameBlur' confirm-type="done" @confirm='onConfirm'>
+          <input type="text" class="color999" placeholder="请输入姓名" v-model="personName" maxlength="6" @input="inputName"
+            @blur='onNameBlur' confirm-type="done" @confirm='onConfirm'>
         </div>
         <div class="person-sex borderB1px person-item">
           <span class="color333">性别</span>
           <div class="tel-right">
-            <input type="text" class="color999" placeholder="请选择性别" v-model="invitedPersonMsg.sex" @click="chooseSex"
-              disabled>
+            <input type="text" class="color999" placeholder="请选择性别" v-model="personSex" @click="chooseSex" disabled>
             <arrow-btn @arrowClick='chooseSex' color='#9B9B9B'></arrow-btn>
           </div>
         </div>
         <div class="person-IDcard borderB1px person-item">
           <span class="color333">身份证号</span>
-          <input type="text" class="color999" placeholder="请输入身份证号" v-model="invitedPersonMsg.idCard"
-            @input="inputIdCard" maxlength="18" @blur="onIdCardBlur" confirm-type="done" @confirm='onConfirm'>
+          <input type="text" class="color999" placeholder="请输入身份证号" v-model="cardNumHidden" @input="inputCardNum"
+            maxlength="18" @blur="onCardNumBlur" confirm-type="done" @confirm='onConfirm'>
         </div>
         <div class="person-tel person-item">
           <span class="color333">手机号</span>
-          <input type="text" class="color999" placeholder="请输入手机号" v-model="invitedPersonMsg.phone" @input="inputPhone"
-            maxlength="11" confirm-type="done" @confirm='onConfirm' @blur="onPhoneBlur">
+          <input type="text" class="color999" placeholder="请输入手机号" v-model="phoneNum" @input="inputPhone" maxlength="11"
+            confirm-type="done" @confirm='onConfirm' @blur="onPhoneBlur">
         </div>
       </div>
       <!-- 新增邀请人按钮 -->
@@ -39,8 +38,9 @@
   </div>
 </template>
 <script>
-import { showToast } from '../../api/wechat'
-import { isName, isIdCard, isPhone, hidden } from '../../utils/index'
+import { showToast, getStorageSync } from '../../api/wechat'
+import { isName, isIdCard, isPhone, cardNumHidden } from '../../utils/index'
+import { toInvite } from '../../api/index'
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
 import navBar from '@/components/navBar'
@@ -48,70 +48,93 @@ export default {
   components: { arrowBtn, submitBtn, navBar },
   mounted () {
     Object.assign(this.$data, this.$options.data())
+    const personMess = getStorageSync('personMess')
+    this.roomId = personMess.rooms[0].roomId
   },
+  inject: ['reload'],
   data () {
     return {
-      invitedPersonMsg: {
-        name: '',
-        sex: '',
-        idCard: '',
-        phone: ''
-      }
+      cardNumHidden: '',
+      personName: '',
+      personSex: '',
+      cardNum: '',
+      phoneNum: '',
+      roomId: '',
+      nameFlag: false,
+      sexFlag: false,
+      cardNumFlag: false,
+      phoneNumFlag: false
     }
   },
   methods: {
     // 姓名输入框校验
     inputName () {
     },
+    // 姓名失焦
     onNameBlur (e) {
-      this.invitedPersonMsg.name = e.mp.detail.value.trim()
-      const nameResult = isName(this.invitedPersonMsg.name)
+      let that = this
+      this.personName = e.mp.detail.value
+      const nameResult = isName(this.personName)
       if (nameResult) {
         showToast(nameResult)
+      } else {
+        that.nameFlag = true
       }
     },
+    // 选择性别
+    chooseSex () {
+      let that = this
+      wx.showActionSheet({
+        itemList: ['未知', '男', '女'],
+        success (res) {
+          if (res.tapIndex === 0) {
+            that.personSex = '未知'
+            that.personSexNum = res.tapIndex
+            that.sexFlag = true
+          } else if (res.tapIndex === 1) {
+            that.personSex = '男'
+            that.personSexNum = res.tapIndex
+            that.sexFlag = true
+          } else if (res.tapIndex === 2) {
+            that.personSex = '女'
+            that.personSexNum = res.tapIndex
+            that.sexFlag = true
+          }
+        }
+      })
+    },
     // 身份证号校验
-    inputIdCard (e) {
+    inputCardNum (e) {
 
     },
-    onIdCardBlur (e) {
-      this.invitedPersonMsg.idCard = e.mp.detail.value
-      const idCardResult = isIdCard(this.invitedPersonMsg.idCard)
+    // 身份证号失焦
+    onCardNumBlur (e) {
+      let that = this
+      this.cardNum = e.mp.detail.value
+      this.cardNumHidden = cardNumHidden(this.cardNum)
+      const idCardResult = isIdCard(this.cardNum)
       if (idCardResult) {
         showToast(idCardResult)
       } else {
-        this.invitedPersonMsg.idCard = hidden(this.invitedPersonMsg.idCard, 3, 3)
+        that.cardNumFlag = true
       }
-
-      // console.log(this.idCard)
-
-      // const isCard = isCardId(this.idCard)
-      // console.log(isCard)
-      // const idCardReg = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
-      // const idReg = /^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$/
-      // if (this.idCard.length === 0) {
-      //   showToast('请输入身份证号')
-      //   return false
-      // } else if (!idCardReg.test(this.idCard)) {
-      //   showToast('请输入正确的身份证号')
-      //   this.idCard = ''
-      //   return false
-      // }
     },
-    // 手机号校验
     // 监听 手机 input 输入框
     inputPhone (e) {
       let filtered = e.target.value.replace(/^0|[^\d]/g, '')
-      if (this.invitedPersonMsg.phone !== filtered) {
-        this.invitedPersonMsg.phone = filtered
+      if (this.phoneNum !== filtered) {
+        this.phoneNum = filtered
       }
     },
-    // 失去焦点
+    // 手机号失去焦点
     onPhoneBlur (e) {
-      this.invitedPersonMsg.phone = e.mp.detail.value
-      const phoneResult = isPhone(this.invitedPersonMsg.phone)
-      if (phoneResult) {
-        showToast(phoneResult)
+      let that = this
+      this.phoneNum = e.mp.detail.value
+      const telResult = isPhone(this.phoneNum)
+      if (telResult) {
+        showToast(telResult)
+      } else {
+        that.phoneNumFlag = true
       }
     },
     // 虚拟键盘 点击 '完成'触发
@@ -127,24 +150,35 @@ export default {
     getValue () {
       return this.invitedPersonMsg.phone
     },
-    // 选择性别
-    chooseSex () {
-      let that = this
-      wx.showActionSheet({
-        itemList: ['男', '女'],
-        success (res) {
-          if (res.tapIndex === 0) {
-            that.invitedPersonMsg.sex = '男'
-          } else {
-            that.invitedPersonMsg.sex = '女'
-          }
-        }
-      })
-    },
     // 提交邀请数据
     invitePerson () {
-      this.$router.push('../../pages/inviteDetail/main')
-      console.log('邀请人员')
+      let that = this
+      if (!this.nameFlag) {
+        showToast('请检查姓名是否正确')
+      } else if (!this.sexFlag) {
+        showToast('请选择性别')
+      } else if (!this.cardNumFlag) {
+        showToast('请检查身份证号是否正确')
+      } else if (!this.phoneNumFlag) {
+        showToast('请检查手机号是否正确')
+      } else {
+        toInvite({
+          'data': {
+            'roomId': that.roomId,
+            'personName': that.personName,
+            'personSex': that.personSexNum,
+            'cardNum': that.cardNum,
+            'phoneNum': that.phoneNum
+          }
+        }).then(res => {
+          console.log('invitePerson', res)
+          this.$router.push('../../pages/index/main')
+          this.reload()
+        })
+      }
+    },
+    goBack () {
+      this.$router.push('../../pages/index/main')
     }
   }
 }

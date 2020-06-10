@@ -75,14 +75,14 @@ export default {
   },
   methods: {
     goBack () {
-      this.$router.push('../../pages/owner/main')
+      this.$router.push('../../pages/addPerson/main')
     },
     // 获取汽车数据
     getCarData () {
-      this.personMess = getStorageSync('personMess')
-      this.car = this.personMess.car
-      this.roomId = this.personMess.rooms[0].roomId
-      console.log(this.car)
+      // this.personMess = getStorageSync('personMess')
+      // this.car = this.personMess.car
+      // this.roomId = this.personMess.rooms[0].roomId
+      // console.log(this.car)
     },
     // 增加car
     addCar () {
@@ -125,10 +125,6 @@ export default {
         // }
       }
       console.log('addcar:', this.car)
-    },
-    // 返回上一页
-    onClickLeft () {
-      this.$router.go(-1)
     },
     // 监听车牌号输入框
     inputCarNum (e) {
@@ -180,39 +176,20 @@ export default {
     },
     // 增加车辆按钮
     submitCarMsg () {
-      const that = this
-      this.isHouseholder = this.personMess.rooms[0].isHouseholder
-      this.personId = this.personMess.id
-      // console.log(this.personMess)
-      // 是住户就发送添加车辆请求, 不是住户,把车辆信息存至缓存,作为发送添加住户的请求
-      if (parseInt(that.isHouseholder) === 1) {
-        // 车辆不为空
-        if (that.car.length !== 0 && that.carNumErrFlag) {
-          updateCar({
-            'data': {
-              'id': that.personId,
-              'roomId': that.roomId,
-              'car': that.car
-            }
-          }).then(res => {
-            getPersonMess().then(res => {
-              that.personMess = res.data.data
-              setStorageSync('personMess', that.personMess)
-              this.$router.push('../../pages/owner/main')
-              this.reload()
-            })
-            console.log('car', res)
+      let that = this
+      // 是住户,把车辆信息存至缓存,作为发送添加住户的请求
+      if (this.car.length !== 0) {
+        if (that.carNumErrFlag) {
+          // setStorageSync('car', that.car)
+          // this.$router.go(-1)
+          this.$router.push({
+            path: '../../pages/addPerson/main',
+            query: { car: that.car }
           })
-        } else {
-          showToast('请检查车牌号是否正确')
+          console.log('提交车辆1')
         }
       } else {
-        if (that.car.length !== 0) {
-          setStorageSync('car', that.car)
-          console.log('提交车辆1')
-        } else {
-          showToast('请检查车牌号是否正确')
-        }
+        showToast('请检查车牌号是否正确')
       }
     }
   }

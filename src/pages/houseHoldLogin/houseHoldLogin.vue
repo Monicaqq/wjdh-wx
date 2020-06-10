@@ -49,9 +49,8 @@
             <!-- 步骤一输入框 -->
             <div class="step1-input">
               <span>邀请码</span>
-              <input type="text" name="inviteCode" placeholder-style="color: #BCC2E1"
-                v-model="houseHoldLoginForm.inviteCode" @focus="onInviteFocus" @blur="onInviteBlur"
-                placeholder="请输入邀请码">
+              <input type="text" name="inviteCode" placeholder-style="color: #BCC2E1" v-model="inviteCode"
+                @focus="onInviteFocus" @blur="onInviteBlur" placeholder="请输入邀请码">
             </div>
             <!-- 聚焦下划线 -->
             <div :class="isInviteInputFocus ? 'borderBlue' : 'borderWhite'"></div>
@@ -61,7 +60,7 @@
             <button class="nextStepBtn" @click="toStep2">下一步</button>
           </div>
           <div class="account-login margin37">
-            <span @click="accountLogin">账号密码登录</span>
+            <span @click="accountLogin">微信授权绑定</span>
           </div>
         </div>
         <!-- 步骤二 -->
@@ -72,33 +71,30 @@
               <!-- 姓名输入框 -->
               <div class="houseHoldInput">
                 <span>户主姓名</span>
-                <input type="text" name="houseHoldName" placeholder-style="color: #BCC2E1"
-                  v-model="houseHoldLoginForm.houseHoldName" @focus="onHouseHoldNameFocus" @blur="onHouseHoldNameBlur"
-                  placeholder="请输入姓名">
+                <input type="text" name="houseHoldName" placeholder-style="color: #BCC2E1" v-model="personName"
+                  @focus="onHouseHoldNameFocus" @blur="onHouseHoldNameBlur" placeholder="请输入姓名">
               </div>
               <div :class="isHouseHoldNameFocus ? 'borderBlue' : 'borderWhite'"></div>
               <!-- 手机号输入框 -->
               <div class="houseHoldInput">
                 <span>手机号</span>
-                <input type="text" name="houseHoldTel" placeholder-style="color: #BCC2E1"
-                  v-model="houseHoldLoginForm.houseHoldTel" @focus="onHouseHoldTelFocus" @blur="onHouseHoldTelBlur"
-                  placeholder="请输入手机号">
+                <input type="text" name="houseHoldTel" placeholder-style="color: #BCC2E1" v-model="phoneNum"
+                  @focus="onHouseHoldTelFocus" @blur="onHouseHoldTelBlur" placeholder="请输入手机号">
               </div>
               <div :class="isHouseHoldTelFocus ? 'borderBlue' : 'borderWhite'"></div>
               <!-- 身份证号输入框 -->
               <div class="houseHoldInput">
                 <span>身份证号</span>
-                <input type="text" name="houseHoldIdCard" placeholder-style="color: #BCC2E1"
-                  v-model="houseHoldLoginForm.houseHoldIdCard" @focus="onHouseHoldIdCardFocus"
-                  @blur="onHouseHoldIdCardBlur" placeholder="请输入身份证号">
+                <input type="text" name="houseHoldIdCard" placeholder-style="color: #BCC2E1" v-model="cardNum"
+                  @focus="onHouseHoldIdCardFocus" @blur="onHouseHoldIdCardBlur" placeholder="请输入身份证号">
               </div>
               <div :class="isHouseHoldIdCardFocus ? 'borderBlue' : 'borderWhite'"></div>
               <!-- 性别选择框 -->
               <div class="houseHoldInput">
                 <span>性别</span>
-                <input type="text" name="houseHoldSex" placeholder-style="color: #BCC2E1"
-                  v-model="houseHoldLoginForm.houseHoldSex" @focus="onHouseHoldSexFocus" @blur="onHouseHoldSexBlur"
-                  placeholder="请选择性别" disabled @click="chooseSex">
+                <input type="text" name="houseHoldSex" placeholder-style="color: #BCC2E1" v-model="personSex"
+                  @focus="onHouseHoldSexFocus" @blur="onHouseHoldSexBlur" placeholder="请选择性别" disabled
+                  @click="chooseSex">
               </div>
               <div :class="isHouseHoldSexFocus ? 'borderBlue' : 'borderWhite'"></div>
               <!-- 车辆输入框 -->
@@ -121,14 +117,14 @@
             <scroll-view class="scroll-view" scroll-y='true'>
               <div class="cars-input">
                 <!-- 渲染车辆信息 -->
-                <div v-if="houseHoldCar.length !== 0">
-                  <div v-for="(item, index) in houseHoldCar" :key="index">
+                <div v-if="car.length !== 0">
+                  <div v-for="(item, index) in car" :key="index">
                     <div class="car-msg">
                       <div class="car-type">{{item.carType}}</div>
                       <div class="choose-icon">
                         <div class="triangle"></div>
                       </div>
-                      <div class="car-number">{{item.carNum}}</div>
+                      <div class="car-number">{{item.licensePlateNo}}</div>
                     </div>
                   </div>
                 </div>
@@ -144,9 +140,9 @@
                   </div>
                   <!-- 车辆输入框 -->
                   <div class="car-number">
-                    <input type="text" placeholder="请输入车辆" v-model="newCarObj.carNum" @input="inputCarNum" maxlength="8"
-                      confirm-type="done" @confirm='onConfirm' @change='onChange' @focus="onHouseHoldCarNumFocus"
-                      @blur="onHouseHoldCarBlur" placeholder-style="color: #BCC2E1">
+                    <input type="text" placeholder="请输入车辆" v-model="carObj.licensePlateNo" @input="inputCarNum"
+                      maxlength="8" confirm-type="done" @confirm='onConfirm' @change='onChange'
+                      @focus="onHouseHoldCarNumFocus" @blur="onHouseHoldCarBlur" placeholder-style="color: #BCC2E1">
                   </div>
                 </div>
               </div>
@@ -164,7 +160,7 @@
             <button class="nextStepBtn" @click="toStep3">下一步</button>
           </div>
           <div class="account-login margin37">
-            <span @click="accountLogin">账号密码登录</span>
+            <span @click="accountLogin">微信授权绑定</span>
           </div>
         </div>
         <!-- 步骤三 -->
@@ -172,13 +168,13 @@
           <!-- 步骤三添加图片 -->
           <div class="person-img">
             <!-- 展示头像 -->
-            <div class="houseHold-img" v-if="houseHoldLoginForm.houseHoldImg">
-              <img :src="houseHoldLoginForm.houseHoldImg" @click="previewImage">
+            <div class="houseHold-img" v-if="tempPhoto">
+              <img :src="tempPhoto" @click="previewImage">
             </div>
             <!-- 展示添加头像背景图 -->
             <div class="bg-img" v-else>
               <img :src="defaultImg">
-              <div class="camera-bg" @click="addPersonImg">
+              <div class="camera-bg" @click="choosePersonImg">
                 <img :src="cameraImg">
               </div>
             </div>
@@ -194,7 +190,7 @@
             <submit-btn btnText='确定' isActive></submit-btn>
           </div>
           <div class="account-login margin37">
-            <span @click="accountLogin">账号密码登录</span>
+            <span @click="accountLogin">微信授权绑定</span>
           </div>
         </div>
       </form>
@@ -202,11 +198,10 @@
   </div>
 </template>
 <script>
-import { showToast } from '../../api/wechat'
-// import { chooseImage } from '../../utils/common'
+import { showToast, chooseWxImage, transformBase64 } from '../../api/wechat'
 import { isName, isIdCard, isPhone, isCarNum } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
-import { checkCode, selectPerson } from '../../api/index'
+import { checkCode, selectPerson, faceDetect, personSave } from '../../api/index'
 export default {
   components: { submitBtn },
   mounted () {
@@ -221,9 +216,9 @@ export default {
   // },
   data () {
     return {
-      isStep1: true,
+      isStep1: false,
       isStep2: false,
-      isStep3: false,
+      isStep3: true,
       isInviteInputFocus: false,
       isHouseHoldNameFocus: false,
       isHouseHoldTelFocus: false,
@@ -235,6 +230,7 @@ export default {
       houseHoldIdCardFlag: false,
       houseHoldSexFlag: false,
       houseHoldCarFlag: false,
+      phoneCardFlag: false,
       isCheckedImg: '../../static/images/isChecked.png',
       notCheckedImg: '../../static/images/notChecked.png',
       addCarIcon: '../../static/images/addCarIcon.png',
@@ -252,35 +248,31 @@ export default {
         }
       ],
       carType: '普通乘用车',
-      newCarObj: {},
-      houseHoldCar: [
-        {
-          carType: '普通乘用车',
-          carNum: '苏K12222'
-        }, {
-          carType: '普通乘用车',
-          carNum: '苏K12223'
-        }
-      ],
-      houseHoldLoginForm: {
-        // 邀请码
-        inviteCode: '',
-        houseHoldName: '',
-        houseHoldTel: '',
-        houseHoldIdCard: '',
-        houseHoldSex: '',
-        hasCar: '',
-        // houseHoldCar: [
-        //   {
-        //   carType: '普通乘用车',
-        //   carNum: '苏K·12222'
-        // }
-        // ],
-        houseHoldImg: ''
-      },
       defaultImg: '../../static/images/default.png',
       cameraImg: '../../static/images/camera.png',
-      choiceIcon: '../../static/images/choice.png'
+      choiceIcon: '../../static/images/choice.png',
+      // 提交注册的人员信息
+      roomsObj: {},
+      rooms: [],
+      roomId: '',
+      roomFullName: '',
+      placeId: '',
+      inviteCode: '',
+      id: '',
+      personName: '',
+      personSex: '',
+      personSexNum: '',
+      cardNum: '',
+      phoneNum: '',
+      tempPhoto: '',
+      regPhoto: '',
+      hasCar: '',
+      carObj: {
+        'carType': '',
+        'licensePlateNo': ''
+      },
+      isExist: false,
+      car: []
     }
   },
   methods: {
@@ -304,8 +296,8 @@ export default {
     // 姓名输入框失焦
     onHouseHoldNameBlur (e) {
       this.isHouseHoldNameFocus = false
-      this.houseHoldLoginForm.houseHoldName = e.mp.detail.value
-      const nameResult = isName(this.houseHoldLoginForm.houseHoldName)
+      this.personName = e.mp.detail.value
+      const nameResult = isName(this.personName)
       if (nameResult) {
         showToast(nameResult)
       } else {
@@ -319,8 +311,8 @@ export default {
     // 手机号失焦
     onHouseHoldTelBlur (e) {
       this.isHouseHoldTelFocus = false
-      this.houseHoldLoginForm.houseHoldTel = e.mp.detail.value
-      const telResult = isPhone(this.houseHoldLoginForm.houseHoldTel)
+      this.phoneNum = e.mp.detail.value
+      const telResult = isPhone(this.phoneNum)
       if (telResult) {
         showToast(telResult)
       } else {
@@ -334,8 +326,8 @@ export default {
     // 身份证号失焦
     onHouseHoldIdCardBlur (e) {
       this.isHouseHoldIdCardFocus = false
-      this.houseHoldLoginForm.houseHoldIdCard = e.mp.detail.value
-      const idCardResult = isIdCard(this.houseHoldLoginForm.houseHoldIdCard)
+      this.cardNum = e.mp.detail.value
+      const idCardResult = isIdCard(this.cardNum)
       if (idCardResult) {
         showToast(idCardResult)
       } else {
@@ -349,7 +341,7 @@ export default {
     // 性别失焦
     onHouseHoldSexBlur () {
       this.isHouseHoldSexFocus = false
-      if (this.houseHoldLoginForm.houseHoldSex) {
+      if (this.personSex) {
         this.houseHoldSexFlag = true
       } else {
         showToast('请选择性别')
@@ -360,14 +352,22 @@ export default {
       this.isHouseHoldSexFocus = true
       let that = this
       wx.showActionSheet({
-        itemList: ['男', '女'],
+        itemList: ['未知', '男', '女'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.houseHoldLoginForm.houseHoldSex = '男'
-          } else {
-            that.houseHoldLoginForm.houseHoldSex = '女'
+            that.personSex = '未知'
+            that.personSexNum = res.tapIndex
+            that.houseHoldSexFlag = true
+          } else if (res.tapIndex === 1) {
+            that.personSex = '男'
+            that.personSexNum = res.tapIndex
+            that.houseHoldSexFlag = true
+          } else if (res.tapIndex === 2) {
+            that.personSex = '女'
+            that.personSexNum = res.tapIndex
+            that.houseHoldSexFlag = true
           }
-          that.isHouseHoldSexFocus = false
+          // that.isHouseHoldSexFocus = false
         }
       })
     },
@@ -376,14 +376,14 @@ export default {
       this.radios.forEach((item) => {
         item.isChecked = false
       })
-      this.houseHoldLoginForm.hasCar = this.radios[index].value
+      this.hasCar = this.radios[index].value
       if (this.radios[index].value !== '1') {
         this.isShowInput = false
       } else {
         this.isShowInput = true
       }
       this.radios[index].isChecked = true
-      console.log(this.houseHoldLoginForm.hasCar)
+      console.log(this.hasCar)
     },
     // 选择车辆类型
     chooseCarType (res) {
@@ -414,97 +414,56 @@ export default {
     // 输入框失去焦点, 验证车牌号,
     onHouseHoldCarBlur (e) {
       let that = this
-      this.newCarObj.carNum = e.mp.detail.value
-      let carResult = isCarNum(this.newCarObj.carNum)
+      this.carObj.licensePlateNo = e.mp.detail.value
+      let carResult = isCarNum(this.carObj.licensePlateNo)
       if (carResult) {
         showToast(carResult)
         that.carNumErrMsg = carResult
-        that.carNumErrFlag = true
+        that.carNumErrFlag = false
       } else {
         that.houseHoldCarFlag = true
-        that.newCarObj.carNum = that.newCarObj.carNum
-        that.newCarObj['carType'] = that.carType
+        that.carObj.licensePlateNo = that.carObj.licensePlateNo
+        that.carObj['carType'] = that.carType
       }
     },
     // 点击 增加车辆 按钮, 将新增的一条车辆信息push 到 车辆数组
     addCar () {
       var that = this
-      // if (!this.newCarObj.carNum) {
-      //   showToast('请输入车牌号')
-      // } else {
-      //   let carResult = isCarNum(that.newCarObj.carNum)
-      //   if (!carResult) {
-      //     that.newCarObj.carNum = carNumFormat(that.newCarObj.carNum)
-      //     that.houseHoldCar.push(that.newCarObj)
-      //     that.newCarObj = {}
-      //     that.carType = '普通乘用车'
-      //   } else {
-      //     showToast(carResult)
-      //   }
-      // }
       // 未输入车牌号
-      if (!this.newCarObj.carNum) {
+      if (!this.carObj.licensePlateNo) {
         showToast('请输入车牌号')
       } else {
         // 已输入车牌号
-        var carResult = isCarNum(that.newCarObj.carNum)
+        var carResult = isCarNum(that.carObj.licensePlateNo)
         // 输入了正确的车牌号
         if (!carResult) {
-          // let arr = [{'color': 'red', 'age': 18}]
-          // for (let obj of arr) {
-          //   console.log(obj)
-          // }
-          // 存在车辆信息, 验证唯一性 循环车辆数组
-          if (that.houseHoldCar.length > 0) {
-            for (let carItem of that.houseHoldCar) {
-              console.log('houseCar', that.houseHoldCar)
-              console.log('carItem0..', carItem)
-              if (that.newCarObj.carType === carItem.carType && that.newCarObj.carNum === carItem.carNum) {
+          if (that.car.length === 0) {
+            that.car.push(that.carObj)
+            that.carObj = {}
+          } else {
+            for (var carItem of that.car) {
+              if (that.carObj.carType === carItem.carType && that.carObj.licensePlateNo === carItem.licensePlateNo) {
                 showToast('您输入的车辆信息已存在')
-                that.newCarObj.carType = ''
-                that.newCarObj.carNum = ''
+                that.isExist = true
+                // that.carObj.carType = ''
                 return false
               } else {
-                // that.newCarObj.carNum = carNumFormat(that.newCarObj.carNum)
-                // that.newCarObj.carNum = that.newCarObj.carNum
-                // that.newCarObj['carType'] = that.carType
-                that.houseHoldCar.push(that.newCarObj)
-                console.log(that.houseHoldCar)
-                that.newCarObj = {}
-                that.carType = '普通乘用车'
-                return false
+                that.isExist = false
               }
             }
-            // that.newCarObj = {}
-            // that.carType = '普通乘用车'
-          } else {
-            that.houseHoldCar.push(that.newCarObj)
-            that.newCarObj = {}
-            that.carType = '普通乘用车'
+            if (!that.isExist) {
+              that.car.push(that.carObj)
+              console.log(that.car)
+              that.carObj = {}
+              that.carType = '普通乘用车'
+            }
           }
-          console.log('newCarObj', that.newCarObj)
         } else {
           // 车牌号格式错误, 报错
           showToast(carResult)
         }
       }
-      // if (that.houseHoldCar) {
-      //   for (let i = 0; i < that.houseHoldCar.length; i++) {
-      //     if (that.houseHoldCar[i].carType === that.newCarObj.carType && that.houseHoldCar[i].carNum === that.newCarObj.carNum) {
-      //       showToast('您输入的车牌号已存在')
-      //     } else {
-      //       that.houseHoldCar.push(that.newCarObj)
-      //       that.newCarObj = {}
-      //       that.carType = '普通乘用车'
-      //     }
-      //   }
-      // }
-
-      // let arrLength = that.houseHoldLoginForm.houseHoldCar.length
-      // that.$set(that.houseHoldLoginForm.houseHoldCar, arrLength, that.newCarObj)
-      // that.carType = '普通乘用车'
-      this.houseHoldLoginForm['houseHoldCar'] = this.houseHoldCar
-      console.log('addcar:', this.houseHoldCar)
+      console.log('addcar:', this.car)
     },
     // 去步骤二
     // 点击下一步 会发送请求, 邀请码作为请求参数 验证是否存在邀请码
@@ -512,41 +471,73 @@ export default {
     toStep2 () {
       // 验证邀请码是否存在
       let that = this
-      if (this.houseHoldLoginForm.inviteCode) {
+      if (this.inviteCode) {
         checkCode({
           'data': {
-            'inviteCode': that.houseHoldLoginForm.inviteCode
+            'inviteCode': that.inviteCode
           }
         }).then(res => {
           const data = res.data
-          // console.log('data', data)
+          // 根据邀请码 获取信息
+          that.inviteCode = data.data.inviteCode
+          that.placeId = data.data.placeId
+          that.roomsObj['roomId'] = data.data.roomId
+          that.roomsObj['roomFullName'] = data.data.fullName
+          that.rooms = that.rooms.push(that.roomsObj)
+          that.roomId = data.data.roomId
+          that.roomFullName = data.data.fullName
+          console.log('data', data)
           if (data.code === 200) {
-            // 通过身份证手机号查询人员是否存在
-            selectPerson({
-
-            })
-            if (data.data.id) {
-              this.$router.push('../../pages/ownerLogin/main')
-            } else {
-              that.isStep1 = false
-              that.isStep2 = true
-              console.log(res)
-            }
+            that.isStep1 = false
+            that.isStep2 = true
           }
         })
       } else {
         showToast('请输入邀请码')
       }
-
-      // if (this.houseHoldLoginForm.inviteCode) {
-      //   this.isStep1 = false
-      //   this.isStep2 = true
-      // } else {
-      //   showToast('请输入邀请码')
-      // }
     },
+    // 通过身份证手机号查询人员是否存在
+    selectPerson () {
+      let that = this
+      selectPerson({
+        'data': {
+          'cardNum': that.cardNum,
+          'phoneNum': that.phoneNum
+        }
+      }).then(res => {
+        console.log('手机号和身份证号验证', res)
+        const data = res.data
+        if (data.code === 200) {
+          that.phoneCardFlag = true
+          // id为空,则该人未注册过, 下一步上传照片.id 不为空, 拿到id,带出照片
+          if (data.id) {
+            that.regPhoto = data.regPhoto
+            that.tempPhoto = 'data:image/png;base64,' + data.regPhoto
+            that.phoneCardFlag = true
+          } else {
+            that.phoneCardFlag = true
+          }
+        } else {
+          // return false
+          that.phoneCardFlag = false
+        }
+        // const data = res.data
+        // id为空,则该人未注册过, 下一步上传照片.id 不为空, 拿到id,带出照片
+        // if (!data.id) {
+        //   this.toStep3()
+        // } else {
+        //   that.id = data.id
+        //   console.log(data.id)
+        //   that.regPhoto = data.regPhoto
+        //   that.tempPhoto = 'data:image/png;base64,' + data.regPhoto
+        // }
+      })
+    },
+
     // 去步骤三
     toStep3 () {
+      console.log('toStep3')
+      this.selectPerson()
       if (!this.houseHoldNameFlag) {
         showToast('请检查姓名是否正确')
       } else if (!this.houseHoldTelFlag) {
@@ -555,32 +546,76 @@ export default {
         showToast('请检查身份证号是否正确')
       } else if (!this.houseHoldSexFlag) {
         showToast('请选择性别')
+      } else if (!this.phoneCardFlag) {
+        showToast('身份证号与手机号不匹配')
       } else {
         this.isStep2 = false
         this.isStep3 = true
       }
     },
     // 添加人像
-    addPersonImg () {
+    choosePersonImg () {
       let that = this
-      wx.chooseImage({
-        count: 1,
-        sizeType: ['original', 'compressed'],
-        sourceType: ['album', 'camera'],
+      wx.showActionSheet({
+        itemList: ['从手机相册选择', '拍照'],
         success (res) {
-          // tempFilePath可以作为img标签的src属性显示图片
-          that.houseHoldLoginForm.houseHoldImg = res.tempFilePaths
+          if (!res.cancel) {
+            if (res.tapIndex === 0) {
+              that.chooseWxImg('album')
+            } else if (res.tapIndex === 1) {
+              that.chooseWxImg('camera')
+            }
+          }
         }
       })
-      console.log('添加人像')
     },
-    // 邀请码成功
+    // 上传照片
+    chooseWxImg (type) {
+      let that = this
+      chooseWxImage(type, (res) => {
+        // console.log('imgPath', res)
+        // 将 url 图片改为 base64
+        transformBase64(res[0], (res) => {
+          // console.log('imgBase64', res)
+          // const tempPhoto = 'data:image/png;base64,' + res.data
+          const tempPhoto = res.data
+          // 上传图片后进行人脸检测
+          faceDetect({
+            'data': {
+              'photo': tempPhoto
+            }
+          }).then(res => {
+            console.log('照片检查', res)
+            if (res.data.code === 200) {
+              that.regPhoto = tempPhoto
+              that.tempPhoto = 'data:image/png;base64,' + tempPhoto
+            }
+          })
+        })
+      })
+    },
+    // 通过邀请码, 注册成功
     inviteCodeFormSubmit () {
-      if (this.houseHoldLoginForm.houseHoldImg) {
-        console.log('邀请码登录')
-      } else {
-        showToast('请上传人像照片')
-      }
+      let that = this
+      personSave({
+        'data': {
+          'rooms': [{
+            'roomId': '01010101001001001001102',
+            'roomFullName': '01栋一单元一楼102室'
+          }],
+          'placeId': that.placeId,
+          'inviteCode': that.inviteCode,
+          'id': that.id,
+          'personName': that.personName,
+          'personSex': that.personSexNum,
+          'cardNum': that.cardNum,
+          'phoneNum': that.phoneNum,
+          'regPhoto': that.regPhoto,
+          'car': []
+        }
+      }).then(res => {
+        this.$router.push('../../pages/ownerLogin/main')
+      })
     },
     // 预览图片
     previewImage (e) {
@@ -592,11 +627,11 @@ export default {
           if (res.tapIndex === 0) {
             wx.previewImage({
               current: e.currentTarget.id,
-              urls: that.houseHoldLoginForm.houseHoldImg
+              urls: that.regPhoto
             })
           } else {
             // 选择删除
-            that.houseHoldLoginForm.houseHoldImg = ''
+            that.regPhoto = ''
           }
         }
       })

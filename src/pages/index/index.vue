@@ -2,317 +2,416 @@
   <!-- 首页 -->
   <div class="home-container">
     <!-- 用户授权 -->
-    <!-- <auth v-if="!isAuth" @getUserInfo="init"></auth> -->
-    <div class="nav-bar">
-      <van-nav-bar title-class='nav-title' title="仙林悦城"></van-nav-bar>
-    </div>
-    <!-- 头部用户信息 -->
-    <div>
-      <!-- 背景图片 -->
-      <img :src="bgImg">
-      <div class="user-container">
-        <img :src="bgImg">
-        <!-- 左侧用户头像 -->
-        <div class="user-avator">
-          <avator-img round :src='avator'></avator-img>
-        </div>
-        <!-- 右侧 用户名、角色、地址 -->
-        <div class="user-info">
-          <div class="user-name-role">
-            <div class="name">王逸飞</div>
-            <div class="role"><span>{{role}}</span></div>
+    <!-- <auth v-if="!isAuth"></auth> -->
+    <div v-if="isAuth" class="isAuth">
+      <div class="nav-bar">
+        <van-nav-bar title-class='nav-title' title="仙林悦城"></van-nav-bar>
+      </div>
+      <!-- 头部用户信息 -->
+      <div>
+        <!-- 背景图片 -->
+        <!-- <img :src="bgImg"> -->
+        <div class="user-container">
+          <img :src="bgImg">
+          <!-- 左侧用户头像 -->
+          <div class="user-avator">
+            <!-- <img :src='regPhoto' lazy='loading'> -->
+            <avator-img round :src='regPhoto'></avator-img>
           </div>
-          <div class="user-address">仙林悦城A区3栋2单元102室仙林悦城A区3栋2单元102室</div>
+          <!-- 右侧 用户名、角色、地址 -->
+          <div class="user-info">
+            <div class="user-name-role">
+              <div class="name">{{personName}}</div>
+              <div class="role"><span>{{isHouseholder == 1 ? '户主' : '业主'}}</span></div>
+            </div>
+            <div class="user-address">{{room.roomFullName}}</div>
+          </div>
+          <!-- 跳转至用户详情箭头 -->
+          <div class="toPersonMsg">
+            <arrow-btn @arrowClick='toPersonMsg' />
+          </div>
         </div>
-        <!-- 跳转至用户详情箭头 -->
-        <div class="toPersonMsg">
-          <arrow-btn @arrowClick='toPersonMsg' />
+        <!-- 通知、导航 -->
+        <div class="info-tabs-container">
+          <div class="info">
+            <img class="info-icon" :src='infoImg' />
+            <div class="info-text">{{infoText}}</div>
+          </div>
+          <div class="tabs">
+            <div v-if='isOwner' :class="[tab, currentTab == 0 ? 'select' : '']" @click='tabClick' data-id='0'>住户</div>
+            <div :class="[tab, currentTab == 1 ? 'select' : '']" @click='tabClick' data-id='1'>报修</div>
+            <div :class="[tab, currentTab == 2 ? 'select' : '']" @click='tabClick' data-id='2'>邀请</div>
+            <div :class="[tab, currentTab == 3 ? 'select' : '']" @click='tabClick' data-id='3'>通知</div>
+          </div>
         </div>
       </div>
-      <!-- 通知、导航 -->
-      <div class="info-tabs-container">
-        <div class="info">
-          <img class="info-icon" :src='infoImg' />
-          <div class="info-text">{{infoText}}</div>
-        </div>
-        <div class="tabs">
-          <div v-if='isOwner' :class="[tab, currentTab == 0 ? 'select' : '']" @click='tabClick' data-id='0'>住户</div>
-          <div :class="[tab, currentTab == 1 ? 'select' : '']" @click='tabClick' data-id='1'>报修</div>
-          <div :class="[tab, currentTab == 2 ? 'select' : '']" @click='tabClick' data-id='2'>邀请</div>
-          <div :class="[tab, currentTab == 3 ? 'select' : '']" @click='tabClick' data-id='3'>通知</div>
-        </div>
-      </div>
-    </div>
-    <!-- 页面主体列表 -->
-    <div class="main-container">
-      <div class="main-content">
-        <!-- 住户界面 -->
-        <!-- <div v-if='isOwner' class="height-1px"> -->
-        <div v-if='currentTab == 0 && isOwner' class="scroll-container">
-          <scroll-view class="scroll-view" scroll-y='true'>
-            <div class="house-lists" v-for='(item, index) in personList' :key='index'>
-              <div class="house-item" @click="toHouseHold">
-                <!-- 左侧用户头像 -->
-                <avator-img round :src='item.avator'></avator-img>
-                <!-- 中间住户信息 -->
-                <div class="house-person">
-                  <div class="house-person-up">
-                    <div class="person-name">{{item.personName}}</div>
-                    <div class="person-sex">
-                      <img :src="female" v-if='item.personSex == 0'>
-                      <img :src="male" v-if='item.personSex == 1'>
+      <!-- 页面主体列表 -->
+      <div class="main-container">
+        <div class="main-content">
+          <!-- 住户界面 -->
+          <div v-if="currentTab == 0 && isOwner" class="scroll-container">
+            <scroll-view class="scroll-view" scroll-y='true'>
+              <div v-if='houseHoldList.length === 0' class="nullData">
+                暂无住户数据
+              </div>
+              <div v-else>
+                <div class="house-lists" v-for='(item, index) in houseHoldList' :key='index'>
+                  <div class="house-item" @click="toHouseHold(item)">
+                    <!-- 左侧用户头像 -->
+                    <avator-img round :src='getImgUrl(item.regPhoto)'>
+                    </avator-img>
+                    <!-- 中间住户信息 -->
+                    <div class="house-person">
+                      <div class="house-person-up">
+                        <div class="person-name">{{item.personName}}</div>
+                        <div class="person-sex">
+                          <img :src="female" v-if='item.personSex == 2'>
+                          <img :src="male" v-else>
+                        </div>
+                        <div
+                          :class="['person-role', item.personRegioncode == 1 ? 'wy' : (item.personRegioncode == 2 ? 'yz':'zh')]">
+                          {{item.personRegioncode == 1 ? '物业' : (item.personRegioncode == 2 ? '业主' : '租户')}}
+                        </div>
+                      </div>
+                      <div class="person-tel">{{item.phoneNum}}</div>
                     </div>
-                    <div :class="['person-role', item.personRole == 3001 ? 'hz' : 'wy']">{{item.personRole}}
+                    <!-- 右侧 跳转至住户信息界面 -->
+                    <div class="toHousePerson">
+                      <arrow-btn color='#D2D7F0' @arrowClick='toHouseHold' />
                     </div>
                   </div>
-                  <div class="person-tel">{{item.telephone}}</div>
-                </div>
-                <!-- 右侧 跳转至住户信息界面 -->
-                <div class="toHousePerson">
-                  <arrow-btn color='#D2D7F0' @arrowClick='toHouseHold' />
-                </div>
-              </div>
-            </div>
-          </scroll-view>
-        </div>
-        <!-- </div> -->
-        <!-- 报修界面 -->
-        <div v-if='currentTab == 1' class="scroll-container">
-          <scroll-view scroll-y="true" class="scroll-view">
-            <div v-for="(item, index) in tabLists" :key="index">
-              <div @click="toRepairDetail">
-                <tab-lists :data='item' isRepair></tab-lists>
-              </div>
-            </div>
-          </scroll-view>
-        </div>
-        <!-- 邀请界面 -->
-        <!-- 如果有邀请权限, 展示邀请界面 -->
-        <div v-if='currentTab == 2' class="scroll-container">
-          <div v-if="hasInviteRole" class="height-1px">
-            <scroll-view scroll-y='true' class="scroll-view">
-              <div v-for="(item, index) in tabLists" :key="index">
-                <div @click="toInviteDetail">
-                  <tab-lists :data='item'></tab-lists>
                 </div>
               </div>
             </scroll-view>
           </div>
-          <!-- 无邀请权限界面展示 -->
-          <div v-else>
-            <div class="notInviteRole">
-              <div>您的邀请功能未开启请联系户主</div>
-            </div>
+          <!-- 报修界面 -->
+          <div v-if='currentTab == 1' class="scroll-container">
+            <scroll-view scroll-y="true" class="scroll-view">
+              <div v-if='repairList.length === 0' class="nullData">
+                暂无报修数据
+              </div>
+              <div>
+                <div v-for="(item, index) in repairList" :key="index">
+                  <div @click="toRepairDetail(item)">
+                    <tab-lists :repairList='item' isRepair></tab-lists>
+                  </div>
+                </div>
+              </div>
+            </scroll-view>
           </div>
-        </div>
-        <!-- 通知界面 -->
-        <div v-if='currentTab == 3' class="scroll-container">
-          <scroll-view class="scroll-view" scroll-y='true'>
-            <div v-for="(item, index) in tabLists" :key="index">
-              <div @click="toInfoDetail">
-                <tab-lists :data='item'></tab-lists>
+          <!-- 邀请界面 -->
+          <!-- 如果有邀请权限, 展示邀请界面 -->
+          <div v-if='currentTab == 2' class="scroll-container">
+            <div v-if="isInvitation" class="height-1px">
+              <scroll-view scroll-y='true' class="scroll-view">
+                <div v-if='inviteList.length === 0' class="nullData">
+                  暂无邀请数据
+                </div>
+                <div v-else>
+                  <div v-for="(item, index) in inviteList" :key="index">
+                    <div @click="toInviteDetail(item)">
+                      <tab-lists :inviteList='item' isInvite></tab-lists>
+                    </div>
+                  </div>
+                </div>
+              </scroll-view>
+            </div>
+            <!-- 无邀请权限界面展示 -->
+            <div v-else>
+              <div class="notInviteRole">
+                <div>您的邀请功能未开启请联系户主</div>
               </div>
             </div>
-          </scroll-view>
-        </div>
-      </div>
-      <!-- 页面下方提交按钮 -->
-      <div class="submit-btn">
-        <div class="add-person" v-if='isOwner'>
-          <submit-btn btnText='添加住户' @submitClick='addHousePerson' isActive v-if='currentTab == 0'></submit-btn>
-        </div>
-        <div class="repair-btn">
-          <submit-btn btnText='报修' @submitClick='applyRepair' isActive v-if='currentTab == 1'></submit-btn>
-        </div>
-        <div class="invite-btn" v-if='currentTab == 2'>
-          <!-- 有邀请权限 -->
-          <div v-if="hasInviteRole" class="hasInvite">
-            <submit-btn btnText='邀请' @submitClick='invitePerson' isActive></submit-btn>
           </div>
-          <!-- 无邀请权限 -->
-          <div v-else>
-            <submit-btn btnText='邀请' isShadow></submit-btn>
+          <!-- 通知界面 -->
+          <div v-if='currentTab == 3' class="scroll-container">
+            <scroll-view class="scroll-view" scroll-y='true'>
+              <div v-if='infoList.length === 0' class="nullData">
+                暂无通知数据
+              </div>
+              <div>
+                <div v-for="(item, index) in infoList" :key="index">
+                  <div @click="toInfoDetail(item)">
+                    <tab-lists :infoList='item' isInfo></tab-lists>
+                  </div>
+                </div>
+              </div>
+            </scroll-view>
+          </div>
+        </div>
+        <!-- 页面下方提交按钮 -->
+        <div class="submit-btn">
+          <div class="add-person" v-if='isOwner'>
+            <submit-btn btnText='添加住户' @submitClick='addHousePerson' isActive v-if='currentTab == 0'></submit-btn>
+          </div>
+          <div class="repair-btn">
+            <submit-btn btnText='报修' @submitClick='applyRepair' isActive v-if='currentTab == 1'></submit-btn>
+          </div>
+          <div class="invite-btn" v-if='currentTab == 2'>
+            <!-- 有邀请权限 -->
+            <div v-if="isInvitation" class="hasInvite">
+              <submit-btn btnText='邀请' @submitClick='invitePerson' isActive></submit-btn>
+            </div>
+            <!-- 无邀请权限 -->
+            <div v-else>
+              <submit-btn btnText='邀请' isShadow></submit-btn>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 <script>
-import auth from '@/components/auth'
+// import auth from '@/components/auth'
 import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
 import tabLists from '@/components/tabLists'
-// import { setStorageSync, getStorageSync } from '../../api/wechat'
+import { getToken, setStorageSync, showLoading, hideLoading, getStorageSync } from '../../api/wechat'
+import { API_URL, getPersonMess, getHouseHoldList, getInviteList, getRepairList, getInfoList } from '../../api/index'
 export default {
-  components: { auth, avatorImg, arrowBtn, submitBtn, tabLists },
-  mounted () {
-    this.init()
+  components: { avatorImg, arrowBtn, submitBtn, tabLists },
+  created () {
+    this.getToken()
     if (!this.isOwner) {
       this.currentTab = 1
-      this.role = '业主'
     }
+  },
+  mounted () {
+    this.getRoom()
   },
   data () {
     return {
       // 是否授权
-      // isAuth: false,
+      isAuth: false,
       // 是否是户主
       isOwner: true,
-      role: '户主',
+      isHouseholder: '',
       // 是否具有邀请权限
-      hasInviteRole: true,
+      isInvitation: false,
+      // 人员信息
+      regPhoto: '../../static/images/avator.png',
+      personMess: {},
+      personName: '',
+      personAddress: '',
+      rooms: [],
+      room: {},
+      personId: '',
+      houseHoldList: [],
+      inviteList: [],
+      repairList: [],
+      infoList: [],
       bgImg: '../../static/images/bg.png',
       avator: '../../static/images/user1.png',
       infoImg: '../../static/images/info.png',
-      infoText: '小区2020年度物业收取通知小区2020年度物业收取通知',
+      infoText: '',
       currentTab: 0,
       female: '../../static/images/female.png',
-      male: '../../static/images/male.png',
-      personList: [
-        {
-          id: 0,
-          avator: '../../static/images/user1.png',
-          personName: '赵小磊',
-          personSex: 0,
-          personRole: '业主',
-          telephone: '13898929333'
-        },
-        {
-          id: 1,
-          avator: '../../static/images/user1.png',
-          personName: '赵小丫',
-          personSex: 1,
-          personRole: '3001',
-          telephone: '13898929333'
-        },
-        {
-          id: 2,
-          avator: '../../static/images/user1.png',
-          personName: '赵小磊',
-          personSex: 0,
-          personRole: '业主',
-          telephone: '13898929333'
-        },
-        {
-          id: 3,
-          avator: '../../static/images/user1.png',
-          personName: '赵小丫',
-          personSex: 1,
-          personRole: '3001',
-          telephone: '13898929333'
-        }, {
-          id: 4,
-          avator: '../../static/images/user1.png',
-          personName: '赵小磊',
-          personSex: 0,
-          personRole: '业主',
-          telephone: '13898929333'
-        },
-        {
-          id: 5,
-          avator: '../../static/images/user1.png',
-          personName: '赵小丫',
-          personSex: 1,
-          personRole: '3001',
-          telephone: '13898929333'
-        }
-      ],
-      // 报修数据
-      tabLists: [
-        {
-          infoMsg: '路灯坏了路灯坏了路灯坏了路灯坏了路灯坏了',
-          repairType: '公共设施',
-          time: '2020',
-          replyState: '已回复'
-        },
-        {
-          infoMsg: '路灯坏了',
-          repairType: '公共设施',
-          time: '2020',
-          replyState: '0'
-        },
-        {
-          infoMsg: '路灯坏了',
-          repairType: '公共设施',
-          time: '',
-          replyState: '0'
-        }, {
-          infoMsg: '路灯1212坏了',
-          repairType: '公共设施',
-          time: '',
-          replyState: '0'
-        }, {
-          infoMsg: '路灯212坏了',
-          repairType: '公共设施',
-          time: '2020',
-          replyState: '0'
-        },
-        {
-          infoMsg: '路灯11坏了',
-          repairType: '公共设施',
-          time: '',
-          replyState: '0'
-        }, {
-          infoMsg: '路灯12坏了',
-          repairType: '公共设施',
-          time: '2021qq',
-          replyState: '0'
-        }, {
-          infoMsg: '路灯21坏了',
-          repairType: '公共设施',
-          time: '2020',
-          replyState: '0'
-        },
-        {
-          infoMsg: '路灯21坏了',
-          repairType: '公共设施',
-          time: '',
-          replyState: '0'
-        }, {
-          infoMsg: '路灯aa坏了',
-          repairType: '公共设施',
-          time: '2021',
-          replyState: '0'
-        }
-      ]
+      male: '../../static/images/male.png'
     }
   },
   methods: {
+    // 获取token
+    getToken () {
+      let that = this
+      getToken(res => {
+        that.isAuth = true
+        that.getRoom()
+        that.getPersonMess()
+        // that.room = getStorageSync('room')
+      })
+      // let that = this
+      // if (getStorageSync('token')) {
+      //   that.isAuth = true
+      //   that.getPersonMess()
+      // } else {
+      //   getToken((res) => {
+      //     console.log('token success', res)
+      //     that.isAuth = true
+      //   })
+      // }
+    },
+    // 获取缓存中  room
+    getRoom () {
+      let that = this
+      if (getStorageSync('room')) {
+        that.room = getStorageSync('room')
+        that.getHouseHoldList()
+        that.getRepairList()
+        that.getInviteList()
+        return false
+      } else {
+        that.getPersonMess()
+      }
+    },
+    // 图片路径拼接
+    getImgUrl (img) {
+      return `${API_URL}${img}`
+    },
+    // 首页所有请求
+    // allRequest () {
+    //   this.getHouseHoldList()
+    //   this.getRepairList()
+    //   this.getInviteList()
+    //   this.getInfoList()
+    // },
+    // 获取首页人员信息
+    getPersonMess () {
+      let that = this
+      getPersonMess().then(res => {
+        that.personMess = res.data.data
+        setStorageSync('personMess', that.personMess)
+        that.regPhoto = ('data:image/png;base64,' + that.personMess.regPhoto).replace(/[\r\n]/g, '')
+        that.personName = that.personMess.personName
+        that.personId = that.personMess.id
+        that.rooms = that.personMess.rooms
+        for (var roomItem of that.rooms) {
+          if (roomItem.isDefault === 1) {
+            that.personAddress = roomItem.roomFullName
+            that.infoText = roomItem.notice
+            that.isHouseholder = roomItem.isHouseholder
+            that.room = {
+              'roomId': roomItem.roomId,
+              'roomFullName': roomItem.roomFullName
+            }
+            // setStorageSync('room', that.room)
+            // that.roomId = roomItem.roomId
+            that.isInvitation = roomItem.isInvitation
+          } else {
+            that.personAddress = that.rooms[0].roomFullName
+            that.infoText = that.rooms[0].notice
+            that.isHouseholder = that.rooms[0].isHouseholder
+            // that.roomId = that.rooms[0].roomId
+            that.room = {
+              'roomId': that.rooms[0].roomId,
+              'roomFullName': that.rooms[0].roomFullName
+            }
+            // setStorageSync('room', that.room)
+            that.isInvitation = that.rooms[0].isInvitation
+          }
+        }
+        if (parseInt(that.isHouseholder) === 1) {
+          that.isOwner = true
+        } else {
+          that.isOwner = false
+        }
+        if (parseInt(that.isInvitation) === 1) {
+          that.isInvitation = true
+        } else {
+          that.isInvitation = false
+        }
+        hideLoading()
+        console.log(res)
+        // 住户列表
+        that.getHouseHoldList()
+        // 报修列表
+        that.getRepairList()
+        // 邀请列表
+        that.getInviteList()
+        // 通知列表
+        that.getInfoList()
+      }).catch(() => {
+        hideLoading('加载失败')
+      })
+    },
+    // 获取房间下住户
+    getHouseHoldList () {
+      let that = this
+      getHouseHoldList({
+        'data': {
+          'roomId': that.room.roomId,
+          'personId': that.personId
+        }
+      }).then(res => {
+        that.houseHoldList = res.data.data
+        console.log('houseHoldList', that.houseHoldList)
+      })
+    },
+    // 报修列表
+    getRepairList () {
+      let that = this
+      getRepairList({
+        'data': {
+          'pageNo': 1,
+          'pageSize': 10,
+          'roomId': that.room.roomId
+        }
+      }).then(res => {
+        that.repairList = res.data.data.rows
+        console.log('报修列表', that.repairList)
+      })
+    },
+    // 访客列表
+    getInviteList () {
+      let that = this
+      getInviteList({
+        'data': {
+          'pageNo': 1,
+          'pageSize': 20,
+          'personId': that.personId,
+          'roomId': that.room.roomId
+        }
+      }).then(res => {
+        console.log('邀请', res)
+        that.inviteList = res.data.data.rows
+        console.log('邀请列表', that.inviteList)
+      })
+    },
+    // 通知列表
+    getInfoList () {
+      let that = this
+      getInfoList({
+        'data': {
+          'pageNo': 1,
+          'pageSize': 10,
+          'noticeTimeBegin': '',
+          'noticeTimeEnd': '',
+          'noticeTitle': '',
+          'roomIds': that.roomId
+        }
+      }).then(res => {
+        that.infoList = res.data.data.rows
+        console.log('infoList', that.infoList)
+      })
+    },
     // 切换 tab 标签
     tabClick (e) {
+      // let that = this
+      // if (parseInt(this.currentTab) === 1) {
+      //   that.getRepairList()
+      // }
       this.currentTab = e.currentTarget.dataset.id
-      // this.btnText = ''
       console.log(e)
       console.log(this.currentTab)
     },
     // 跳转至个人信息页面
     toPersonMsg () {
-      // getOwnerData()
-      //   .then(res => {
-      //     console.log(res)
-      //   })
-      //   .catch(() => {
-      //     console.log('请求失败')
-      //   })
-      // this.$router.push('../../pages/owner/main')
-      // console.log('去户主个人信息界面')
+      // let that = this
+      this.$router.push({
+        path: '../../pages/owner/main'
+      })
     },
-    // 跳转至住户界面
-    toHouseHold (e) {
-      this.$router.push('../../pages/houseHold/main')
-      console.log(e)
+    // 跳转至住户详情
+    toHouseHold (item) {
+      this.$router.push({
+        path: '../../pages/houseHold/main',
+        query: {
+          personId: item.personId,
+          houId: item.houId
+        }
+      })
     },
     // 跳转至添加住户界面
-    addHousePerson () {
+    addHousePerson (item) {
       this.$router.push('../../pages/addPerson/main')
     },
     // 报修详情页面
-    toRepairDetail () {
-      this.$router.push('../../pages/repairDetail/main')
-      console.log('去报修详情页')
+    toRepairDetail (item) {
+      this.$router.push({
+        path: '../../pages/repairDetail/main',
+        query: { item: JSON.stringify(item) }
+      })
     },
     // 跳转至新增报修界面
     applyRepair () {
@@ -324,15 +423,21 @@ export default {
       console.log('邀请人员')
       this.$router.push('../../pages/invitePerson/main')
     },
-    // 查看邀请的人员信息
-    toInviteDetail () {
-      console.log('查看邀请的详情')
-      this.$router.push('../../pages/inviteDetail/main')
+    // 查看邀请详情
+    toInviteDetail (item) {
+      if (this.isInvitation) {
+        this.$router.push({
+          path: '../../pages/inviteDetail/main',
+          query: { item: JSON.stringify(item) }
+        })
+      }
     },
     // 跳转至通知详情页面
-    toInfoDetail () {
-      console.log('查看通知详情')
-      this.$router.push('../../pages/infoDetail/main')
+    toInfoDetail (item) {
+      this.$router.push({
+        path: '../../pages/infoDetail/main',
+        query: { item: JSON.stringify(item) }
+      })
     }
   }
 }
@@ -346,6 +451,9 @@ export default {
   width: 100%;
   height: 100%;
   background: rgba(255, 255, 255, 1);
+  .isAuth {
+    height: 100%;
+  }
   img {
     width: 100%;
     height: 109px;
@@ -374,6 +482,10 @@ export default {
       background: rgba(255, 255, 255, 0.6);
       border-radius: 50%;
       z-index: 99;
+      img {
+        width: 47px;
+        height: 47px;
+      }
     }
     .user-info {
       z-index: 99;
@@ -475,17 +587,17 @@ export default {
   }
   // 页面主体样式
   .main-container {
-    height: calc(100% - 265px);
+    height: calc(100% - 275px);
     position: relative;
     .main-content {
-      height: calc(100% - 90px);
+      height: calc(100% - 83px);
       // height: 100%;
       position: relative;
       background: rgba(255, 255, 255, 1);
       margin: 14px 15px 1px 15px;
       overflow: hidden;
       .scroll-container {
-        height: 100%;
+        height: calc(100% - 1px);
         .scroll-view {
           height: 100%;
         }
@@ -536,13 +648,17 @@ export default {
                 line-height: 15px;
                 text-align: center;
               }
-              .hz {
+              .yz {
                 background: rgba(255, 236, 203, 1);
                 color: rgba(158, 87, 25, 1);
               }
               .wy {
                 background: rgba(223, 245, 236, 1);
                 color: rgba(7, 132, 81, 1);
+              }
+              .zh {
+                background: rgba(226, 230, 246, 1);
+                color: rgba(76, 85, 124, 1);
               }
             }
             .person-tel {
@@ -556,7 +672,8 @@ export default {
         }
       }
       // 无邀请权限的界面
-      .notInviteRole {
+      .notInviteRole,
+      .nullData {
         display: flex;
         flex-direction: column;
         align-items: center;

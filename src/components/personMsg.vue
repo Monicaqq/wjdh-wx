@@ -10,7 +10,7 @@
         <div class="person-photo borderB1px person-item">
           <span class="color333">照片</span>
           <div class="photo-right">
-            <avator-img round :src='perPhoto'></avator-img>
+            <avator-img round :src='regPhoto'></avator-img>
             <div class="arrow-btn">
               <arrow-btn @arrowClick='addAvator' color='#9B9B9B'></arrow-btn>
             </div>
@@ -18,21 +18,21 @@
         </div>
         <div class="person-name borderB1px person-item">
           <span class="color333">姓名</span>
-          <span class="color666">王逸飞</span>
+          <span class="color666">{{personMsg.personName}}</span>
         </div>
         <div class="person-sex borderB1px person-item">
           <span class="color333">性别</span>
-          <span class="color666">女</span>
+          <span class="color666">{{personMsg.personSex == 0 ? '未知' : (personMsg.personSex == 1 ? '男' : '女')}}</span>
         </div>
         <div class="person-IDcard borderB1px person-item">
           <span class="color333">身份证号</span>
-          <span class="color666">321023192003330003</span>
+          <span class="color666">{{cardNum}}</span>
         </div>
         <div class="person-tel person-item">
           <span class="color333">手机号</span>
-          <div class="tel-right" @click="toTelView">
-            <span class="color666">1983343433</span>
-            <arrow-btn color='#9B9B9B'></arrow-btn>
+          <div class="tel-right">
+            <span class="color666">{{personMsg.phoneNum}}</span>
+            <!-- <arrow-btn color='#9B9B9B'></arrow-btn> -->
           </div>
         </div>
       </div>
@@ -48,23 +48,32 @@
         <div class="person-tel borderB1px person-item" v-if='isPerson'>
           <span class="color333">住址</span>
           <div class="tel-right">
-            <span class="color666">仙林悦城A区3栋2单元2012室</span>
-            <arrow-btn @arrowClick='chooseAddress' color='#9B9B9B'></arrow-btn>
+            <!-- <div> -->
+            <picker @change="chooseAddress" :value='index' :range='rooms' :range-key="'roomFullName'">
+              <div class="picker">
+                <span class="color666">{{rooms[index].roomFullName}}</span>
+                <arrow-btn color='#9B9B9B'></arrow-btn>
+              </div>
+            </picker>
+            <!-- </div> -->
+            <!-- <span class="color666" @click="chooseAddress">{{roomFullName}}</span>
+            <arrow-btn @arrowClick='chooseAddress' color='#9B9B9B'></arrow-btn> -->
           </div>
         </div>
+        <!-- </div> -->
         <!-- 人员类型 -->
         <div class="person-tel borderB1px person-item">
           <span class="color333">人员类型</span>
           <div class="tel-right">
-            <span class="color666">业主</span>
-            <arrow-btn @arrowClick='choosePersonType' color='#9B9B9B'></arrow-btn>
+            <span class="color666">{{personType == 1 ? '业主' : '租户'}}</span>
+            <!-- <arrow-btn @arrowClick='choosePersonType' color='#9B9B9B'></arrow-btn> -->
           </div>
         </div>
         <!-- 车辆 -->
         <div class="person-tel person-item">
           <span class="color333">车辆</span>
           <div class="tel-right" @click="toCarView">
-            <span class="color666">0</span>
+            <span class="color666">{{carNum}}</span>
             <arrow-btn color='#9B9B9B'></arrow-btn>
           </div>
         </div>
@@ -75,32 +84,72 @@
 <script>
 import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
+import { cardNumHidden } from '../utils/index'
 export default {
   components: { avatorImg, arrowBtn },
-  props: {
-    personMsg: {},
+  props:
+  {
+    personMsg: {
+      type: Object,
+      default: {}
+    },
     isPerson: {
       type: Boolean,
       default: false
     }
   },
+  created () {
+    this.getPersonData()
+  },
+  mounted () {
+
+  },
   data () {
     return {
-      perPhoto: '../../static/images/timg.jpg'
+      personData: {},
+      roomFullName: '',
+      personType: '',
+      car: [],
+      carNum: '',
+      cardNum: '',
+      regPhoto: '../../static/images/timg.jpg',
+      rooms: [],
+      index: 0
+    }
+  },
+  watch: {
+    personData (newVal) {
+      this.cardNum = cardNumHidden(newVal.cardNum, 3, 3)
     }
   },
   methods: {
+    // 获取父组件中数据
+    getPersonData () {
+      // let that = this
+      this.personData = this.personMsg
+      // this.rooms = this.personData.rooms
+      this.roomFullName = this.personData.rooms[0].roomFullName
+      this.personType = this.personData.rooms[0].isHouseholder
+      this.carNum = this.personData.car.length
+      this.regPhoto = ('data:image/png;base64,' + this.personData.regPhoto).replace(/[\r\n]/g, '')
+      console.log('personData', this.personData)
+      this.rooms = Array.from(this.personData.rooms)
+      this.rooms = JSON.stringify(this.rooms)
+      this.rooms = JSON.parse(this.rooms)
+    },
     // 跳转至手机号界面
     toTelView () {
       this.$router.push('../../pages/telphone/main')
     },
-    // 点击 选择户址
-    chooseAddress () {
-      console.log('选择户址')
-    },
-    // 选择人员类型
-    choosePersonType () {
-      console.log('选择人员类型')
+    // 点击选择户址
+    chooseAddress (e) {
+      console.log(e)
+      // 选中的index
+      this.index = e.mp.detail.value
+      this.roomId = this.rooms[this.index].roomId
+      this.roomFullName = this.rooms[this.index].roomFullName
+      console.log(this.rooms)
+      console.log(this.rooms[this.index].roomFullName)
     },
     // 去车辆界面
     toCarView () {
@@ -174,6 +223,11 @@ export default {
     padding-right: 15px;
     box-sizing: border-box;
     font-size: 14px;
+    .picker {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
   }
 }
 </style>

@@ -1,34 +1,34 @@
 <template>
   <div class="repair-detail-container">
-    <nav-bar navTitle='详情'></nav-bar>
+    <nav-bar navTitle='详情' @clickLeft='goBack'></nav-bar>
     <!-- 维修详情头部区域 -->
     <div class="repair-detail-header">
       <!-- 左侧维修状态 -->
       <div class="repair-detail-text">
         <!-- 状态为已提交 -->
-        <div class="repair-detail" v-if="repairState === 1">
+        <div class="repair-detail" v-if="repairDetail.handleType == 0">
           <div class="state">已提交</div>
           <div class="info">请耐心等待物业处理</div>
         </div>
         <!-- 状态为已回复 -->
-        <div class="repair-detail" v-if='repairState == 2'>
+        <div class="repair-detail" v-if='repairDetail.handleType == 1'>
           <div class="state">已回复</div>
           <div class="info">“已交给相关人员处理，请耐心等待工作人员联系”</div>
         </div>
         <!-- 状态为已处理 -->
-        <div class="repair-detail" v-if="repairState == 3">
+        <div class="repair-detail" v-if="repairDetail.handleType == 2">
           <div class="state">已处理</div>
           <div class="info">“您已确认该报修已被处理”</div>
         </div>
         <!-- 状态已取消 -->
-        <div class="repair-detail" v-if="repairState == 4">
+        <div class="repair-detail" v-if="repairDetail.handleType == 3">
           <div class="state">已取消</div>
           <div class="info">“您已取消该报修”</div>
         </div>
       </div>
       <!-- 右侧图片 -->
       <div class="repair-detail-img">
-        <div v-if='repairState == 3'>
+        <div v-if='repairDetail.handleType == 2'>
           <img :src="repairBg2" class="bg2">
         </div>
         <div v-else>
@@ -41,49 +41,93 @@
       <div class="repair-type">
         <span>类型</span>
         <div class="type-text">
-          <span>{{repairType}}</span>
-          <arrow-btn color='#D2D7F0' @arrowClick='chooseType'></arrow-btn>
+          <span>{{repairDetail.repairType == 1 ? '公共设施' : '户内设施'}}</span>
+          <arrow-btn color='#D2D7F0'></arrow-btn>
         </div>
       </div>
       <div class="repair-detail">
         <span>详细</span>
-        <div class="detail-text">
-          3栋旁边路灯坏了，晚上不亮回家不方便3栋旁边路灯坏了，晚上不亮回家不方便3栋旁边路灯坏了，晚上不亮回家不方便
-          方便3栋旁边路灯坏了，晚上不亮回家不方便3栋旁边路灯坏了，晚上不亮回家不方便
+        <div class="detail-text">{{repairDetail.repairContent}}
         </div>
       </div>
     </div>
     <!-- 底部 处理、取消按钮 -->
-    <div class="repair-detail-footer" v-if="repairState === 1 || repairState == 2">
+    <div class="repair-detail-footer" v-if="repairDetail.handleType == 0 || repairDetail.handleType == 1">
       <!-- 维修状态为已提交或已回复, 按钮文本为已处理 -->
       <!-- 已处理按钮 将已提交或已回复的维修状态切换为已处理 -->
-      <button class="btn left" @click="handledRepair">已处理</button>
-      <button class="btn right" @click="cancleRepair">取消</button>
+      <button class="btn left" @click="handleRepair">已处理</button>
+      <button class="btn right" @click="cancelRepair">取消</button>
     </div>
   </div>
 </template>
 <script>
 import arrowBtn from '@/components/arrowBtn'
 import navBar from '@/components/navBar'
+import { handleRepair, cancelRepair } from '../../api/index'
 export default {
   components: { arrowBtn, navBar },
   mounted () {
+    this.repairDetail = JSON.parse(this.$route.query.item)
+    this.id = this.repairDetail.id
   },
+  inject: ['reload'],
   data () {
     return {
-      repairType: '公共设施',
-      repairState: 3,
+      repairDetail: {},
+      id: '',
       repairBg1: '../../static/images/repairBg1.png',
       repairBg2: '../../static/images/repairBg2.png'
     }
   },
   methods: {
-    handledRepair () {
-      console.log('确认该维修信息已被处理？')
+    goBack () {
+      // this.$router.push('../../pages/index/main')
+      this.$router.go(-1)
     },
-    cancleRepair () {
+    handleRepair () {
+      let that = this
+      mpvue.showModal({
+        title: '提示',
+        content: '确认该维修数据已被处理？',
+        success (res) {
+          if (res.confirm) {
+            handleRepair({
+              'data': {
+                'id': that.id
+              }
+            }).then(res => {
+              if (res.data.code === 200) {
+                that.$router.push('../../pages/index/main')
+                console.log('已处理', res)
+                that.reload()
+              }
+            })
+          }
+        }
+      })
+    },
+    cancelRepair () {
       // 更改已提交或已回复的维修状态
-      console.log('确认取消该维修信息吗？')
+      let that = this
+      mpvue.showModal({
+        title: '提示',
+        content: '确认取消该维修信息吗？',
+        success (res) {
+          if (res.confirm) {
+            cancelRepair({
+              'data': {
+                'id': that.id
+              }
+            }).then(res => {
+              if (res.data.code === 200) {
+                // that.$router.go(-1)
+                that.$router.push('../../pages/index/main')
+                that.reload()
+              }
+            })
+          }
+        }
+      })
     }
   }
 }

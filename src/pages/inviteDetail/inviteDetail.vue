@@ -1,12 +1,17 @@
 <template>
   <div class="invite-detail-container">
-     <nav-bar navTitle='邀请'></nav-bar>
+    <nav-bar navTitle='邀请' @clickLeft='goBack'></nav-bar>
     <!-- 二维码展示 -->
     <div class="qr-code">
-      <img :src="qrCode" mode='aspectFit'>
+      <div class="qrcode-img">
+        <img :src="qrCodeURL" v-if="notOver" mode='aspectFit'>
+        <img :src="qrCodeURL" v-else class="isOver" mode='aspectFit'>
+      </div>
+      <div>
+        <span v-if="notOver">有效期24小时</span>
+        <span v-else>已过期</span>
+      </div>
 
-      <span v-if="!isOvertime">有效期24小时</span>
-      <span v-if="isOvertime">已过期</span>
     </div>
     <!-- 被邀人信息 -->
     <div class="invited-person-msg">
@@ -17,45 +22,76 @@
       <div class="person-lists">
         <div class="person-name borderB1px person-item">
           <span class="color333">姓名</span>
-          <span class="color666">王逸飞</span>
+          <span class="color666">{{inviteDetail.personName}}</span>
         </div>
         <div class="person-sex borderB1px person-item">
           <span class="color333">性别</span>
-          <span class="color666">男</span>
+          <span class="color666">{{inviteDetail.personSex}}</span>
         </div>
         <div class="person-IDcard borderB1px person-item">
           <span class="color333">身份证号</span>
-          <span class="color666">{{idCard}}</span>
+          <span class="color666">{{cardNum}}</span>
         </div>
         <div class="person-tel person-item">
           <span class="color333">手机号</span>
-          <span class="color666">1983343433</span>
+          <span class="color666">{{inviteDetail.phoneNum}}</span>
         </div>
       </div>
     </div>
     <!-- 保存二维码按钮 -->
-    <div class="qrcode-btn" v-if="isOvertime">
+    <div class="qrcode-btn" v-if="notOver">
       <submit-btn btnText='保存二维码' isActive @submitClick="saveQrCode"></submit-btn>
     </div>
   </div>
 </template>
 <script>
-// import hidden from '../../utils/index'
+import { cardNumHidden } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
 import navBar from '@/components/navBar'
+const QR = require('@/utils/weapp-qrcode.js')
 export default {
   components: { submitBtn, navBar },
   mounted () {
-    // this.idCard = hidden(this.idCard, 3, 3)
+    this.inviteDetail = JSON.parse(this.$route.query.item)
+    this.beOver = this.inviteDetail.beOver
+    console.log(typeof parseInt(this.beOver))
+    this.qrCode = this.inviteDetail.qrCode
+    this.drawImg()
+    this.cardNum = cardNumHidden(this.inviteDetail.cardNum, 3, 3)
+    console.log(this.inviteDetail)
   },
   data () {
     return {
-      qrCode: '../../static/images/qrCode.png',
-      idCard: '321023192003330003',
-      isOvertime: true
+      inviteDetail: {},
+      cardNum: '',
+      beOver: '',
+      qrCode: '',
+      qrCodeURL: ''
+    }
+  },
+  computed: {
+    notOver () {
+      this.beOver = parseInt(this.beOver)
+      if (this.beOver === 1) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   methods: {
+    goBack () {
+      // this.$router.push('../../pages/index/main')
+      this.$router.go(-1)
+    },
+    drawImg () {
+      var imgData = QR.drawImg(this.qrCode, {
+        typeNumber: 4,
+        errorCorrectLevel: 'M',
+        size: 500
+      })
+      this.qrCodeURL = imgData
+    },
     saveQrCode () {
       console.log('保存二维码至手机相册')
     }
@@ -76,9 +112,22 @@ export default {
     justify-content: center;
     align-items: center;
     height: 38%;
-    img {
+    .qrcode-img {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 137px;
       height: 137px;
+      background: #fff;
+      img {
+        width: 110px;
+        height: 110px;
+      }
+      .isOver {
+        width: 110px;
+        height: 110px;
+        opacity: 0.3;
+      }
     }
     span {
       margin-top: 13px;

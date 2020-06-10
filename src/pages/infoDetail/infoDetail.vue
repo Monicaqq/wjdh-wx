@@ -1,20 +1,18 @@
 <template>
   <!-- 通知详情界面 -->
   <div class="info-detail-container">
-    <nav-bar navTitle='详细'></nav-bar>
+    <nav-bar navTitle='详细' @clickLeft='goBack'></nav-bar>
     <!-- 通知详情标题 -->
     <div class="info-title">
       <span>标题</span>
       <div class="title-text">
-        物业费收取通知3栋旁边路灯坏了
+        {{infoDetail.noticeTitle}}
       </div>
     </div>
     <!-- 通知详情内容 -->
     <div class="info-content">
       <span>内容</span>
-      <div class="content-text">
-        3栋旁边路灯坏了，晚上不亮回家不方便3栋旁边路灯坏了，晚上不亮回家不方便3栋旁边路灯坏了，晚上不亮回家不方便
-        方便3栋旁边路灯坏了，晚上不亮回家不方便3栋旁边路灯坏了，晚上不亮回家不方便
+      <div class="content-text">{{infoDetail.noticeContent}}
       </div>
     </div>
   </div>
@@ -22,7 +20,21 @@
 <script>
 import navBar from '@/components/navBar'
 export default {
-  components: { navBar }
+  components: { navBar },
+  mounted () {
+    this.infoDetail = JSON.parse(this.$route.query.item)
+  },
+  data () {
+    return {
+      infoDetail: {}
+    }
+  },
+  methods: {
+    goBack () {
+      // this.$router.push('../../pages/index/main')
+      this.$router.go(-1)
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

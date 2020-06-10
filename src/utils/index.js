@@ -71,7 +71,7 @@ export function isCarNum (carNum) {
   }
 }
 // 身份证号部分字段隐藏
-export function hidden (str, startLen, endLen) {
+export function cardNumHidden (str, startLen, endLen) {
   let len = str.length - startLen - endLen
   var star = ''
   for (let i = 0; i < len; i++) {
@@ -84,6 +84,11 @@ export function carNumFormat (carNum) {
   const str1 = carNum.substr(0, 2)
   const str2 = carNum.substr(2, carNum.length - 1)
   return `${str1}·${str2}`
+}
+
+// 去除左右空格
+export function trim (s) {
+  return s.replace(/(^\s*)|(\s*$)/g, '')
 }
 
 export default {

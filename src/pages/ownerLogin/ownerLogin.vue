@@ -82,21 +82,6 @@ export default {
           console.log('获取code失败')
         })
     },
-    // 输入框聚焦和失焦
-    onAccountFocus () {
-      this.isAccountFocus = true
-    },
-    onAccountBlur () {
-      this.isAccountFocus = false
-      console.log(this.username)
-    },
-    onPasswdFocus () {
-      this.isPasswdFocus = true
-    },
-    onPasswdBlur () {
-      this.isPasswdFocus = false
-      console.log(this.password)
-    },
     // 账号密码登录
     formSubmit () {
       let that = this
@@ -107,20 +92,44 @@ export default {
           'code': that.code
         }
       })
-        .then(response => {
-          console.log('RES', response)
-          console.log('授权验证')
+        .then(res => {
+          // 第一次获取绑定, 拿到jwt
+          if (res.data.code === 200) {
+            const jwt = res.data.data.jwt
+            // setStorageSync('token', jwt)
+            if (jwt) {
+              this.$router.push('../../pages/index/main')
+            }
+          } else {
+            console.log(res)
+          }
+          // if (!jwt && jwt.length === 0) {
+          //   that.getCode()
+          //   const jwt = res.data.data.jwt
+
+          //   console.log('jwt:', jwt)
+          // }
+          // console.log('RES', response)
         })
         .catch(err => {
           console.log(err)
-          // console.log(that.username, that.code)
         })
-      // if (this.loginForm.account && this.loginForm.password) {
-
-      //   console.log('用户名密码登录')
-      // }
     },
-
+    // 输入框聚焦和失焦
+    onAccountFocus () {
+      this.isAccountFocus = true
+    },
+    onAccountBlur () {
+      this.isAccountFocus = false
+      // console.log(this.username)
+    },
+    onPasswdFocus () {
+      this.isPasswdFocus = true
+    },
+    onPasswdBlur () {
+      this.isPasswdFocus = false
+      // console.log(this.password)
+    },
     // 邀请码登录
     invitedLogin () {
       this.$router.replace('../../pages/houseHoldLogin/main')

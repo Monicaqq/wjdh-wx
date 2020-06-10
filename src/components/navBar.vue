@@ -1,6 +1,6 @@
 <template>
-  <div @click="onClickLeft" class="nav-bar-container">
-    <van-nav-bar custom-class='left-arrow' title-class='nav-title' :title="title" left-arrow @click-left="onClickLeft">
+  <div class="nav-bar-container">
+    <van-nav-bar custom-class='left-arrow' title-class='nav-title' :title="title" left-arrow @clickLeft="clickLeft">
     </van-nav-bar>
   </div>
 </template>
@@ -23,8 +23,9 @@ export default {
   },
   methods: {
     // 返回上一页
-    onClickLeft () {
-      this.$router.go(-1)
+    clickLeft () {
+      this.$emit('clickLeft')
+      // this.$router.go(-1)
     }
   }
 }

@@ -1,22 +1,19 @@
 {
   "pages": [
-   
-    "pages/ownerLogin/main",
     "pages/index/main",
     "pages/houseHoldLogin/main",
-    
-    "pages/cars/main",
+    "pages/ownerLogin/main",
     "pages/telphone/main",
     "pages/addPerson/main",
     "pages/invitePerson/main",
     "pages/owner/main",
     "pages/houseHold/main",
+    "pages/cars/main",
+    "pages/houseHoldCar/main",
     "pages/repairApply/main",
     "pages/repairDetail/main",
     "pages/inviteDetail/main",
     "pages/infoDetail/main"
-    
-    
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -29,6 +26,8 @@
     "van-icon": "/vant-weapp/dist/icon/index",
     "van-nav-bar": "/vant-weapp/dist/nav-bar/index",
     "van-field": "/vant-weapp/dist/field/index",
-    "van-notify": "/vant-weapp/dist/notify/index"
+    "van-notify": "/vant-weapp/dist/notify/index",
+    "van-picker": "/vant-weapp/dist/picker/index",
+    "van-popup": "/vant-weapp/dist/popup/index"
   }
 }
