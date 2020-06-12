@@ -63,7 +63,6 @@ export default {
         that.isInvitation = that.rooms[0].isInvitation
         that.personName = that.houseHoldDetail.personName
         // console.log(typeof (that.rooms[0].isInvitation))
-        console.log('houdeHolder', that.houseHoldDetail)
       })
     },
     delHousePerson () {
@@ -79,7 +78,7 @@ export default {
                 'personId': that.id
               }
             }).then(res => {
-              // that.$router.push('../../pages/home/main')
+              that.$router.push('../../pages/home/main')
               console.log('delHouseHold', res)
             })
           }

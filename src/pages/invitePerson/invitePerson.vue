@@ -53,7 +53,7 @@ export default {
       this.roomId = personMess.rooms[0].roomId
     }
   },
-  inject: ['reload'],
+  // inject: ['reload'],
   data () {
     return {
       cardNumHidden: '',
@@ -175,8 +175,8 @@ export default {
           }
         }).then(res => {
           console.log('invitePerson', res)
-          this.$router.push('../../pages/index/main')
-          this.reload()
+          this.$router.push('../../pages/home/main')
+          // this.reload()
         })
       }
     },

@@ -36,7 +36,7 @@ export default {
     const personMess = getStorageSync('personMess')
     this.roomId = personMess.rooms[0].roomId
   },
-  inject: ['reload'],
+  // inject: ['reload'],
   data () {
     return {
       repairType: '公共设施',
@@ -64,7 +64,7 @@ export default {
           }
         }
       })
-      console.log('选择报修类型')
+      // console.log('选择报修类型')
     },
     applyRepair () {
       let that = this
@@ -79,8 +79,8 @@ export default {
           }
         }).then(res => {
           console.log(res)
-          this.$router.push('../../pages/index/main')
-          this.reload()
+          this.$router.push('../../pages/home/main')
+          // this.reload()
         })
       }
     }

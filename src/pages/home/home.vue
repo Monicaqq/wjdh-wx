@@ -451,7 +451,7 @@ export default {
     // 切换 tab 标签
     tabClick (e) {
       this.currentTab = e.currentTarget.dataset.id
-      console.log(e)
+      // console.log(e)
     },
     // 跳转至个人信息页面
     toPersonMsg () {

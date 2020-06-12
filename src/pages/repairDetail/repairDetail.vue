@@ -70,7 +70,7 @@ export default {
     this.repairDetail = JSON.parse(this.$route.query.item)
     this.id = this.repairDetail.id
   },
-  inject: ['reload'],
+  // inject: ['reload'],
   data () {
     return {
       repairDetail: {},
@@ -97,9 +97,9 @@ export default {
               }
             }).then(res => {
               if (res.data.code === 200) {
-                that.$router.push('../../pages/index/main')
-                console.log('已处理', res)
-                that.reload()
+                that.$router.push('../../pages/home/main')
+                // console.log('已处理', res)
+                // that.reload()
               }
             })
           }
@@ -121,8 +121,8 @@ export default {
             }).then(res => {
               if (res.data.code === 200) {
                 // that.$router.go(-1)
-                that.$router.push('../../pages/index/main')
-                that.reload()
+                that.$router.push('../../pages/home/main')
+                // that.reload()
               }
             })
           }
