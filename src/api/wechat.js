@@ -1,5 +1,4 @@
 ﻿import { loginWechat } from '../api/index'
-
 // 获取code
 export function getCode (onSuccess, onFail) {
   mpvue.login({
@@ -26,20 +25,21 @@ export function getToken (onSuccess, onFail) {
             'code': code
           }
         }).then(res => {
+          console.log(res)
           // onSuccess(res)
           if (res.data.code === 200) {
-            // console.log('token', res)
+            console.log('token', res)
             const token = res.data.data.jwt
             const appId = res.data.data.appId
             setStorageSync('token', token)
             setStorageSync('appId', appId)
             onSuccess(token)
           } else {
-            this.$router.push('../../pages/ownerLogin/main')
+            onFail(err)
           }
+        }).catch(err => {
+          onFail(err)
         })
-      } else {
-        console.log(res)
       }
     },
     fail (err) {
@@ -118,7 +118,6 @@ export function showLoading (title) {
     title: '加载中'
   })
 }
-
 // hidLoading
 export function hideLoading () {
   mpvue.hideLoading()

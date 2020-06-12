@@ -15,7 +15,7 @@
       </div>
     </div>
     <!-- 添加车辆输入框 -->
-    <div class="cars-input">
+    <div class="cars-input" v-if="isShowInput">
       <div class="car-msg">
         <!-- 选择车辆类型, 默认列表第一个 -->
         <div class="car-type" @click="chooseCarType">
@@ -27,15 +27,22 @@
         </div>
         <!-- 车辆输入框 -->
         <div class="car-number">
-          <input type="text" placeholder="请输入车辆" v-model="carObj.licensePlateNo" @input="inputCarNum" maxlength="8"
+          <input type="text" placeholder="请输入车牌号" v-model="carObj.licensePlateNo" @input="inputCarNum" maxlength="8"
             confirm-type="done" @confirm='onConfirm' @change='onChange' @blur="onBlur">
           <!-- <div class="err" v-if="carNumErrFlag"><span>{{carNumErrMsg}}</span></div> -->
         </div>
       </div>
     </div>
+    <!-- 增加 按钮 -->
+    <div class="add-car-wrapper">
+      <div class="add-car-btn" @click="showInput">
+        <img :src="addCarIcon">
+        <span>增加</span>
+      </div>
+    </div>
     <!-- 添加车辆提交按钮 -->
     <div class="car-commit">
-      <submit-btn btnText='增加车辆' @submitClick='submitCarMsg' isActive></submit-btn>
+      <submit-btn btnText='提交车辆' @submitClick='submitCarMsg' isActive></submit-btn>
     </div>
     <!-- </form> -->
   </div>
@@ -70,7 +77,9 @@ export default {
       isExist: false,
       addCarFlag: false,
       carNumErrFlag: false,
-      carNumErrMsg: ''
+      carNumErrMsg: '',
+      addCarIcon: '../../static/images/addCarIcon.png',
+      isShowInput: true
     }
   },
   methods: {
@@ -79,17 +88,16 @@ export default {
     },
     // 获取汽车数据
     getCarData () {
+      let that = this
       this.personMess = getStorageSync('personMess')
       this.car = this.personMess.car
-      this.roomId = this.personMess.rooms[0].roomId
-      console.log(this.car)
     },
     // 增加car
     addCar () {
       var that = this
       // 未输入车牌号
       if (!this.carObj.licensePlateNo) {
-        showToast('请输入车牌号')
+        showToast('请检查车牌号')
       } else {
         // 已输入车牌号
         // var carResult = isCarNum(that.carObj.licensePlateNo)
@@ -99,6 +107,9 @@ export default {
           that.carNumErrFlag = true
           that.car.push(that.carObj)
           that.carObj = {}
+          that.carTypeVal = '小汽车'
+          that.carType = 1
+          that.isShowInput = false
         } else {
           for (var carItem of that.car) {
             if (that.carObj.carType === carItem.carType && that.carObj.licensePlateNo === carItem.licensePlateNo) {
@@ -113,18 +124,18 @@ export default {
             that.car.push(that.carObj)
             console.log(that.car)
             that.carObj = {}
-            that.carTypeVal = '小汽车'
-            that.carType = 1
+            that.isShowInput = false
+            // that.carTypeVal = '小汽车'
+            // that.carType = 1
             that.carNumErrFlag = true
           }
         }
-        // }
-        // else {
-        //   // 车牌号格式错误, 报错
-        //   showToast(carResult)
-        // }
       }
       console.log('addcar:', this.car)
+    },
+    // 展示车辆输入输入框
+    showInput () {
+      this.isShowInput = true
     },
     // 返回上一页
     onClickLeft () {
@@ -145,7 +156,6 @@ export default {
       this.carObj.carType = this.carType
       let carResult = isCarNum(this.carObj.licensePlateNo)
       if (carResult) {
-        showToast(carResult)
         that.carNumErrFlag = false
       } else {
         that.carObj.licensePlateNo = carNumFormat(that.carObj.licensePlateNo)
@@ -178,14 +188,14 @@ export default {
     getValue () {
       return this.carNum
     },
-    // 增加车辆按钮
+    // 提交车辆按钮
     submitCarMsg () {
       const that = this
-      this.isHouseholder = this.personMess.rooms[0].isHouseholder
       this.personId = this.personMess.id
-      // console.log(this.personMess)
-      // 是住户就发送添加车辆请求, 不是住户,把车辆信息存至缓存,作为发送添加住户的请求
-      if (parseInt(that.isHouseholder) === 1) {
+      if (this.personMess.rooms[0]) {
+        that.roomId = this.personMess.rooms[0].roomId
+        // }
+        // 是住户就发送添加车辆请求, 不是住户,把车辆信息存至缓存,作为发送添加住户的请求
         // 车辆不为空
         if (that.car.length !== 0 && that.carNumErrFlag) {
           updateCar({
@@ -195,24 +205,26 @@ export default {
               'car': that.car
             }
           }).then(res => {
-            getPersonMess().then(res => {
-              that.personMess = res.data.data
-              setStorageSync('personMess', that.personMess)
-              this.$router.push('../../pages/owner/main')
-              this.reload()
-            })
-            console.log('car', res)
+            // getPersonMess().then(res => {
+            //   console.log(res)
+            //   // that.personMess = res.data.data
+            //   // setStorageSync('personMess', that.personMess)
+            //   this.$router.push('../../pages/owner/main')
+            //   this.reload()
+            // })
+            this.$router.push(
+              {
+                path: '../../pages/owner/main',
+                query: { carLen: that.car.length }
+              }
+            )
+            this.reload()
           })
         } else {
-          showToast('请检查车牌号是否正确')
+          showToast(' 请检查车牌号')
         }
       } else {
-        if (that.car.length !== 0) {
-          setStorageSync('car', that.car)
-          console.log('提交车辆1')
-        } else {
-          showToast('请检查车牌号是否正确')
-        }
+        showToast('您未绑定户址')
       }
     }
   }
@@ -252,7 +264,7 @@ export default {
         flex-direction: row;
         color: #666;
         input {
-          width: 80px;
+          width: 100px;
           height: 100%;
         }
         .err {
@@ -260,6 +272,37 @@ export default {
           right: 0;
           color: #cc3333;
         }
+      }
+    }
+  }
+  // 添加车辆样式
+  .add-car-wrapper {
+    position: relative;
+    height: 30px;
+    margin-left: 15px;
+    margin-right: 15px;
+    // background: rgba(245, 246, 252, 1);
+    .add-car-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      bottom: 5px;
+      right: 23px;
+      width: 45px;
+      height: 18px;
+      background: rgba(245, 246, 252, 1);
+      border-radius: 9px;
+      color: #667dfa;
+      text-align: center;
+      img {
+        width: 7px;
+        height: 7px;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+      span {
+        font-size: 11px;
       }
     }
   }

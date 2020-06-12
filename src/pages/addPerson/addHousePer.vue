@@ -69,7 +69,7 @@
           <div class="person-sex person-item">
             <span class="color333">车辆</span>
             <div class="tel-right" @click="toCarView">
-              <span class="color666">{{carLen}}</span>
+              <span class="color999">{{carLen}}</span>
               <div class="arrow-btn">
                 <arrow-btn color='#9B9B9B'></arrow-btn>
               </div>
@@ -148,7 +148,8 @@ export default {
       inviteRole: '',
       isInvitation: '',
       roomId: '',
-      carLen: '',
+      car: [],
+      carLen: 0,
       regPhotoFlag: false,
       nameFlag: false,
       sexFlag: false,
@@ -159,22 +160,25 @@ export default {
       inviteFlag: false
     }
   },
-  created () {
+  mounted () {
+    Object.assign(this.$data, this.$options.data())
+  },
+  onShow () {
+    let that = this
     const personDetail = getStorageSync('personMess')
     // this.carLen = car.length
-    this.roomId = personDetail.rooms[0].roomId
+    if (personDetail.rooms.length !== 0) {
+      that.roomId = personDetail.rooms[0].roomId
+    }
+    if (getStorageSync('car')) {
+      this.car = getStorageSync('car')
+      this.carLen = this.car.length
+    }
+
+    console.log('car1', this.car)
   },
-  // watch: {
-  //   $route (to, from) {
-  //     console.log('to:', to.path, 'from:', from.path)
-  //   }
-  // },
-  // mounted () {
-  //   const car = JSON.parse(this.$route.query.car)
-  //   console.log('car', car)
-  // },
-  destory () {
-    Object.assign(this.$data, this.$options.data())
+  onUnload () {
+    mpvue.removeStorageSync('car')
   },
   methods: {
     // 选择人像照片
@@ -240,7 +244,6 @@ export default {
     },
     // 姓名输入框校验
     inputName () {
-
     },
     // 姓名失焦
     onNameBlur (e) {
@@ -248,7 +251,8 @@ export default {
       this.personName = e.mp.detail.value
       const nameResult = isName(this.personName)
       if (nameResult) {
-        showToast(nameResult)
+        that.nameFlag = false
+        // showToast(nameResult)
       } else {
         that.nameFlag = true
       }
@@ -263,7 +267,8 @@ export default {
       this.cardNum = e.mp.detail.value
       const idCardResult = isIdCard(this.cardNum)
       if (idCardResult) {
-        showToast(idCardResult)
+        that.cardNumFlag = false
+        // showToast(idCardResult)
       } else {
         that.cardNumFlag = true
       }
@@ -282,7 +287,7 @@ export default {
       this.phoneNum = e.mp.detail.value
       const telResult = isPhone(this.phoneNum)
       if (telResult) {
-        showToast(telResult)
+        that.phoneNumFlag = false
       } else {
         that.phoneNumFlag = true
       }
@@ -387,7 +392,7 @@ export default {
     },
     addHouserPerson () {
       let that = this
-      this.car = getStorageSync('car')
+      // this.car = getStorageSync('car')
       if (!this.regPhotoFlag) {
         showToast('请上传人像照片')
       } else if (!this.nameFlag) {
@@ -423,8 +428,8 @@ export default {
           }
         }).then(res => {
           if (res.data.code === 200) {
-            this.$router.push('../../pages/index/main')
-            wx.clearStorage('car')
+            mpvue.removeStorageSync('car')
+            this.$router.push('../../pages/home/main')
             console.log('addPerson', res)
           } else {
             showToast(res.data.message)
@@ -433,7 +438,8 @@ export default {
       }
     },
     goBack () {
-      this.$router.push('../../pages/index/main')
+      mpvue.removeStorageSync('car')
+      this.$router.push('../../pages/home/main')
       // this.$router.go(-1)
     }
   }
@@ -446,14 +452,14 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background: #f7f7f7;
+  background: #f5f6fa;
   .person-item {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    height: 44.5px;
-    line-height: 44.5px;
+    height: 40px;
+    line-height: 40px;
     text-align: right;
     input {
       height: 100%;
@@ -472,9 +478,6 @@ export default {
     border-bottom: 0.5px solid #eee;
   }
   .err {
-    // position: absolute;
-    // bottom: -32px;
-    // right: 0;
     color: #cc3333;
   }
   .person-sex {
@@ -489,15 +492,15 @@ export default {
     }
   }
   .title-label {
-    height: 40px;
+    height: 38px;
     margin-left: 15px;
     font-size: 12px;
-    line-height: 40px;
+    line-height: 38px;
     color: rgba(102, 102, 102, 1);
   }
   .person-lists {
     width: 100%;
-    height: 240px;
+    height: 221px;
     background: rgba(255, 255, 255, 1);
     padding-left: 15px;
     padding-right: 15px;

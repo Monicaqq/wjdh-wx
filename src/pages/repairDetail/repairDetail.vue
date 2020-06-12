@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     goBack () {
-      // this.$router.push('../../pages/index/main')
+      // this.$router.push('../../pages/home/main')
       this.$router.go(-1)
     },
     handleRepair () {

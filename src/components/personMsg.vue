@@ -45,27 +45,26 @@
       <!-- 住户信息列表 -->
       <div class="housePer-lists">
         <!-- 住址 -->
-        <div class="person-tel borderB1px person-item" v-if='isPerson'>
+        <!-- <div class="person-tel borderB1px person-item" v-if='isPerson'>
           <span class="color333">住址</span>
           <div class="tel-right">
-            <!-- <div> -->
             <picker @change="chooseAddress" :value='index' :range='rooms' :range-key="'roomFullName'">
               <div class="picker">
                 <span class="color666">{{rooms[index].roomFullName}}</span>
                 <arrow-btn color='#9B9B9B'></arrow-btn>
               </div>
-            </picker>
-            <!-- </div> -->
-            <!-- <span class="color666" @click="chooseAddress">{{roomFullName}}</span>
+            </picker> -->
+        <!-- <span class="color666" @click="chooseAddress">{{roomFullName}}</span>
             <arrow-btn @arrowClick='chooseAddress' color='#9B9B9B'></arrow-btn> -->
-          </div>
-        </div>
+        <!-- </div>
+        </div> -->
+
         <!-- </div> -->
         <!-- 人员类型 -->
         <div class="person-tel borderB1px person-item">
           <span class="color333">人员类型</span>
           <div class="tel-right">
-            <span class="color666">{{personType == 1 ? '业主' : '租户'}}</span>
+            <span class="color666">{{personRegion}}</span>
             <!-- <arrow-btn @arrowClick='choosePersonType' color='#9B9B9B'></arrow-btn> -->
           </div>
         </div>
@@ -96,25 +95,23 @@ export default {
     isPerson: {
       type: Boolean,
       default: false
+    },
+    carLen: {
+      type: Number,
+      default: 0
     }
   },
   created () {
     this.getPersonData()
   },
-  mounted () {
-
-  },
   data () {
     return {
       personData: {},
       roomFullName: '',
-      personType: '',
-      car: [],
-      carNum: '',
+      personRegion: '',
       cardNum: '',
       regPhoto: '../../static/images/timg.jpg',
-      rooms: [],
-      index: 0
+      carNum: ''
     }
   },
   watch: {
@@ -125,32 +122,49 @@ export default {
   methods: {
     // 获取父组件中数据
     getPersonData () {
-      // let that = this
+      let that = this
       this.personData = this.personMsg
       // this.rooms = this.personData.rooms
-      this.roomFullName = this.personData.rooms[0].roomFullName
-      this.personType = this.personData.rooms[0].isHouseholder
+      // this.roomFullName = this.personData.rooms[0].roomFullName
+      if (this.personData.rooms[0]) {
+        const isHouseholder = parseInt(this.personData.rooms[0].isHouseholder)
+        const personRegioncode = parseInt(this.personData.rooms[0].personRegioncode)
+        if (isHouseholder === 1) {
+          that.personRegion = '户主'
+        } else {
+          if (personRegionCode === 1) {
+            that.personRegion = '物业'
+          } else if (personRegionCode === 2) {
+            that.personRegion = '业主'
+          } else {
+            that.personRegion = '租户'
+          }
+        }
+      }
+      // this.personRegioncode = this.personData.rooms[0].personRegioncode
       this.carNum = this.personData.car.length
       this.regPhoto = ('data:image/png;base64,' + this.personData.regPhoto).replace(/[\r\n]/g, '')
       console.log('personData', this.personData)
-      this.rooms = Array.from(this.personData.rooms)
-      this.rooms = JSON.stringify(this.rooms)
-      this.rooms = JSON.parse(this.rooms)
+      // this.rooms = Array.from(this.personData.rooms)
+      // this.rooms = JSON.stringify(this.rooms)
+      // this.rooms = JSON.parse(this.rooms)
+      // this.car = this.carLen
+      // console.log('carLen', this.car)
     },
     // 跳转至手机号界面
-    toTelView () {
-      this.$router.push('../../pages/telphone/main')
-    },
+    // toTelView () {
+    //   this.$router.push('../../pages/telphone/main')
+    // },
     // 点击选择户址
-    chooseAddress (e) {
-      console.log(e)
-      // 选中的index
-      this.index = e.mp.detail.value
-      this.roomId = this.rooms[this.index].roomId
-      this.roomFullName = this.rooms[this.index].roomFullName
-      console.log(this.rooms)
-      console.log(this.rooms[this.index].roomFullName)
-    },
+    // chooseAddress (e) {
+    //   console.log(e)
+    //   // 选中的index
+    //   this.index = e.mp.detail.value
+    //   this.roomId = this.rooms[this.index].roomId
+    //   this.roomFullName = this.rooms[this.index].roomFullName
+    //   console.log(this.rooms)
+    //   console.log(this.rooms[this.index].roomFullName)
+    // },
     // 去车辆界面
     toCarView () {
       this.$router.push('../../pages/cars/main')

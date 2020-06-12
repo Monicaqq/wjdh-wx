@@ -91,29 +91,13 @@ export default {
           'password': that.password,
           'code': that.code
         }
+      }).then(res => {
+        // 第一次获取绑定, 拿到jwt
+        if (res.data.code === 200) {
+          console.log('login')
+          this.$router.push('../../pages/home/main')
+        }
       })
-        .then(res => {
-          // 第一次获取绑定, 拿到jwt
-          if (res.data.code === 200) {
-            const jwt = res.data.data.jwt
-            // setStorageSync('token', jwt)
-            if (jwt) {
-              this.$router.push('../../pages/index/main')
-            }
-          } else {
-            console.log(res)
-          }
-          // if (!jwt && jwt.length === 0) {
-          //   that.getCode()
-          //   const jwt = res.data.data.jwt
-
-          //   console.log('jwt:', jwt)
-          // }
-          // console.log('RES', response)
-        })
-        .catch(err => {
-          console.log(err)
-        })
     },
     // 输入框聚焦和失焦
     onAccountFocus () {

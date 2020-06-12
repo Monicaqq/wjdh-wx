@@ -15,7 +15,7 @@
       </div>
     </div>
     <!-- 添加车辆输入框 -->
-    <div class="cars-input">
+    <div class="cars-input" v-if="isShowInput">
       <div class="car-msg">
         <!-- 选择车辆类型, 默认列表第一个 -->
         <div class="car-type" @click="chooseCarType">
@@ -31,6 +31,13 @@
             confirm-type="done" @confirm='onConfirm' @change='onChange' @blur="onBlur">
           <!-- <div class="err" v-if="carNumErrFlag"><span>{{carNumErrMsg}}</span></div> -->
         </div>
+      </div>
+    </div>
+    <!-- 增加 按钮 -->
+    <div class="add-car-wrapper">
+      <div class="add-car-btn" @click="showInput">
+        <img :src="addCarIcon">
+        <span>增加</span>
       </div>
     </div>
     <!-- 添加车辆提交按钮 -->
@@ -49,8 +56,11 @@ import navBar from '@/components/navBar'
 export default {
   components: { submitBtn, navBar },
   mounted () {
+    let that = this
     Object.assign(this.$data, this.$options.data())
-    this.getCarData()
+    if (getStorageSync('car')) {
+      that.car = getStorageSync('car')
+    }
   },
   inject: ['reload'],
   data () {
@@ -70,26 +80,25 @@ export default {
       isExist: false,
       addCarFlag: false,
       carNumErrFlag: false,
-      carNumErrMsg: ''
+      carNumErrMsg: '',
+      isShowInput: true,
+      addCarIcon: '../../static/images/addCarIcon.png',
     }
   },
   methods: {
     goBack () {
       this.$router.push('../../pages/addPerson/main')
     },
-    // 获取汽车数据
-    getCarData () {
-      // this.personMess = getStorageSync('personMess')
-      // this.car = this.personMess.car
-      // this.roomId = this.personMess.rooms[0].roomId
-      // console.log(this.car)
+    // 展示车辆输入输入框
+    showInput () {
+      this.isShowInput = true
     },
     // 增加car
     addCar () {
       var that = this
       // 未输入车牌号
       if (!this.carObj.licensePlateNo) {
-        showToast('请输入车牌号')
+        showToast('请检查车牌号')
       } else {
         // 已输入车牌号
         // var carResult = isCarNum(that.carObj.licensePlateNo)
@@ -99,6 +108,9 @@ export default {
           that.carNumErrFlag = true
           that.car.push(that.carObj)
           that.carObj = {}
+          that.carTypeVal = '小汽车'
+          that.carType = 1
+          that.isShowInput = false
         } else {
           for (var carItem of that.car) {
             if (that.carObj.carType === carItem.carType && that.carObj.licensePlateNo === carItem.licensePlateNo) {
@@ -113,9 +125,9 @@ export default {
             that.car.push(that.carObj)
             console.log(that.car)
             that.carObj = {}
-            that.carTypeVal = '小汽车'
             that.carType = 1
             that.carNumErrFlag = true
+            that.isShowInput = false
           }
         }
         // }
@@ -141,7 +153,6 @@ export default {
       this.carObj.carType = this.carType
       let carResult = isCarNum(this.carObj.licensePlateNo)
       if (carResult) {
-        showToast(carResult)
         that.carNumErrFlag = false
       } else {
         that.carObj.licensePlateNo = carNumFormat(that.carObj.licensePlateNo)
@@ -180,13 +191,9 @@ export default {
       // 是住户,把车辆信息存至缓存,作为发送添加住户的请求
       if (this.car.length !== 0) {
         if (that.carNumErrFlag) {
-          // setStorageSync('car', that.car)
-          // this.$router.go(-1)
-          this.$router.push({
-            path: '../../pages/addPerson/main',
-            query: { car: that.car }
-          })
-          console.log('提交车辆1')
+          setStorageSync('car', that.car)
+          this.$router.go(-1)
+          console.log(that.car)
         }
       } else {
         showToast('请检查车牌号是否正确')
@@ -237,6 +244,37 @@ export default {
           right: 0;
           color: #cc3333;
         }
+      }
+    }
+  }
+  // 添加车辆样式
+  .add-car-wrapper {
+    position: relative;
+    height: 30px;
+    margin-left: 15px;
+    margin-right: 15px;
+    // background: rgba(245, 246, 252, 1);
+    .add-car-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      bottom: 5px;
+      right: 23px;
+      width: 45px;
+      height: 18px;
+      background: rgba(245, 246, 252, 1);
+      border-radius: 9px;
+      color: #667dfa;
+      text-align: center;
+      img {
+        width: 7px;
+        height: 7px;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+      span {
+        font-size: 11px;
       }
     }
   }

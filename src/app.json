@@ -1,12 +1,13 @@
 {
   "pages": [
-    "pages/index/main",
-    "pages/houseHoldLogin/main",
+    "pages/home/main",
+    "pages/chooseCity/main",
+    "pages/address/main",
     "pages/ownerLogin/main",
-    "pages/telphone/main",
+    "pages/houseHoldLogin/main",
+    "pages/owner/main",
     "pages/addPerson/main",
     "pages/invitePerson/main",
-    "pages/owner/main",
     "pages/houseHold/main",
     "pages/cars/main",
     "pages/houseHoldCar/main",
@@ -18,7 +19,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "仙林悦城",
+    "navigationBarTitleText": "云上物业",
     "navigationBarTextStyle": "black",
     "navigationStyle": "custom"
   },

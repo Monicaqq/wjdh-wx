@@ -49,7 +49,9 @@ export default {
   mounted () {
     Object.assign(this.$data, this.$options.data())
     const personMess = getStorageSync('personMess')
-    this.roomId = personMess.rooms[0].roomId
+    if (personMess.rooms.length !== 0) {
+      this.roomId = personMess.rooms[0].roomId
+    }
   },
   inject: ['reload'],
   data () {
@@ -76,7 +78,8 @@ export default {
       this.personName = e.mp.detail.value
       const nameResult = isName(this.personName)
       if (nameResult) {
-        showToast(nameResult)
+        that.nameFlag = false
+        // showToast(nameResult)
       } else {
         that.nameFlag = true
       }
@@ -114,7 +117,7 @@ export default {
       this.cardNumHidden = cardNumHidden(this.cardNum)
       const idCardResult = isIdCard(this.cardNum)
       if (idCardResult) {
-        showToast(idCardResult)
+        that.cardNumFlag = false
       } else {
         that.cardNumFlag = true
       }
@@ -132,7 +135,7 @@ export default {
       this.phoneNum = e.mp.detail.value
       const telResult = isPhone(this.phoneNum)
       if (telResult) {
-        showToast(telResult)
+        that.phoneNumFlag = false
       } else {
         that.phoneNumFlag = true
       }
@@ -178,7 +181,7 @@ export default {
       }
     },
     goBack () {
-      this.$router.push('../../pages/index/main')
+      this.$router.push('../../pages/home/main')
     }
   }
 }
@@ -190,7 +193,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background: #f7f7f7;
+  background: #f5f6fa;
   .person-item {
     display: flex;
     flex-direction: row;

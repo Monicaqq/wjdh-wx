@@ -36,12 +36,13 @@ export default {
       houId: '',
       roomId: '',
       isPass: '',
-      isInvitation: ''
+      isInvitation: '',
+      personRegioncode: ''
     }
   },
   methods: {
     goBack () {
-      this.$router.push('../../pages/index/main')
+      this.$router.push('../../pages/home/main')
       this.updateHouseHold()
     },
     getHouseHolderInfo () {
@@ -60,19 +61,29 @@ export default {
         that.roomId = that.rooms[0].roomId
         that.isPass = that.rooms[0].isPass
         that.isInvitation = that.rooms[0].isInvitation
+        that.personName = that.houseHoldDetail.personName
         // console.log(typeof (that.rooms[0].isInvitation))
         console.log('houdeHolder', that.houseHoldDetail)
       })
     },
     delHousePerson () {
       let that = this
-      deleteHouseHold({
-        'data': {
-          'id': that.houId,
-          'personId': that.id
+      mpvue.showModal({
+        title: '提示',
+        content: '确定进行删除操作吗？',
+        success (res) {
+          if (res.confirm) {
+            deleteHouseHold({
+              'data': {
+                'id': that.houId,
+                'personId': that.id
+              }
+            }).then(res => {
+              // that.$router.push('../../pages/home/main')
+              console.log('delHouseHold', res)
+            })
+          }
         }
-      }).then(res => {
-        console.log('delHouseHold', res)
       })
     },
     // 更改住户信息
@@ -81,6 +92,7 @@ export default {
       let child = this.$refs.child
       this.isPass = child.isPass
       this.isInvitation = child.isInvitation
+      this.personRegioncode = child.personRegioncode
       console.log(child.isPass)
       updateHouseHold({
         'data': {
@@ -88,9 +100,11 @@ export default {
           'personId': that.id,
           'roomId': that.roomId,
           'isPass': that.isPass,
-          'isInvitation': that.isInvitation
+          'isInvitation': that.isInvitation,
+          'personRegioncode': that.personRegioncode
         }
       }).then(res => {
+        that.$router.push('../../pages/home/main')
         console.log(res)
       })
     }
@@ -102,14 +116,12 @@ export default {
   display: flex;
   flex-direction: column;
   position: relative;
-  width: 100%;
-  // height: 100%;
-  background-color: #f7f7f7;
+  height: 100%;
+  background-color: #f5f6fa;
   .submit-btn {
     width: 100%;
-    height: 40px;
-    // position: absolute;
-    // bottom: 0;
+    position: absolute;
+    bottom: 0;
   }
 }
 </style>

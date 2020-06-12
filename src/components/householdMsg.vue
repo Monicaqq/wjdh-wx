@@ -146,9 +146,10 @@ export default {
       this.personRegionCode = parseInt(newVal.personRegioncode)
       this.isPass = parseInt(newVal.isPass)
       this.isInvitation = parseInt(newVal.isInvitation)
-      console.log('rooms', newVal)
-      console.log('isPass', this.isPass)
-      console.log('isInvitation', typeof (this.isInvitation))
+      this.personRegioncode = parseInt(newVal.personRegionCode)
+      // console.log('rooms', newVal)
+      // console.log('isPass', this.isPass)
+      // console.log('isInvitation', typeof (this.isInvitation))
       // this.personRegionCode = newVal[0].personRegionCode
       // console.log('人员类型', this.personRegionCode)
       // console.log('人员类型', typeof (this.personRegionCode))
@@ -225,7 +226,8 @@ export default {
     },
     // 去车辆界面
     toCarView () {
-      this.$router.push('../../pages/houserHolderCar/main')
+      console.log('')
+      this.$router.push('../../pages/houseHoldCar/main')
     }
   }
 }
@@ -237,8 +239,8 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    height: 44.5px;
-    line-height: 44.5px;
+    height: 40px;
+    line-height: 40px;
   }
   .color666 {
     color: #666666;
@@ -260,15 +262,15 @@ export default {
     }
   }
   .title-label {
-    height: 40px;
+    height: 38px;
     margin-left: 15px;
     font-size: 12px;
-    line-height: 40px;
+    line-height: 38px;
     color: rgba(102, 102, 102, 1);
   }
   .person-lists {
     width: 100%;
-    height: 240px;
+    height: 221px;
     background: rgba(255, 255, 255, 1);
     padding-left: 15px;
     padding-right: 15px;

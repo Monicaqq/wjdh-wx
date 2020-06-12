@@ -129,10 +129,10 @@
                   </div>
                 </div>
 
-                <div class="car-msg">
+                <div class="car-msg" v-if="isCarInput">
                   <!-- 选择车辆类型, 默认列表第一个 -->
                   <div class="car-type" @click="chooseCarType">
-                    <input type="text" v-model='carType'>
+                    <input type="text" v-model='carTypeVal'>
                   </div>
                   <!-- 点击图标, 展示所有类型, 供选择 -->
                   <div class="choose-icon">
@@ -140,7 +140,7 @@
                   </div>
                   <!-- 车辆输入框 -->
                   <div class="car-number">
-                    <input type="text" placeholder="请输入车辆" v-model="carObj.licensePlateNo" @input="inputCarNum"
+                    <input type="text" placeholder="请输入车牌号" v-model="carObj.licensePlateNo" @input="inputCarNum"
                       maxlength="8" confirm-type="done" @confirm='onConfirm' @change='onChange'
                       @focus="onHouseHoldCarNumFocus" @blur="onHouseHoldCarBlur" placeholder-style="color: #BCC2E1">
                   </div>
@@ -199,7 +199,7 @@
 </template>
 <script>
 import { showToast, chooseWxImage, transformBase64 } from '../../api/wechat'
-import { isName, isIdCard, isPhone, isCarNum } from '../../utils/index'
+import { isName, isIdCard, isPhone, isCarNum, carNumFormat } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
 import { checkCode, selectPerson, faceDetect, personSave } from '../../api/index'
 export default {
@@ -207,18 +207,24 @@ export default {
   mounted () {
     Object.assign(this.$data, this.$options.data())
   },
-  // watch: {
-  //   // 监听车辆数组的变化
-  //   'houseHoldLoginForm.houseHoldCar' (curArr) {
-  //     this.houseHoldLoginForm.houseHoldCar = curArr
-  //     console.log(curArr)
-  //   }
-  // },
+  watch: {
+    // 监听是否有车的变化
+    hasCar (newVal) {
+      this.carTypeVal = '小汽车'
+      this.carType = 1
+      this.carObj = {}
+      this.car = []
+    }
+    // 'houseHoldLoginForm.houseHoldCar' (curArr) {
+    //   this.houseHoldLoginForm.houseHoldCar = curArr
+    //   console.log(curArr)
+    // }
+  },
   data () {
     return {
       isStep1: false,
-      isStep2: false,
-      isStep3: true,
+      isStep2: true,
+      isStep3: false,
       isInviteInputFocus: false,
       isHouseHoldNameFocus: false,
       isHouseHoldTelFocus: false,
@@ -231,10 +237,12 @@ export default {
       houseHoldSexFlag: false,
       houseHoldCarFlag: false,
       phoneCardFlag: false,
+      carNumErrFlag: false,
       isCheckedImg: '../../static/images/isChecked.png',
       notCheckedImg: '../../static/images/notChecked.png',
       addCarIcon: '../../static/images/addCarIcon.png',
       isShowInput: true,
+      isCarInput: true,
       radios: [
         {
           label: '有车',
@@ -247,7 +255,8 @@ export default {
           isChecked: false
         }
       ],
-      carType: '普通乘用车',
+      carTypeVal: '小汽车',
+      carType: 1,
       defaultImg: '../../static/images/default.png',
       cameraImg: '../../static/images/camera.png',
       choiceIcon: '../../static/images/choice.png',
@@ -268,7 +277,8 @@ export default {
       regPhoto: '',
       hasCar: '',
       carObj: {
-        'carType': '',
+        'carType': '1',
+        // 'carTypeVal': '小汽车',
         'licensePlateNo': ''
       },
       isExist: false,
@@ -299,7 +309,7 @@ export default {
       this.personName = e.mp.detail.value
       const nameResult = isName(this.personName)
       if (nameResult) {
-        showToast(nameResult)
+        this.houseHoldNameFlag = false
       } else {
         this.houseHoldNameFlag = true
       }
@@ -314,7 +324,7 @@ export default {
       this.phoneNum = e.mp.detail.value
       const telResult = isPhone(this.phoneNum)
       if (telResult) {
-        showToast(telResult)
+        this.houseHoldTelFlag = false
       } else {
         this.houseHoldTelFlag = true
       }
@@ -329,7 +339,7 @@ export default {
       this.cardNum = e.mp.detail.value
       const idCardResult = isIdCard(this.cardNum)
       if (idCardResult) {
-        showToast(idCardResult)
+        this.houseHoldIdCardFlag = false
       } else {
         this.houseHoldIdCardFlag = true
       }
@@ -339,14 +349,14 @@ export default {
       this.isHouseHoldSexFocus = true
     },
     // 性别失焦
-    onHouseHoldSexBlur () {
-      this.isHouseHoldSexFocus = false
-      if (this.personSex) {
-        this.houseHoldSexFlag = true
-      } else {
-        showToast('请选择性别')
-      }
-    },
+    // onHouseHoldSexBlur () {
+    //   this.isHouseHoldSexFocus = false
+    //   if (this.personSex) {
+    //     this.houseHoldSexFlag = true
+    //   } else {
+    //     showToast('请选择性别')
+    //   }
+    // },
     // 选择性别
     chooseSex () {
       this.isHouseHoldSexFocus = true
@@ -357,14 +367,17 @@ export default {
           if (res.tapIndex === 0) {
             that.personSex = '未知'
             that.personSexNum = res.tapIndex
+            that.isHouseHoldSexFocus = false
             that.houseHoldSexFlag = true
           } else if (res.tapIndex === 1) {
             that.personSex = '男'
             that.personSexNum = res.tapIndex
+            that.isHouseHoldSexFocus = false
             that.houseHoldSexFlag = true
           } else if (res.tapIndex === 2) {
             that.personSex = '女'
             that.personSexNum = res.tapIndex
+            that.isHouseHoldSexFocus = false
             that.houseHoldSexFlag = true
           }
           // that.isHouseHoldSexFocus = false
@@ -389,12 +402,14 @@ export default {
     chooseCarType (res) {
       let that = this
       wx.showActionSheet({
-        itemList: ['普通乘用车', '大货车'],
+        itemList: ['小汽车', '大卡车'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.carType = '普通乘用车'
+            that.carTypeVal = '小汽车'
+            that.carType = 1
           } else {
-            that.carType = '大货车'
+            that.carTypeVal = '大卡车'
+            that.carType = 2
           }
         }
       })
@@ -417,51 +432,63 @@ export default {
       this.carObj.licensePlateNo = e.mp.detail.value
       let carResult = isCarNum(this.carObj.licensePlateNo)
       if (carResult) {
-        showToast(carResult)
-        that.carNumErrMsg = carResult
+        // showToast(carResult)
+        // that.carNumErrMsg = carResult
         that.carNumErrFlag = false
       } else {
         that.houseHoldCarFlag = true
-        that.carObj.licensePlateNo = that.carObj.licensePlateNo
-        that.carObj['carType'] = that.carType
+        that.carObj.licensePlateNo = carNumFormat(that.carObj.licensePlateNo)
+        that.carObj['carType'] = that.carTypeVal
+        that.carTypeVal = '小汽车'
+        that.submitCar()
       }
     },
-    // 点击 增加车辆 按钮, 将新增的一条车辆信息push 到 车辆数组
+    // 点击 增加车辆 按钮, 添加车辆记录输入框
     addCar () {
+      this.isCarInput = true
+    },
+    // 点击 增加车辆 按钮, 将新增的一条车辆信息push 到 车辆数组
+    submitCar () {
       var that = this
       // 未输入车牌号
       if (!this.carObj.licensePlateNo) {
-        showToast('请输入车牌号')
+        showToast('请检查车牌号')
       } else {
         // 已输入车牌号
-        var carResult = isCarNum(that.carObj.licensePlateNo)
+        // var carResult = isCarNum(that.carObj.licensePlateNo)
         // 输入了正确的车牌号
-        if (!carResult) {
-          if (that.car.length === 0) {
-            that.car.push(that.carObj)
-            that.carObj = {}
-          } else {
-            for (var carItem of that.car) {
-              if (that.carObj.carType === carItem.carType && that.carObj.licensePlateNo === carItem.licensePlateNo) {
-                showToast('您输入的车辆信息已存在')
-                that.isExist = true
-                // that.carObj.carType = ''
-                return false
-              } else {
-                that.isExist = false
-              }
-            }
-            if (!that.isExist) {
-              that.car.push(that.carObj)
-              console.log(that.car)
-              that.carObj = {}
-              that.carType = '普通乘用车'
+        // if (!carResult) {
+        if (that.car.length === 0) {
+          that.car.push(that.carObj)
+          that.carObj = {}
+          that.carTypeVal = '小汽车'
+          that.carType = 0
+          that.isCarInput = false
+          that.carNumErrFlag = true
+        } else {
+          for (var carItem of that.car) {
+            if (that.carObj.carType === carItem.carType && that.carObj.licensePlateNo === carItem.licensePlateNo) {
+              showToast('您输入的车辆信息已存在')
+              that.isExist = true
+              // that.carObj.carType = ''
+              return false
+            } else {
+              that.isExist = false
             }
           }
-        } else {
-          // 车牌号格式错误, 报错
-          showToast(carResult)
+          if (!that.isExist) {
+            that.car.push(that.carObj)
+            console.log(that.car)
+            that.carObj = {}
+            that.isCarInput = false
+            that.carNumErrFlag = true
+            // that.carType = '普通乘用车'
+          }
         }
+        // } else {
+        //   // 车牌号格式错误, 报错
+        //   showToast(carResult)
+        // }
       }
       console.log('addcar:', this.car)
     },
@@ -539,15 +566,17 @@ export default {
       console.log('toStep3')
       this.selectPerson()
       if (!this.houseHoldNameFlag) {
-        showToast('请检查姓名是否正确')
+        showToast('请检查姓名')
       } else if (!this.houseHoldTelFlag) {
-        showToast('请检查手机号是否正确')
+        showToast('请检查手机号')
       } else if (!this.houseHoldIdCardFlag) {
-        showToast('请检查身份证号是否正确')
+        showToast('请检查身份证号')
       } else if (!this.houseHoldSexFlag) {
         showToast('请选择性别')
       } else if (!this.phoneCardFlag) {
         showToast('身份证号与手机号不匹配')
+      } else if (!this.carNumErrFlag) {
+        showToast('请检查车牌号')
       } else {
         this.isStep2 = false
         this.isStep3 = true
@@ -849,7 +878,7 @@ export default {
                   flex-direction: row;
                   color: #666;
                   input {
-                    width: 80px;
+                    width: 100px;
                     height: 100%;
                   }
                   .err {
