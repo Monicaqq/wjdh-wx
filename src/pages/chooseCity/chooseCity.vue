@@ -21,7 +21,7 @@
           </div>
         </div>
         <div class="btn">
-          <button>确定</button>
+          <button @click="toHomePage">确定</button>
         </div>
       </div>
     </div>
@@ -44,7 +44,11 @@ export default {
     chooseCity (e) {
       const id = e.currentTarget.dataset.id
       this.currentId = id
-      this.$router.push('../../pages/home/main')
+    },
+    toHomePage () {
+      if (this.currentId) {
+        this.$router.push('../../pages/home/main')
+      }
     }
   },
 

@@ -81,7 +81,6 @@
             <!-- 页面主体列表 -->
             <div class="main-container">
               <div class="main-content">
-
                 <!-- 住户界面 -->
                 <div v-if="currentTab == 0 && isOwner" class="scroll-container">
                   <scroll-view class="scroll-view" scroll-y='true'>
@@ -278,23 +277,12 @@ export default {
       getToken(() => {
         that.getRoom()
         that.isAuth = true
-        // that.getPersonMess()
-        // that.room = getStorageSync('room')
+        showLoading('正在加载')
       }, () => {
         that.isAuth = false
         that.$router.push('../../pages/ownerLogin/main')
       }
       )
-      // let that = this
-      // if (getStorageSync('token')) {
-      //   that.isAuth = true
-      //   that.getPersonMess()
-      // } else {
-      //   getToken((res) => {
-      //     console.log('token success', res)
-      //     that.isAuth = true
-      //   })
-      // }
     },
     // 获取缓存中  room
     getRoom () {
@@ -323,13 +311,6 @@ export default {
     getImgUrl (img) {
       return `${API_URL}${img}`
     },
-    // 首页所有请求
-    // allRequest () {
-    //   this.getHouseHoldList()
-    //   this.getRepairList()
-    //   this.getInviteList()
-    //   this.getInfoList()
-    // },
     // 获取首页人员信息
     getPersonMess () {
       let that = this
@@ -353,8 +334,6 @@ export default {
                 'roomId': roomItem.roomId,
                 'roomFullName': roomItem.roomFullName
               }
-              // setStorageSync('room', that.room)
-              // that.roomId = roomItem.roomId
               that.isInvitation = roomItem.isInvitation
             } else {
               that.roomFullName = that.rooms[0].roomFullName
@@ -370,7 +349,7 @@ export default {
               that.isInvitation = that.rooms[0].isInvitation
             }
           }
-          if (parseInt(that.isHouseholder) === 1) {
+          if (parseInt(that.isHouseholder) === 0) {
             that.isOwner = true
             that.personRegion = '户主'
           } else {
