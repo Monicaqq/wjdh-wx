@@ -44,6 +44,7 @@ export default {
     chooseCity (e) {
       const id = e.currentTarget.dataset.id
       this.currentId = id
+      this.$router.push('../../pages/home/main')
     }
   },
 
