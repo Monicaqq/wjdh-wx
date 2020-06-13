@@ -225,14 +225,13 @@ export default {
   components: { avatorImg, arrowBtn, submitBtn, tabLists },
   onShow () {
     this.getToken()
-    mpvue.removeStorageSync('car')
     let that = this
     if (!this.isOwner) {
+      that.currentTab = 1
+    } else {
       that.currentTab = 0
     }
-  },
-  mounted () {
-    // this.getRoom()
+    mpvue.removeStorageSync('car')
   },
   data () {
     return {
@@ -270,6 +269,12 @@ export default {
       roomFullName: '您暂未绑定户址'
     }
   },
+  // 下拉刷新
+  onPullDownRefresh () {
+    this.getToken()
+    //调用微信停止下拉刷新的函数
+    wx.stopPullDownRefresh()
+  },
   methods: {
     // 获取token
     getToken () {
@@ -277,7 +282,7 @@ export default {
       getToken(() => {
         that.getRoom()
         that.isAuth = true
-        showLoading('正在加载')
+        showLoading('加载中')
       }, () => {
         that.isAuth = false
         that.$router.push('../../pages/ownerLogin/main')
@@ -322,7 +327,6 @@ export default {
         that.phoneNum = that.personMess.phoneNum
         that.personId = that.personMess.id
         that.rooms = that.personMess.rooms
-        console.log(that.personMess)
         if (that.rooms.length !== 0) {
           that.isExamine = true
           for (var roomItem of that.rooms) {
@@ -367,7 +371,6 @@ export default {
           } else {
             that.isInvitation = false
           }
-          hideLoading()
           console.log(res)
           // 住户列表
           that.getHouseHoldList()
@@ -377,6 +380,7 @@ export default {
           that.getInviteList()
           // 通知列表
           that.getInfoList()
+          hideLoading()
         } else {
           // 没有绑定户址, 就是未审核通过
           that.isExamine = false
@@ -483,12 +487,12 @@ export default {
     },
     // 跳转至新增报修界面
     applyRepair () {
-      console.log('去报修页')
+      // console.log('去报修页')
       this.$router.push('../../pages/repairApply/main')
     },
     // 跳转至邀请人员界面
     invitePerson () {
-      console.log('邀请人员')
+      // console.log('邀请人员')
       this.$router.push('../../pages/invitePerson/main')
     },
     // 查看邀请详情

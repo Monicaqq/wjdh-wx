@@ -9,7 +9,7 @@
       <div class="person-lists">
         <div class="person-photo borderB1px person-item">
           <span class="color333">照片</span>
-          <div class="photo-right">
+          <div class="photo-right" data-src='regPhoto' @click="previewImg">
             <avator-img round :src='regPhoto'></avator-img>
             <div class="arrow-btn">
               <arrow-btn @arrowClick='addAvator' color='#9B9B9B'></arrow-btn>
@@ -44,22 +44,6 @@
       </div>
       <!-- 住户信息列表 -->
       <div class="housePer-lists">
-        <!-- 住址 -->
-        <!-- <div class="person-tel borderB1px person-item" v-if='isPerson'>
-          <span class="color333">住址</span>
-          <div class="tel-right">
-            <picker @change="chooseAddress" :value='index' :range='rooms' :range-key="'roomFullName'">
-              <div class="picker">
-                <span class="color666">{{rooms[index].roomFullName}}</span>
-                <arrow-btn color='#9B9B9B'></arrow-btn>
-              </div>
-            </picker> -->
-        <!-- <span class="color666" @click="chooseAddress">{{roomFullName}}</span>
-            <arrow-btn @arrowClick='chooseAddress' color='#9B9B9B'></arrow-btn> -->
-        <!-- </div>
-        </div> -->
-
-        <!-- </div> -->
         <!-- 人员类型 -->
         <div class="person-tel borderB1px person-item">
           <span class="color333">人员类型</span>
@@ -128,7 +112,7 @@ export default {
       // this.roomFullName = this.personData.rooms[0].roomFullName
       if (this.personData.rooms[0]) {
         const isHouseholder = parseInt(this.personData.rooms[0].isHouseholder)
-        const personRegioncode = parseInt(this.personData.rooms[0].personRegioncode)
+        const personRegionCode = parseInt(this.personData.rooms[0].personRegionCode)
         if (isHouseholder === 1) {
           that.personRegion = '户主'
         } else {
@@ -155,16 +139,14 @@ export default {
     // toTelView () {
     //   this.$router.push('../../pages/telphone/main')
     // },
-    // 点击选择户址
-    // chooseAddress (e) {
-    //   console.log(e)
-    //   // 选中的index
-    //   this.index = e.mp.detail.value
-    //   this.roomId = this.rooms[this.index].roomId
-    //   this.roomFullName = this.rooms[this.index].roomFullName
-    //   console.log(this.rooms)
-    //   console.log(this.rooms[this.index].roomFullName)
-    // },
+    // 预览图片
+    previewImg (e) {
+      let that = this
+      wx.previewImage({
+        current: e.currentTarget.dataset.src,
+        urls: [that.regPhoto]
+      })
+    },
     // 去车辆界面
     toCarView () {
       this.$router.push('../../pages/cars/main')

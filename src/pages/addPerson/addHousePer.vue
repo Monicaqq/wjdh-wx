@@ -13,7 +13,7 @@
             <span class="color333">照片</span>
             <div class="photo-right">
               <!-- 已选中图片 -->
-              <div v-if='tempPhoto' @click="previewImage">
+              <div v-if='tempPhoto' @click="previewImage" data-src='tempPhoto'>
                 <avator-img round :src='tempPhoto'></avator-img>
               </div>
               <div v-else @click="choosePersonImg">
@@ -232,12 +232,12 @@ export default {
           // 选择预览
           if (res.tapIndex === 0) {
             wx.previewImage({
-              current: e.currentTarget.id,
-              urls: that.houseHoldForm.perPhoto
+              current: e.currentTarget.dataset.src,
+              urls: [that.tempPhoto]
             })
           } else {
             // 选择删除
-            that.houseHoldForm.perPhoto = ''
+            that.tempPhoto = ''
           }
         }
       })

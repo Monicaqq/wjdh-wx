@@ -169,7 +169,7 @@
           <div class="person-img">
             <!-- 展示头像 -->
             <div class="houseHold-img" v-if="tempPhoto">
-              <img :src="tempPhoto" @click="previewImage">
+              <img :src="tempPhoto" @click="previewImage" data-src='tempPhoto'>
             </div>
             <!-- 展示添加头像背景图 -->
             <div class="bg-img" v-else>
@@ -348,15 +348,6 @@ export default {
     onHouseHoldSexFocus () {
       this.isHouseHoldSexFocus = true
     },
-    // 性别失焦
-    // onHouseHoldSexBlur () {
-    //   this.isHouseHoldSexFocus = false
-    //   if (this.personSex) {
-    //     this.houseHoldSexFlag = true
-    //   } else {
-    //     showToast('请选择性别')
-    //   }
-    // },
     // 选择性别
     chooseSex () {
       this.isHouseHoldSexFocus = true
@@ -655,12 +646,12 @@ export default {
           // 选择预览
           if (res.tapIndex === 0) {
             wx.previewImage({
-              current: e.currentTarget.id,
-              urls: that.regPhoto
+              current: e.currentTarget.dataset.src,
+              urls: [that.tempPhoto]
             })
           } else {
             // 选择删除
-            that.regPhoto = ''
+            that.tempPhoto = ''
           }
         }
       })

@@ -9,7 +9,7 @@
       <div class="person-lists">
         <div class="person-photo borderB1px person-item">
           <span class="color333">照片</span>
-          <div class="photo-right">
+          <div class="photo-right" @click="previewImg" data-src='regPhoto'>
             <avator-img round :src='regPhoto'></avator-img>
             <div class="arrow-btn">
               <arrow-btn @arrowClick='addAvator' color='#9B9B9B'></arrow-btn>
@@ -228,7 +228,15 @@ export default {
     toCarView () {
       console.log('')
       this.$router.push('../../pages/houseHoldCar/main')
-    }
+    },
+    // 预览图片
+    previewImg (e) {
+      let that = this
+      wx.previewImage({
+        current: e.currentTarget.dataset.src,
+        urls: [that.regPhoto]
+      })
+    },
   }
 }
 </script>

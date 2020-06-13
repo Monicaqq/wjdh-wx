@@ -8,8 +8,7 @@
         <img :src="qrCodeURL" v-else class="isOver" mode='aspectFit'>
       </div>
       <div>
-        <span v-if="notOver">有效期24小时</span>
-        <span v-else>已过期</span>
+        <span>{{notOver == 0 ? '已过期' : '有效期24小时'}}</span>
       </div>
 
     </div>
@@ -39,8 +38,10 @@
       </div>
     </div>
     <!-- 保存二维码按钮 -->
-    <div class="qrcode-btn" v-if="notOver">
-      <submit-btn btnText='保存二维码' isActive @submitClick="saveQrCode"></submit-btn>
+    <div class="qrcode-btn-footer" v-if="notOver">
+      <button class="btn left" open-type='share'>分享二维码</button>
+      <button class="btn right" @click="saveQrCode" v-if='saveQrBtn'>保存二维码</button>
+      <button class='btn right' open-type="openSetting" @opensetting='handleSetting' v-else>去授权</button>
     </div>
   </div>
 </template>
@@ -48,17 +49,21 @@
 import { cardNumHidden } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
 import navBar from '@/components/navBar'
+import { showToast, showLoading, hideLoading, getStorageSync, setStorageSync } from '../../api/wechat'
 const QR = require('@/utils/weapp-qrcode.js')
 export default {
   components: { submitBtn, navBar },
   mounted () {
+    showLoading('加载中')
     this.inviteDetail = JSON.parse(this.$route.query.item)
     this.beOver = this.inviteDetail.beOver
-    console.log(typeof parseInt(this.beOver))
     this.qrCode = this.inviteDetail.qrCode
     this.drawImg()
+    hideLoading()
     this.cardNum = cardNumHidden(this.inviteDetail.cardNum, 3, 3)
     console.log(this.inviteDetail)
+    // 判断是否具有授权
+    this.isAuth()
   },
   data () {
     return {
@@ -66,7 +71,10 @@ export default {
       cardNum: '',
       beOver: '',
       qrCode: '',
-      qrCodeURL: ''
+      qrCodeURL: '',
+      // openSettingBtn: true,
+      saveQrBtn: '',
+      imgUrl: '../../static/images/qrcode.jpg'
     }
   },
   computed: {
@@ -78,6 +86,64 @@ export default {
         return false
       }
     }
+  },
+  // 微信分享二维码
+  onShareAppMessage (res) {
+    let that = this
+    if (res.from === 'button') {
+      console.log('from pages', res.target)
+    }
+    return {
+      // 自定义转发标题
+      title: '云上物业',
+      // 图片地址
+      path: `${wx.env.USER_DATA_PATH}/qrcode.png`,
+      // 自定义转发图片
+      // imageUrl: `${wx.env.USER_DATA_PATH}/qrcode.png`,
+      imageUrl: that.imgUrl,
+      success (res) {
+        // 返回目标源
+        console.log('1111')
+        wx.showShareMenu({
+          withShareTicket: true
+        })
+      }, fail (err) {
+        console.log(err)
+      }
+    }
+
+    // var getFile = wx.getFileSystemManager()
+    // 写文件
+    // getFile.writeFile({
+    //   // 创建临时文件名
+    //   filePath: `${wx.env.USER_DATA_PATH}/qrcode.png`,
+    //   // 去除 data:image/png;base64
+    //   data: that.qrCodeURL.slice(22),
+    //   encoding: 'base64',
+    //   success (res) {
+    //     console.log('111', res)
+    //     if (res.from === 'button') {
+    //       console.log('from pages', res.target)
+    //     }
+    //     return {
+    //       // 自定义转发标题
+    //       title: '被邀人二维码',
+    //       // 图片地址
+    //       path: `${wx.env.USER_DATA_PATH}/qrcode.png`,
+    //       // 自定义转发图片
+    //       imageUrl: `${wx.env.USER_DATA_PATH}/qrcode.png`,
+    //       success (res) {
+    //         // 返回目标源
+    //         console.log('1111')
+    //         wx.showShareMenu({
+    //           withShareTicket: true
+    //         })
+    //       }
+    //     }
+    //   }, fail (err) {
+    //     console.log(err)
+    //   }
+    // })
   },
   methods: {
     goBack () {
@@ -92,8 +158,87 @@ export default {
       })
       this.qrCodeURL = imgData
     },
+    // 分享二维码按钮
+    // shareQrCode () {
+    //   this.onShareAppMessage()
+    // },
+    // 保存图片与授权按钮展示
+    isAuth () {
+      let that = this
+      wx.getSetting({
+        success (res) {
+          if (res.authSetting['scope.writePhotosAlbum']) {
+            that.saveQrBtn = true
+          } else {
+            that.saveQrBtn = false
+          }
+        }
+      })
+    },
+    // 保存至本机
     saveQrCode () {
-      console.log('保存二维码至手机相册')
+      let that = this
+      wx.getSetting({
+        // 有保存到相册的权限
+        success (res) {
+          if (res.authSetting['scope.writePhotosAlbum']) {
+            that.saveImg()
+            console.log('tosaveImg')
+          } else if (res.authSetting['scope.writePhotosAlbum'] === undefined) {
+            // 无权限,进行授权
+            that.saveQrBtn = false
+          } else {
+            that.saveQrBtn = true
+          }
+        }
+      })
+    },
+    // 保存二维码
+    saveImg () {
+      let that = this
+      // base 64的图片
+      // console.log('saveImg', that.qrCodeURL)
+      var fileN = new Date().valueOf()
+      // 获取文件管理器对象
+      var getFile = wx.getFileSystemManager()
+      // 写文件
+      getFile.writeFile({
+        // 创建临时文件名
+        filePath: `${wx.env.USER_DATA_PATH}/qrcode_${fileN}.png`,
+        // 去除 data:image/png;base64
+        data: that.qrCodeURL.slice(22),
+        encoding: 'base64',
+        success (res) {
+          wx.saveImageToPhotosAlbum({
+            filePath: `${wx.env.USER_DATA_PATH}/qrcode_${fileN}.png`,
+            success (res) { showToast('保存成功') },
+            fail (err) {
+              console.log(err)
+            }
+          })
+        }, fail (err) {
+          console.log(err)
+        }
+      })
+    },
+    // 授权按钮
+    handleSetting (e) {
+      let that = this
+      console.log(e)
+      if (!e.mp.detail.authSetting['scope.writePhotosAlbum']) {
+        wx.showModal({
+          title: '警告',
+          content: '若不打开授权,则无法保存保存二维码至相册中',
+          showCancel: false
+        })
+        that.saveQrBtn = false
+      } else {
+        wx.showModal({
+          title: '提示',
+          content: '您已授权, 赶紧将图片保存至相册中吧'
+        })
+        that.saveQrBtn = true
+      }
     }
   }
 }
@@ -179,10 +324,31 @@ export default {
       font-size: 14px;
     }
   }
-  .qrcode-btn {
+  .qrcode-btn-footer {
+    display: flex;
+    flex-direction: row;
     width: 100%;
     position: absolute;
+    height: 45px;
     bottom: 0;
+    .btn {
+      border-radius: 0;
+      font-size: 16px;
+    }
+    .btn:active {
+      top: 2px;
+    }
+    .left {
+      width: 60%;
+      color: #fff;
+      background: rgba(102, 125, 250, 1);
+    }
+    .right {
+      width: 40%;
+      background: rgba(255, 255, 255, 1);
+      color: #667dfa;
+      border: 0.5px solid rgba(102, 125, 250, 1);
+    }
   }
 }
 </style>

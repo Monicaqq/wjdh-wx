@@ -43,6 +43,7 @@ export function chooseImage () {
 }
 // 预览图片
 export function previewImage (e) {
+  console.log(e)
   wx.showActionSheet({
     itemList: ['预览', '删除'],
     success (res) {
