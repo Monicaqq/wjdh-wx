@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/home/main",
+    "pages/index/main",
     "pages/chooseCity/main",
     "pages/address/main",
     "pages/ownerLogin/main",

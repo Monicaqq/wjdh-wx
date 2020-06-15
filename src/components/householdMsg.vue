@@ -30,9 +30,9 @@
         </div>
         <div class="person-tel person-item">
           <span class="color333">手机号</span>
-          <div class="tel-right" @click="toTelView">
+          <div class="tel-right">
             <span class="color666">{{personMsg.phoneNum}}</span>
-            <arrow-btn color='#9B9B9B'></arrow-btn>
+            <!-- <arrow-btn color='#9B9B9B'></arrow-btn> -->
           </div>
         </div>
       </div>
@@ -96,6 +96,7 @@
 import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import { cardNumHidden } from '../utils/index'
+import { updateHouseHold } from '../api/index'
 export default {
   components: { avatorImg, arrowBtn },
   props:
@@ -103,6 +104,14 @@ export default {
     personMsg: {
       type: Object,
       default: {}
+    },
+    houId: {
+      type: String,
+      default: ''
+    },
+    id: {
+      type: String,
+      default: ''
     },
     car: {
       type: Array,
@@ -122,7 +131,7 @@ export default {
     }
   },
   created () {
-    this.getCarData()
+    this.getPersonData()
   },
   data () {
     return {
@@ -162,13 +171,19 @@ export default {
     },
     car (newVal) {
       this.carLen = newVal.length
+    },
+    houId (newVal) {
+      this.houId = newVal
+    },
+    id (newVal) {
+      this.id = newVal
     }
   },
   methods: {
     // 获取父组件中数据
-    getCarData () {
+    getPersonData () {
       this.personData = this.personMsg
-      // console.log('personData', this.personData)
+      console.log('人员', this.personData)
     },
     // 选择人员类型
     choosePersonRegion () {
@@ -178,14 +193,25 @@ export default {
         success (res) {
           if (res.tapIndex === 0) {
             that.personRegion = '物业'
-            that.personRegionCode = res.tapIndex
+            that.personRegionCode = 1
           } else if (res.tapIndex === 1) {
             that.personRegion = '业主'
-            that.personRegionCode = res.tapIndex
+            that.personRegionCode = 2
           } else if (res.tapIndex === 2) {
             that.personRegion = '租户'
-            that.personRegionCode = res.tapIndex
+            that.personRegionCode = 3
           }
+          mpvue.showModal({
+            title: '提示',
+            content: '您确定更改人员类型',
+            success (res) {
+              if (res.confirm) {
+                that.updateHouseHold()
+              } else {
+                console.log('您已取消')
+              }
+            }
+          })
         }
       })
     },
@@ -193,17 +219,28 @@ export default {
     choosePassRole () {
       let that = this
       wx.showActionSheet({
-        itemList: ['可进出', '不可进出'],
+        itemList: ['不可进出', '可进出'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.passRole = '可进出'
-            that.personMsg.rooms[0].isPass = res.tapIndex
-            that.isPass = res.tapIndex
-          } else if (res.tapIndex === 1) {
             that.passRole = '不可进出'
             that.personMsg.rooms[0].isPass = res.tapIndex
             that.isPass = res.tapIndex
+          } else if (res.tapIndex === 1) {
+            that.passRole = '可进出'
+            that.personMsg.rooms[0].isPass = res.tapIndex
+            that.isPass = res.tapIndex
           }
+          mpvue.showModal({
+            title: '提示',
+            content: '您确定更进出权限',
+            success (res) {
+              if (res.confirm) {
+                that.updateHouseHold()
+              } else {
+                console.log('您已取消')
+              }
+            }
+          })
         }
       })
     },
@@ -211,22 +248,31 @@ export default {
     chooseInviteRole () {
       let that = this
       wx.showActionSheet({
-        itemList: ['允许邀请访客', '禁止邀请访客'],
+        itemList: ['禁止邀请访客', '允许邀请访客'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.inviteRole = '允许邀请访客'
-            that.isInvitation = res.tapIndex
-          } else if (res.tapIndex === 1) {
             that.inviteRole = '禁止邀请访客'
             that.isInvitation = res.tapIndex
+          } else if (res.tapIndex === 1) {
+            that.inviteRole = '允许邀请访客'
+            that.isInvitation = res.tapIndex
           }
+          mpvue.showModal({
+            title: '提示',
+            content: '您确定更邀请权限',
+            success (res) {
+              if (res.confirm) {
+                that.updateHouseHold()
+              } else {
+                console.log('您已取消')
+              }
+            }
+          })
         }
       })
-      console.log('选择邀请权限')
     },
     // 去车辆界面
     toCarView () {
-      console.log('')
       this.$router.push('../../pages/houseHoldCar/main')
     },
     // 预览图片
@@ -237,6 +283,29 @@ export default {
         urls: [that.regPhoto]
       })
     },
+    // 更改住户信息
+    updateHouseHold () {
+      let that = this
+      // let child = this.$refs.child
+      // this.isPass = child.isPass
+      // this.isInvitation = child.isInvitation
+      // this.personRegioncode = child.personRegioncode
+      // console.log(child.isPass)
+      updateHouseHold({
+        'data': {
+          'houId': that.houId,
+          'personId': that.id,
+          'roomId': that.roomId,
+          'isPass': that.isPass,
+          'isInvitation': that.isInvitation,
+          'personRegioncode': that.personRegioncode
+        }
+      }).then(res => {
+        // this.$router.go(-1)
+        // that.$router.push('../../pages/home/main')
+        console.log('更新人员类型', res)
+      })
+    }
   }
 }
 </script>

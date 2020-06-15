@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import HouseHold from './HouseHold'
+import HouseHold from './houseHold'
 
 const app = new Vue(HouseHold)
 app.$mount()

@@ -46,20 +46,11 @@ export default {
       getPersonMess().then(res => {
         that.personMess = res.data.data
         setStorageSync('personMess', that.personMess)
-        // that.carLen = 
       })
     },
     // 返回上一页
     goBack () {
-      // const roomId = this.$refs.child.roomId
-      // const roomFullName = this.$refs.child.roomFullName
-      // const room = {
-      //   roomId: this.$refs.child.roomId,
-      //   roomFullName: this.$refs.child.roomFullName
-      // }
-      // console.log(room)
-      // setStorageSync('room', room)
-      this.$router.push('../../pages/home/main')
+      this.$router.go(-1)
     },
     // 跳转至手机号界面
     // toTelView () {

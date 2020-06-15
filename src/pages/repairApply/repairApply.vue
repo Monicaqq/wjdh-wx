@@ -36,7 +36,6 @@ export default {
     const personMess = getStorageSync('personMess')
     this.roomId = personMess.rooms[0].roomId
   },
-  // inject: ['reload'],
   data () {
     return {
       repairType: '公共设施',
@@ -47,7 +46,6 @@ export default {
   },
   methods: {
     goBack () {
-      // this.$router.push('../../pages/home/main')
       this.$router.go(-1)
     },
     chooseRepairType () {
@@ -64,7 +62,6 @@ export default {
           }
         }
       })
-      // console.log('选择报修类型')
     },
     applyRepair () {
       let that = this
@@ -79,8 +76,7 @@ export default {
           }
         }).then(res => {
           console.log(res)
-          this.$router.push('../../pages/home/main')
-          // this.reload()
+          this.$router.go(-1)
         })
       }
     }
@@ -120,11 +116,8 @@ export default {
   }
   .apply-detail {
     margin: 15px 15px;
-    // margin-left: 15px;
-    // margin-right: 15px;
     .detail-text {
       height: 100px;
-
       margin-top: 16px;
       background: #f7f8fa;
       padding: 5px 10px;

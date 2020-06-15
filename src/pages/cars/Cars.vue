@@ -84,7 +84,8 @@ export default {
   },
   methods: {
     goBack () {
-      this.$router.push('../../pages/owner/main')
+      this.$router.go(-1)
+      // this.$router.push('../../pages/owner/main')
     },
     // 获取汽车数据
     getCarData () {

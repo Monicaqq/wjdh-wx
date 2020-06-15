@@ -82,12 +82,13 @@ export default {
       carNumErrFlag: false,
       carNumErrMsg: '',
       isShowInput: true,
-      addCarIcon: '../../static/images/addCarIcon.png',
+      addCarIcon: '../../static/images/addCarIcon.png'
     }
   },
   methods: {
     goBack () {
-      this.$router.push('../../pages/addPerson/main')
+      this.$router.go(-1)
+      // this.$router.push('../../pages/addPerson/main')
     },
     // 展示车辆输入输入框
     showInput () {

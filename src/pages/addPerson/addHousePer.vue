@@ -107,7 +107,7 @@
         </div>
       </div>
       <!-- 新增住户按钮 -->
-      <div class="submit-btn">
+      <div class="submit-btn" @click="addHouserPerson">
         <submit-btn btnText='确定' isActive></submit-btn>
       </div>
     </form>
@@ -429,7 +429,8 @@ export default {
         }).then(res => {
           if (res.data.code === 200) {
             mpvue.removeStorageSync('car')
-            this.$router.push('../../pages/home/main')
+            this.$router.go(-1)
+            // this.$router.push('../../pages/home/main')
             console.log('addPerson', res)
           } else {
             showToast(res.data.message)
@@ -439,8 +440,8 @@ export default {
     },
     goBack () {
       mpvue.removeStorageSync('car')
-      this.$router.push('../../pages/home/main')
-      // this.$router.go(-1)
+      // this.$router.push('../../pages/home/main')
+      this.$router.go(-1)
     }
   }
 }

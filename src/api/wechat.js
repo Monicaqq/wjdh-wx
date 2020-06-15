@@ -35,7 +35,7 @@ export function getToken (onSuccess, onFail) {
             setStorageSync('appId', appId)
             onSuccess(token)
           } else {
-            onFail(err)
+            onFail(res)
           }
         }).catch(err => {
           onFail(err)

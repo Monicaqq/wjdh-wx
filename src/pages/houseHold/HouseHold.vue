@@ -5,7 +5,7 @@
     <!-- <img :src="houseHoldDetail." alt=""> -->
     <!-- 住户个人信息部分 -->
     <household-msg ref='child' :personMsg='houseHoldDetail' :regPhoto='regPhoto' :car='car' :rooms='rooms'
-      :cardNum='cardNum'>
+      :cardNum='cardNum' :houId='houId' :id='id'>
     </household-msg>
     <!-- 删除住户按钮 -->
     <div class="submit-btn">
@@ -17,13 +17,13 @@
 import householdMsg from '@/components/householdMsg'
 import submitBtn from '@/components/submitBtn'
 import navBar from '@/components/navBar'
-import { getHouseHoldInfo, deleteHouseHold, updateHouseHold } from '../../api/index'
+import { getHouseHoldInfo, deleteHouseHold } from '../../api/index'
 export default {
   components: { householdMsg, submitBtn, navBar },
   mounted () {
     this.houId = this.$route.query.houId
     this.id = this.$route.query.personId
-    this.getHouseHolderInfo()
+    this.getHouseHoldInfo()
   },
   data () {
     return {
@@ -42,10 +42,9 @@ export default {
   },
   methods: {
     goBack () {
-      this.$router.push('../../pages/home/main')
-      this.updateHouseHold()
+      this.$router.go(-1)
     },
-    getHouseHolderInfo () {
+    getHouseHoldInfo () {
       let that = this
       getHouseHoldInfo({
         'data': {
@@ -58,11 +57,10 @@ export default {
         that.car = that.houseHoldDetail.car
         that.rooms = that.houseHoldDetail.rooms[0]
         that.cardNum = that.houseHoldDetail.cardNum
-        that.roomId = that.rooms[0].roomId
-        that.isPass = that.rooms[0].isPass
-        that.isInvitation = that.rooms[0].isInvitation
+        that.roomId = that.rooms.roomId
+        that.isPass = that.rooms.isPass
+        that.isInvitation = that.rooms.isInvitation
         that.personName = that.houseHoldDetail.personName
-        // console.log(typeof (that.rooms[0].isInvitation))
       })
     },
     delHousePerson () {
@@ -78,33 +76,13 @@ export default {
                 'personId': that.id
               }
             }).then(res => {
-              that.$router.push('../../pages/home/main')
               console.log('delHouseHold', res)
+              if (res.data.code === 200) {
+                that.$router.go(-1)
+              }
             })
           }
         }
-      })
-    },
-    // 更改住户信息
-    updateHouseHold () {
-      let that = this
-      let child = this.$refs.child
-      this.isPass = child.isPass
-      this.isInvitation = child.isInvitation
-      this.personRegioncode = child.personRegioncode
-      console.log(child.isPass)
-      updateHouseHold({
-        'data': {
-          'houId': that.houId,
-          'personId': that.id,
-          'roomId': that.roomId,
-          'isPass': that.isPass,
-          'isInvitation': that.isInvitation,
-          'personRegioncode': that.personRegioncode
-        }
-      }).then(res => {
-        that.$router.push('../../pages/home/main')
-        console.log(res)
       })
     }
   }

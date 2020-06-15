@@ -113,7 +113,8 @@ export default {
       this.showModal = false
     },
     goBack () {
-      this.$router.push('../../pages/home/main')
+      this.$router.go(-1)
+      // this.$router.push('../../pages/home/main')
     },
   },
 }

@@ -280,9 +280,9 @@ export default {
     getToken () {
       let that = this
       getToken(() => {
+        showLoading('加载中')
         that.getRoom()
         that.isAuth = true
-        showLoading('加载中')
       }, () => {
         that.isAuth = false
         that.$router.push('../../pages/ownerLogin/main')
@@ -296,6 +296,12 @@ export default {
         that.room = getStorageSync('room')
         that.roomFullName = that.room.roomFullName
         that.infoText = that.room.notice
+        that.isInvitation = that.room.isInvitation
+        if (parseInt(that.isInvitation) === 1) {
+          that.isInvitation = true
+        } else {
+          that.isInvitation = false
+        }
         that.isExamine = true
         that.personMess = getStorageSync('personMess')
         that.regPhoto = ('data:image/png;base64,' + that.personMess.regPhoto).replace(/[\r\n]/g, '')
@@ -305,12 +311,16 @@ export default {
         that.getHouseHoldList()
         that.getRepairList()
         that.getInviteList()
+        that.getInfoList()
         console.log('缓存中room')
+        hideLoading()
         return false
       } else {
         console.log('缓存中无room')
         that.getPersonMess()
+        hideLoading()
       }
+
     },
     // 图片路径拼接
     getImgUrl (img) {
@@ -344,12 +354,10 @@ export default {
               that.infoText = that.rooms[0].notice
               that.isHouseholder = that.rooms[0].isHouseholder
               that.personRegionCode = that.rooms[0].personRegionCode
-              // that.roomId = that.rooms[0].roomId
               that.room = {
                 'roomId': that.rooms[0].roomId,
                 'roomFullName': that.rooms[0].roomFullName
               }
-              // setStorageSync('room', that.room)
               that.isInvitation = that.rooms[0].isInvitation
             }
           }
@@ -371,7 +379,7 @@ export default {
           } else {
             that.isInvitation = false
           }
-          console.log(res)
+          console.log('人员详情', res)
           // 住户列表
           that.getHouseHoldList()
           // 报修列表
@@ -419,7 +427,7 @@ export default {
         console.log('报修列表', that.repairList)
       })
     },
-    // 访客列表
+    // 邀请列表
     getInviteList () {
       let that = this
       getInviteList({
@@ -430,7 +438,6 @@ export default {
           'roomId': that.room.roomId
         }
       }).then(res => {
-        console.log('邀请', res)
         that.inviteList = res.data.data.rows
         console.log('邀请列表', that.inviteList)
       })
@@ -487,7 +494,6 @@ export default {
     },
     // 跳转至新增报修界面
     applyRepair () {
-      // console.log('去报修页')
       this.$router.push('../../pages/repairApply/main')
     },
     // 跳转至邀请人员界面

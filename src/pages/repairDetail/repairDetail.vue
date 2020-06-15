@@ -81,7 +81,6 @@ export default {
   },
   methods: {
     goBack () {
-      // this.$router.push('../../pages/home/main')
       this.$router.go(-1)
     },
     handleRepair () {
@@ -97,9 +96,7 @@ export default {
               }
             }).then(res => {
               if (res.data.code === 200) {
-                that.$router.push('../../pages/home/main')
-                // console.log('已处理', res)
-                // that.reload()
+                that.$router.go(-1)
               }
             })
           }
@@ -120,9 +117,7 @@ export default {
               }
             }).then(res => {
               if (res.data.code === 200) {
-                // that.$router.go(-1)
-                that.$router.push('../../pages/home/main')
-                // that.reload()
+                that.$router.go(-1)
               }
             })
           }

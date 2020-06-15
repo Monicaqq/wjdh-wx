@@ -175,13 +175,15 @@ export default {
           }
         }).then(res => {
           console.log('invitePerson', res)
-          this.$router.push('../../pages/home/main')
+          this.$router.go(-1)
+          // this.$router.push('../../pages/home/main')
           // this.reload()
         })
       }
     },
     goBack () {
-      this.$router.push('../../pages/home/main')
+      this.$router.go(-1)
+      // this.$router.push('../../pages/home/main')
     }
   }
 }

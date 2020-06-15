@@ -107,7 +107,8 @@ export default {
         wx.showShareMenu({
           withShareTicket: true
         })
-      }, fail (err) {
+      },
+      fail (err) {
         console.log(err)
       }
     }
@@ -147,7 +148,6 @@ export default {
   },
   methods: {
     goBack () {
-      // this.$router.push('../../pages/home/main')
       this.$router.go(-1)
     },
     drawImg () {
@@ -216,7 +216,8 @@ export default {
               console.log(err)
             }
           })
-        }, fail (err) {
+        },
+        fail (err) {
           console.log(err)
         }
       })
