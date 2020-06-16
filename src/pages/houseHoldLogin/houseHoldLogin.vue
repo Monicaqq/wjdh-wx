@@ -222,8 +222,8 @@ export default {
   },
   data () {
     return {
-      isStep1: false,
-      isStep2: true,
+      isStep1: true,
+      isStep2: false,
       isStep3: false,
       isInviteInputFocus: false,
       isHouseHoldNameFocus: false,

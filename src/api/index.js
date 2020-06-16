@@ -110,4 +110,9 @@ export function getInfoDetail (params) {
   return get(`${API_URL}api/notice/info?id=`, params)
 }
 
+// 邀请码新增
+export function qrCodeAdd (params) {
+  return post(`${API_URL}/appPerson/qrCodeAdd`, params)
+}
+
 export { API_URL }

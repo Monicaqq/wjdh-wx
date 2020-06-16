@@ -7,9 +7,20 @@
         <div class="margin15">
           <div class="address-item" v-for='(item, index ) in rooms' :key='index' @click="chooseRoom(index)">
             <!-- 单个地址展示 -->
-            <div :class="['personRegion', item.isHouseholder == 1 ? 'hz' : 'zh']">
+            <!-- <div :class="['personRegion', item.isHouseholder == 1 ? 'hz' : 'zh']">
               <span>{{item.isHouseholder == 1 ? '户主' : '租户'}}</span>
+            </div> -->
+            <div class="regionStyle">
+              <div v-if="item.isHouseholder == 1" :class="['personRegion', 'hz']">
+                <span>户主</span>
+              </div>
+              <div v-else>
+                <div v-if="item.personRegioncode == 1" :class="['personRegion', 'wy']"><span>物业</span></div>
+                <div v-if="item.personRegioncode == 2" :class="['personRegion', 'yz']"><span>业主</span></div>
+                <div v-if="item.personRegioncode == 3" :class="['personRegion', 'zh']"><span>租户</span></div>
+              </div>
             </div>
+
             <!-- 地址对应人员类型 -->
             <!-- 地址 -->
             <div class="address-txt">
@@ -56,12 +67,18 @@
 <script>
 import navBar from '@/components/navBar'
 import { getStorageSync, setStorageSync, showToast } from '../../api/wechat'
-import { checkCode } from '../../api/index'
+import { qrCodeAdd } from '../../api/index'
 export default {
   components: { navBar },
   mounted () {
-    const personMess = getStorageSync('personMess')
-    this.rooms = personMess.rooms
+    Object.assign(this.$data, this.$options.data())
+    if (!getStorageSync('rooms')) {
+      const personMess = getStorageSync('personMess')
+      this.personId = personMess.id
+      this.rooms = personMess.rooms
+    } else {
+      this.rooms = getStorageSync('rooms')
+    }
   },
   data () {
     return {
@@ -72,6 +89,7 @@ export default {
       showModal: false,
       errorInfo: '',
       inviteCode: '',
+      personId: '',
       rooms: []
     }
   },
@@ -81,7 +99,6 @@ export default {
       // this.chooseFlag = true
       this.currentId = index
       setStorageSync('room', this.rooms[index])
-      console.log('所选住址', this.rooms[index])
     },
     // 邀请码添加户址
     inviteCodeAdd () {
@@ -96,13 +113,20 @@ export default {
       console.log(e)
       let that = this
       if (this.inviteCode) {
-        checkCode({
+        qrCodeAdd({
           'data': {
-            'inviteCode': that.inviteCode
+            'inviteCode': that.inviteCode,
+            'personId': that.personId
           }
         }).then(res => {
-          const data = res.data
-          console.log(data)
+          if (res.data.code == 200) {
+            const roomObj = res.data.data
+            console.log('rooms0', that.rooms)
+            that.rooms = that.rooms.concat(roomObj)
+            setStorageSync('rooms', that.rooms)
+            console.log('rooms', that.rooms)
+            that.showModal = false
+          }
         })
       } else {
         showToast('请输入邀请码')
@@ -113,8 +137,13 @@ export default {
       this.showModal = false
     },
     goBack () {
+      var pages = getCurrentPages()
+      var beforePage = pages[pages.length - 2]
+      beforePage.onLoad()
       this.$router.go(-1)
-      // this.$router.push('../../pages/home/main')
+      // wx.navigateBack({
+      //   delta: 1
+      // })
     },
   },
 }
@@ -137,6 +166,10 @@ export default {
       font-size: 13px;
       line-height: 49.5px;
       border-bottom: 0.5px solid rgba(238, 238, 238, 1);
+      .regionStyle {
+        display: flex;
+        align-items: center;
+      }
       .personRegion {
         display: flex;
         flex-direction: row;

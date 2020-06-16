@@ -143,7 +143,7 @@ export default {
     // 虚拟键盘 点击 '完成'触发
     onConfirm (e) {
       const { phone } = e.mp.detail
-      this.invitedPersonMsg.phone = phone
+      this.phone = phone
     },
     // 对输入框关键字赋值
     setValue (v) {
@@ -182,6 +182,9 @@ export default {
       }
     },
     goBack () {
+      var pages = getCurrentPages()
+      var beforePage = pages[pages.length - 2]
+      beforePage.onLoad()
       this.$router.go(-1)
       // this.$router.push('../../pages/home/main')
     }

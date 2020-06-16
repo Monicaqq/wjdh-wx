@@ -148,6 +148,9 @@ export default {
   },
   methods: {
     goBack () {
+      var pages = getCurrentPages()
+      var beforePage = pages[pages.length - 2]
+      beforePage.onLoad()
       this.$router.go(-1)
     },
     drawImg () {

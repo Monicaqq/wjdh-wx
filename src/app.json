@@ -1,21 +1,20 @@
 {
   "pages": [
-    "pages/home/main",
-    "pages/index/main",
     "pages/chooseCity/main",
-    "pages/address/main",
-    "pages/ownerLogin/main",
     "pages/houseHoldLogin/main",
+    "pages/ownerLogin/main",
     "pages/owner/main",
     "pages/addPerson/main",
-    "pages/invitePerson/main",
     "pages/houseHold/main",
+    "pages/address/main",
+    "pages/invitePerson/main",
     "pages/cars/main",
     "pages/houseHoldCar/main",
     "pages/repairApply/main",
     "pages/repairDetail/main",
     "pages/inviteDetail/main",
-    "pages/infoDetail/main"
+    "pages/infoDetail/main",
+    "pages/index/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

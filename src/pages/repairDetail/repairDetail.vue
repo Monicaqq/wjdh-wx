@@ -81,7 +81,13 @@ export default {
   },
   methods: {
     goBack () {
-      this.$router.go(-1)
+      var pages = getCurrentPages()
+      var beforePage = pages[pages.length - 2]
+      beforePage.onLoad()
+      wx.navigateBack({
+        delta: 1
+      })
+      // this.$router.go(-1)
     },
     handleRepair () {
       let that = this

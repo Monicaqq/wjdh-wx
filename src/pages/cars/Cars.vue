@@ -206,6 +206,7 @@ export default {
               'car': that.car
             }
           }).then(res => {
+            console.log(res)
             // getPersonMess().then(res => {
             //   console.log(res)
             //   // that.personMess = res.data.data

@@ -225,6 +225,7 @@ export default {
   components: { avatorImg, arrowBtn, submitBtn, tabLists },
   onShow () {
     this.getToken()
+    // this.onLoad()
     let that = this
     if (!this.isOwner) {
       that.currentTab = 1
@@ -279,9 +280,10 @@ export default {
     // 获取token
     getToken () {
       let that = this
+      showLoading('加载中')
       getToken(() => {
-        showLoading('加载中')
         that.getRoom()
+        // showLoading('加载中')
         that.isAuth = true
       }, () => {
         that.isAuth = false
@@ -289,7 +291,7 @@ export default {
       }
       )
     },
-    // 获取缓存中  room
+    // 获取缓存中 room
     getRoom () {
       let that = this
       if (getStorageSync('room')) {
@@ -302,13 +304,32 @@ export default {
         } else {
           that.isInvitation = false
         }
+        // 人员类型
+        that.isHouseholder = that.room.isHouseholder
+        that.personRegionCode = that.room.personRegionCode
+        if (parseInt(that.isHouseholder) === 1) {
+          that.getHouseHoldList()
+          that.isOwner = true
+          that.personRegion = '户主'
+
+        } else {
+          that.isOwner = false
+          if (parseInt(that.personRegionCode) === 1) {
+            that.personRegion = '物业'
+          } else if (parseInt(that.personRegionCode) === 2) {
+            that.personRegion = '业主'
+          } else {
+            that.personRegion = '租户'
+            that.currentTab = 1
+          }
+        }
         that.isExamine = true
         that.personMess = getStorageSync('personMess')
         that.regPhoto = ('data:image/png;base64,' + that.personMess.regPhoto).replace(/[\r\n]/g, '')
         that.personName = that.personMess.personName
         that.phoneNum = that.personMess.phoneNum
         that.personId = that.personMess.id
-        that.getHouseHoldList()
+
         that.getRepairList()
         that.getInviteList()
         that.getInfoList()
@@ -318,7 +339,6 @@ export default {
       } else {
         console.log('缓存中无room')
         that.getPersonMess()
-        hideLoading()
       }
 
     },
@@ -331,6 +351,7 @@ export default {
       let that = this
       getPersonMess().then(res => {
         that.personMess = res.data.data
+        console.log('人员详情', that.personMess)
         setStorageSync('personMess', that.personMess)
         that.regPhoto = ('data:image/png;base64,' + that.personMess.regPhoto).replace(/[\r\n]/g, '')
         that.personName = that.personMess.personName
@@ -361,9 +382,11 @@ export default {
               that.isInvitation = that.rooms[0].isInvitation
             }
           }
-          if (parseInt(that.isHouseholder) === 0) {
+          if (parseInt(that.isHouseholder) === 1) {
             that.isOwner = true
             that.personRegion = '户主'
+            // 住户列表
+            that.getHouseHoldList()
           } else {
             that.isOwner = false
             if (parseInt(that.personRegionCode) === 1) {
@@ -371,7 +394,9 @@ export default {
             } else if (parseInt(that.personRegionCode) === 2) {
               that.personRegion = '业主'
             } else {
+              that.currentTab = 1
               that.personRegion = '租户'
+              // that.currentTab = 1
             }
           }
           if (parseInt(that.isInvitation) === 1) {
@@ -379,9 +404,7 @@ export default {
           } else {
             that.isInvitation = false
           }
-          console.log('人员详情', res)
-          // 住户列表
-          that.getHouseHoldList()
+
           // 报修列表
           that.getRepairList()
           // 邀请列表
