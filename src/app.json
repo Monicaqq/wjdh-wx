@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/chooseCity/main",
+    "pages/home/main",
     "pages/houseHoldLogin/main",
     "pages/ownerLogin/main",
     "pages/owner/main",
