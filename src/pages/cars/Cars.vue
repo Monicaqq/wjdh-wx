@@ -5,15 +5,17 @@
     <!-- <form @submit="submitCarMsg"> -->
 
     <!-- 车牌列表 -->
-    <div class="cars-list" v-for="(item, index) in car" :key="index">
-      <div class="car-msg">
-        <div class="car-type">{{item.carType === 1 ? '小汽车' : '大卡车'}}</div>
-        <div class="choose-icon">
-          <div class="triangle"></div>
+    <scroll-view class="scroll-view" scroll-y='true'>
+      <div class="cars-list" v-for="(item, index) in car" :key="index">
+        <div class="car-msg">
+          <div class="car-type">{{carVals[item.carType-1]}}</div>
+          <div class="choose-icon">
+            <div class="triangle"></div>
+          </div>
+          <div class="car-number">{{item.licensePlateNo}}</div>
         </div>
-        <div class="car-number">{{item.licensePlateNo}}</div>
       </div>
-    </div>
+    </scroll-view>
     <!-- 添加车辆输入框 -->
     <div class="cars-input" v-if="isShowInput">
       <div class="car-msg">
@@ -27,8 +29,8 @@
         </div>
         <!-- 车辆输入框 -->
         <div class="car-number">
-          <input type="text" placeholder="请输入车牌号" v-model="carObj.licensePlateNo" @input="inputCarNum" maxlength="8"
-            confirm-type="done" @confirm='onConfirm' @change='onChange' @blur="onBlur">
+          <input type="text" placeholder="请输入车牌号" v-model="carObj.licensePlateNo" @input="inputCarNum" maxlength="9"
+            confirm-type="done" @focus="onFocus" @confirm='onConfirm' @change='onChange' @blur="onBlur">
           <!-- <div class="err" v-if="carNumErrFlag"><span>{{carNumErrMsg}}</span></div> -->
         </div>
       </div>
@@ -65,9 +67,10 @@ export default {
       personMess: {},
       personId: '',
       isHouseholder: '',
-      carTypeVal: '小汽车',
+      carTypeVal: '轿车',
       carType: 1,
       // carList: [],
+      carVals: ['轿车', '电车', '载货汽车', '客车', '挂车'],
       car: [],
       carObj: {
         'carType': 1,
@@ -79,7 +82,8 @@ export default {
       carNumErrFlag: false,
       carNumErrMsg: '',
       addCarIcon: '../../static/images/addCarIcon.png',
-      isShowInput: true
+      isShowInput: true,
+      isCarFocus: false,
     }
   },
   methods: {
@@ -108,7 +112,7 @@ export default {
           that.carNumErrFlag = true
           that.car.push(that.carObj)
           that.carObj = {}
-          that.carTypeVal = '小汽车'
+          that.carTypeVal = '轿车'
           that.carType = 1
           that.isShowInput = false
         } else {
@@ -150,18 +154,24 @@ export default {
       //   this.phone = filtered
       // }
     },
+    // 车牌号聚焦
+    onFocus () {
+      this.isCarFocus = true
+    },
     // 输入框失去焦点, 验证车牌号, 验证成功后添加车辆
     onBlur (e) {
+      this.isCarFocus = false
       let that = this
       this.carObj.licensePlateNo = e.mp.detail.value
       this.carObj.carType = this.carType
       let carResult = isCarNum(this.carObj.licensePlateNo)
       if (carResult) {
         that.carNumErrFlag = false
+        showToast(carResult)
       } else {
         that.carObj.licensePlateNo = carNumFormat(that.carObj.licensePlateNo)
         that.carNumErrFlag = true
-        // that.carTypeVal = '小汽车'
+        that.carTypeVal = '轿车'
         that.addCar()
       }
     },
@@ -169,14 +179,23 @@ export default {
     chooseCarType (res) {
       let that = this
       wx.showActionSheet({
-        itemList: ['小汽车', '大卡车'],
+        itemList: ['轿车', '电车', '载货汽车', '客车', '挂车'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.carTypeVal = '小汽车'
+            that.carTypeVal = '轿车'
             that.carType = 1
           } else if (res.tapIndex === 1) {
-            that.carTypeVal = '大卡车'
+            that.carTypeVal = '电车'
             that.carType = 2
+          } else if (res.tapIndex === 2) {
+            that.carTypeVal = '载货汽车'
+            that.carType = 3
+          } else if (res.tapIndex === 3) {
+            that.carTypeVal = '客车'
+            that.carType = 4
+          } else if (res.tapIndex === 4) {
+            that.carTypeVal = '挂车'
+            that.carType = 5
           }
         }
       })
@@ -207,20 +226,22 @@ export default {
             }
           }).then(res => {
             console.log(res)
-            // getPersonMess().then(res => {
-            //   console.log(res)
-            //   // that.personMess = res.data.data
-            //   // setStorageSync('personMess', that.personMess)
-            //   this.$router.push('../../pages/owner/main')
-            //   this.reload()
-            // })
-            this.$router.push(
-              {
-                path: '../../pages/owner/main',
-                query: { carLen: that.car.length }
-              }
-            )
-            this.reload()
+            if (res.data.code === 200) {
+              this.$router.push(
+                {
+                  path: '../../pages/owner/main',
+                  query: { carLen: that.car.length }
+                }
+              )
+              const personMess = getStorageSync('personMess')
+              personMess.car = that.car
+              setStorageSync('personMess', personMess)
+              let pages = getCurrentPages()
+              let beforePage = pages[pages.length - 2]
+              beforePage.onLoad()
+            } else {
+              that.carObj = {}
+            }
           })
         } else {
           showToast(' 请检查车牌号')
@@ -239,6 +260,9 @@ export default {
   position: relative;
   background: rgba(255, 255, 255, 1);
   border-top: 0.5px solid #eee;
+  .scroll-view {
+    max-height: 68%;
+  }
   .cars-list,
   .cars-input {
     display: flex;

@@ -2,219 +2,217 @@
   <!-- 首页 -->
   <div class="home-container">
     <!-- 用户授权 -->
-    <!-- <auth v-if="!isAuth"></auth> -->
-    <div v-if="isAuth" class="isAuth">
-      <!-- 未审核 -->
-      <!-- <div v-if="isExamine">
+    <!-- <div v-if="isAuth" class="isAuth"> -->
+    <!-- 未审核 -->
+    <!-- <div v-if="isExamine">
       </div> -->
-      <!-- 已审核 -->
-      <div v-if="isExamine" class="examine">
-        <div class="nav-bar">
-          <van-nav-bar title-class='nav-title' title="云上物业"></van-nav-bar>
-        </div>
-        <!-- 头部用户信息 -->
-        <!-- 背景图片 -->
-        <div class="user-container">
-          <img :src="bgImg">
-          <!-- 用户上部分基本个人信息 -->
-          <div class='user-datas'>
-            <!-- 左侧用户头像 -->
-            <div class="user-avator">
-              <!-- <img :src='regPhoto' lazy='loading'> -->
-              <avator-img round :src='regPhoto'></avator-img>
-            </div>
-            <!-- 右侧 用户名、角色、手机号 -->
-            <div class="user-info">
-              <div class="user-name-role">
-                <div class="name">{{personName}}</div>
-                <div class="role" v-if='personRegion'><span>{{personRegion}}</span></div>
-              </div>
-              <div class="user-phone">{{phoneNum}}</div>
-            </div>
-            <!-- 跳转至用户详情箭头 -->
-            <div class="toPersonMsg" @click="toPersonMsg">
-              <arrow-btn />
-            </div>
+    <!-- 已审核 -->
+    <div class="examine">
+      <div class="nav-bar">
+        <van-nav-bar title-class='nav-title' title="云上物业"></van-nav-bar>
+      </div>
+      <!-- 头部用户信息 -->
+      <!-- 背景图片 -->
+      <div class="user-container">
+        <img :src="bgImg">
+        <!-- 用户上部分基本个人信息 -->
+        <div class='user-datas'>
+          <!-- 左侧用户头像 -->
+          <div class="user-avator">
+            <!-- <img :src='regPhoto' lazy='loading'> -->
+            <avator-img round :src='regPhoto'></avator-img>
           </div>
-          <!-- 用户下部分用户地址 -->
-          <div class="user-address">
-            <div class="address-content">
-              <!-- 地图图标 -->
-              <div class="address-icon">
-                <img :src="addressIcon">
-              </div>
-              <!-- 地址详情 -->
-              <div class="address-txt">{{roomFullName}}</div>
-              <!-- 去新增地址页 -->
-              <div class="add-address" @click="toAddress">
-                <img :src="addAddressIcon">
-              </div>
+          <!-- 右侧 用户名、角色、手机号 -->
+          <div class="user-info">
+            <div class="user-name-role">
+              <div class="name">{{personName}}</div>
+              <div class="role" v-if='personRegion'><span>{{personRegion}}</span></div>
             </div>
+            <div class="user-phone">{{phoneNum}}</div>
+          </div>
+          <!-- 跳转至用户详情箭头 -->
+          <div class="toPersonMsg" @click="toPersonMsg">
+            <arrow-btn />
           </div>
         </div>
-        <!-- 通知 导航 列表展示 -->
-        <div class="home-body">
-          <!-- 通知 -->
-          <div class="info-container margin15">
-            <!-- <div class="info"> -->
-            <img class="info-icon" :src='infoImg' />
-            <div class="info-text">{{infoText}}</div>
-          </div>
-          <!-- 导航+数据列表 -->
-          <div class="tabs-lists-container margin15">
-            <!-- <div class="main-container"> -->
-            <!-- 导航 -->
-            <div class="tabs">
-              <div class="btnStyle" @click='tabClick' v-if='isOwner' data-id='0'>
-                <div><span :class="[tab, currentTab == 0 ? 'select' : '']">住户</span></div>
-              </div>
-              <div class="btnStyle" @click='tabClick' data-id='1'>
-                <div><span :class="[tab, currentTab == 1 ? 'select' : '']">报修</span></div>
-              </div>
-              <div class="btnStyle" @click='tabClick' data-id='2'>
-                <div><span :class="[tab, currentTab == 2 ? 'select' : '']">邀请</span></div>
-              </div>
-              <div class="btnStyle" @click='tabClick' data-id='3'>
-                <div><span :class="[tab, currentTab == 3 ? 'select' : '']">通知</span></div>
-              </div>
+        <!-- 用户下部分用户地址 -->
+        <div class="user-address">
+          <div class="address-content" @click="toAddress">
+            <!-- 地图图标 -->
+            <div class="address-icon">
+              <img :src="addressIcon">
             </div>
-            <!-- 页面主体列表 -->
-            <div class="main-container">
-              <div class="main-content">
-                <!-- 住户界面 -->
-                <div v-if="currentTab == 0 && isOwner" class="scroll-container">
-                  <scroll-view class="scroll-view" scroll-y='true'>
-                    <div v-if='houseHoldList.length === 0' class="nullData">
-                      暂无住户数据
-                    </div>
-                    <div v-else>
-                      <div class="house-lists" v-for='(item, index) in houseHoldList' :key='index'>
-                        <div class="house-item" @click="toHouseHold(item)">
-                          <!-- 左侧用户头像 -->
-                          <avator-img round :src='getImgUrl(item.regPhoto)'>
-                          </avator-img>
-                          <!-- 中间住户信息 -->
-                          <div class="house-person">
-                            <div class="house-person-up">
-                              <div class="person-name">{{item.personName}}</div>
-                              <div class="person-sex">
-                                <img :src="female" v-if='item.personSex == 2'>
-                                <img :src="male" v-else>
-                              </div>
-                              <div
-                                :class="['person-role', item.personRegioncode == 1 ? 'wy' : (item.personRegioncode == 2 ? 'yz':'zh')]">
-                                {{item.personRegioncode == 1 ? '物业' : (item.personRegioncode == 2 ? '业主' : '租户')}}
-                              </div>
+            <!-- 地址详情 -->
+            <div class="address-txt">{{roomFullName}}</div>
+            <!-- 去新增地址页 -->
+            <div class="add-address">
+              <img :src="addAddressIcon">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 通知 导航 列表展示 -->
+      <div class="home-body">
+        <!-- 通知 -->
+        <div class="info-container margin15">
+          <!-- <div class="info"> -->
+          <img class="info-icon" :src='infoImg' />
+          <div class="info-text">{{infoText}}</div>
+        </div>
+        <!-- 导航+数据列表 -->
+        <div class="tabs-lists-container margin15">
+          <!-- <div class="main-container"> -->
+          <!-- 导航 -->
+          <div class="tabs">
+            <div class="btnStyle" @click='tabClick' v-if='isOwner' data-id='0'>
+              <div><span :class="[tab, currentTab == 0 ? 'select' : '']">住户</span></div>
+            </div>
+            <div class="btnStyle" @click='tabClick' data-id='1'>
+              <div><span :class="[tab, currentTab == 1 ? 'select' : '']">报修</span></div>
+            </div>
+            <div class="btnStyle" @click='tabClick' data-id='2'>
+              <div><span :class="[tab, currentTab == 2 ? 'select' : '']">邀请</span></div>
+            </div>
+            <div class="btnStyle" @click='tabClick' data-id='3'>
+              <div><span :class="[tab, currentTab == 3 ? 'select' : '']">通知</span></div>
+            </div>
+          </div>
+          <!-- 页面主体列表 -->
+          <div class="main-container">
+            <div class="main-content">
+              <!-- 住户界面 -->
+              <div v-if="currentTab == 0 && isOwner" class="scroll-container">
+                <scroll-view class="scroll-view" scroll-y='true'>
+                  <div v-if='houseHoldList && houseHoldList.length > 0'>
+                    <div class="house-lists" v-for='(item, index) in houseHoldList' :key='index'>
+                      <div class="house-item" @click="toHouseHold(item)">
+                        <!-- 左侧用户头像 -->
+                        <avator-img round :src='getImgUrl(item.regPhoto)'>
+                        </avator-img>
+                        <!-- 中间住户信息 -->
+                        <div class="house-person">
+                          <div class="house-person-up">
+                            <div class="person-name">{{item.personName}}</div>
+                            <div class="person-sex">
+                              <img :src="female" v-if='item.personSex == 2'>
+                              <img :src="male" v-else>
                             </div>
-                            <div class="person-tel">{{item.phoneNum}}</div>
+                            <div
+                              :class="['person-role', item.personRegioncode == 1 ? 'wy' : (item.personRegioncode == 2 ? 'yz':'zh')]">
+                              {{item.personRegioncode == 1 ? '物业' : (item.personRegioncode == 2 ? '业主' : '租户')}}
+                            </div>
                           </div>
-                          <!-- 右侧 跳转至住户信息界面 -->
-                          <div class="toHousePerson">
-                            <arrow-btn color='#D2D7F0' @arrowClick='toHouseHold' />
-                          </div>
+                          <div class="person-tel">{{item.phoneNum}}</div>
+                        </div>
+                        <!-- 右侧 跳转至住户信息界面 -->
+                        <div class="toHousePerson">
+                          <arrow-btn color='#D2D7F0' @arrowClick='toHouseHold' />
                         </div>
                       </div>
-                    </div>
-                  </scroll-view>
-                </div>
-                <!-- 报修界面 -->
-                <div v-if='currentTab == 1' class="scroll-container">
-                  <scroll-view scroll-y="true" class="scroll-view">
-                    <div v-if='repairList.length === 0' class="nullData">
-                      暂无报修数据
-                    </div>
-                    <div>
-                      <div v-for="(item, index) in repairList" :key="index">
-                        <div @click="toRepairDetail(item)">
-                          <tab-lists :repairList='item' isRepair></tab-lists>
-                        </div>
-                      </div>
-                    </div>
-                  </scroll-view>
-                </div>
-                <!-- 邀请界面 -->
-                <!-- 如果有邀请权限, 展示邀请界面 -->
-                <div v-if='currentTab == 2' class="scroll-container">
-                  <div v-if="isInvitation" class="height-1px">
-                    <scroll-view scroll-y='true' class="scroll-view">
-                      <div v-if='inviteList.length === 0' class="nullData">
-                        暂无邀请数据
-                      </div>
-                      <div v-else>
-                        <div v-for="(item, index) in inviteList" :key="index">
-                          <div @click="toInviteDetail(item)">
-                            <tab-lists :inviteList='item' isInvite></tab-lists>
-                          </div>
-                        </div>
-                      </div>
-                    </scroll-view>
-                  </div>
-                  <!-- 无邀请权限界面展示 -->
-                  <div v-else>
-                    <div class="notInviteRole">
-                      <div>您的邀请功能未开启请联系户主</div>
                     </div>
                   </div>
-                </div>
-                <!-- 通知界面 -->
-                <div v-if='currentTab == 3' class="scroll-container">
-                  <scroll-view class="scroll-view" scroll-y='true'>
-                    <div v-if='infoList.length === 0' class="nullData">
-                      暂无通知数据
+                  <div v-else class="nullData">
+                    暂无住户数据
+                  </div>
+                </scroll-view>
+              </div>
+              <!-- 报修界面 -->
+              <div v-if='currentTab == 1' class="scroll-container">
+                <scroll-view scroll-y="true" class="scroll-view">
+                  <div v-if='repairList && repairList.length > 0'>
+                    <div v-for="(item, index) in repairList" :key="index">
+                      <div @click="toRepairDetail(item)">
+                        <tab-lists :repairList='item' isRepair></tab-lists>
+                      </div>
                     </div>
-                    <div>
-                      <div v-for="(item, index) in infoList" :key="index">
-                        <div @click="toInfoDetail(item)">
-                          <tab-lists :infoList='item' isInfo></tab-lists>
+                  </div>
+                  <div v-else class="nullData">
+                    暂无报修数据
+                  </div>
+                </scroll-view>
+              </div>
+              <!-- 邀请界面 -->
+              <!-- 如果有邀请权限, 展示邀请界面 -->
+              <div v-if='currentTab == 2' class="scroll-container">
+                <div v-if="isInvitation" class="height-1px">
+                  <scroll-view scroll-y='true' class="scroll-view">
+                    <div v-if='inviteList && inviteList.length > 0'>
+                      <div v-for="(item, index) in inviteList" :key="index">
+                        <div @click="toInviteDetail(item)">
+                          <tab-lists :inviteList='item' isInvite></tab-lists>
                         </div>
                       </div>
                     </div>
+                    <div v-else class="nullData">
+                      暂无邀请数据
+                    </div>
                   </scroll-view>
+                </div>
+                <!-- 无邀请权限界面展示 -->
+                <div v-else>
+                  <div class="notInviteRole">
+                    <div>您的邀请功能未开启请联系户主</div>
+                  </div>
                 </div>
               </div>
+              <!-- 通知界面 -->
+              <div v-if='currentTab == 3' class="scroll-container">
+                <scroll-view class="scroll-view" scroll-y='true'>
+                  <div v-if='infoList && infoList.length > 0'>
+                    <div v-for="(item, index) in infoList" :key="index">
+                      <div @click="toInfoDetail(item)">
+                        <tab-lists :infoList='item' isInfo></tab-lists>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="nullData">
+                    暂无通知数据
+                  </div>
+                </scroll-view>
+              </div>
+            </div>
 
+          </div>
+        </div>
+        <!-- 页面下方提交按钮 -->
+        <div class="submit-btn">
+          <!-- 添加住户按钮 -->
+          <div class="add-person" v-if='isOwner'>
+            <div v-if='isExamine'>
+              <submit-btn btnText='添加住户' @submitClick='addHousePerson' v-if='currentTab == 0'></submit-btn>
+            </div>
+            <div v-else>
+              <submit-btn btnText='添加住户' v-if='currentTab == 0' isShadow></submit-btn>
             </div>
           </div>
-          <!-- 页面下方提交按钮 -->
-          <div class="submit-btn">
-            <!-- 添加住户按钮 -->
-            <div class="add-person" v-if='isOwner'>
-              <div v-if='isExamine'>
-                <submit-btn btnText='添加住户' @submitClick='addHousePerson' v-if='currentTab == 0'></submit-btn>
-              </div>
-              <div v-else>
-                <submit-btn btnText='添加住户' v-if='currentTab == 0' isShadow></submit-btn>
-              </div>
+          <!-- 报修按钮 -->
+          <div class="repair-btn" v-if='currentTab == 1'>
+            <div v-if='isExamine'>
+              <submit-btn btnText='报修' @submitClick='applyRepair' isActive v-if='currentTab == 1'></submit-btn>
             </div>
-            <!-- 报修按钮 -->
-            <div class="repair-btn" v-if='currentTab == 1'>
-              <div v-if='isExamine'>
-                <submit-btn btnText='报修' @submitClick='applyRepair' isActive v-if='currentTab == 1'></submit-btn>
-              </div>
-              <div v-else>
-                <submit-btn btnText='报修' isShadow></submit-btn>
-              </div>
+            <div v-else>
+              <submit-btn btnText='报修' isShadow></submit-btn>
+            </div>
 
+          </div>
+          <!-- 邀请按钮 -->
+          <div class="invite-btn" v-if='currentTab == 2'>
+            <!-- 有邀请权限 -->
+            <div v-if="isInvitation" class="hasInvite">
+              <submit-btn btnText='邀请' @submitClick='invitePerson' isActive></submit-btn>
             </div>
-            <!-- 邀请按钮 -->
-            <div class="invite-btn" v-if='currentTab == 2'>
-              <!-- 有邀请权限 -->
-              <div v-if="isInvitation" class="hasInvite">
-                <submit-btn btnText='邀请' @submitClick='invitePerson' isActive></submit-btn>
-              </div>
-              <!-- 无邀请权限 -->
-              <div v-else>
-                <submit-btn btnText='邀请' isShadow></submit-btn>
-              </div>
+            <!-- 无邀请权限 -->
+            <div v-else>
+              <submit-btn btnText='邀请' isShadow></submit-btn>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <!-- </div> -->
   </div>
 </template>
 <script>
-// import auth from '@/components/auth'
 import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
@@ -223,23 +221,31 @@ import { getToken, setStorageSync, showLoading, hideLoading, getStorageSync, sho
 import { API_URL, getPersonMess, getHouseHoldList, getInviteList, getRepairList, getInfoList } from '../../api/index'
 export default {
   components: { avatorImg, arrowBtn, submitBtn, tabLists },
-  onShow () {
+  mounted () {
+    showLoading('加载中')
     this.getToken()
-    // this.onLoad()
     let that = this
-    if (!this.isOwner) {
-      that.currentTab = 1
-    } else {
-      that.currentTab = 0
-    }
     mpvue.removeStorageSync('car')
+  },
+  onLoad () {
+    if (this.isOwner) {
+      this.getHouseHoldList()
+    }
+    if (this.room.roomId) {
+      this.getRepairList()
+      this.getInviteList()
+      this.getInfoList()
+    }
+    if (getStorageSync('room')) {
+      this.getRoom()
+    }
   },
   data () {
     return {
       // 是否授权
       isAuth: true,
       // 是否是户主
-      isOwner: true,
+      isOwner: false,
       isExamine: false,
       isHouseholder: '',
       // 是否具有邀请权限
@@ -249,7 +255,7 @@ export default {
       personMess: {},
       personName: '',
       personRegion: '',
-      personRegionCode: '',
+      personRegioncode: '',
       phoneNum: '',
       rooms: [],
       room: {},
@@ -272,7 +278,9 @@ export default {
   },
   // 下拉刷新
   onPullDownRefresh () {
+    showLoading('加载中')
     this.getToken()
+    let that = this
     //调用微信停止下拉刷新的函数
     wx.stopPullDownRefresh()
   },
@@ -280,10 +288,9 @@ export default {
     // 获取token
     getToken () {
       let that = this
-      showLoading('加载中')
+      // showLoading('加载中')
       getToken(() => {
         that.getRoom()
-        // showLoading('加载中')
         that.isAuth = true
       }, () => {
         that.isAuth = false
@@ -306,17 +313,18 @@ export default {
         }
         // 人员类型
         that.isHouseholder = that.room.isHouseholder
-        that.personRegionCode = that.room.personRegionCode
+        that.personRegioncode = that.room.personRegioncode
         if (parseInt(that.isHouseholder) === 1) {
           that.getHouseHoldList()
           that.isOwner = true
+          that.currentTab = 0
           that.personRegion = '户主'
-
         } else {
           that.isOwner = false
-          if (parseInt(that.personRegionCode) === 1) {
+          that.currentTab = 1
+          if (parseInt(that.personRegioncode) === 1) {
             that.personRegion = '物业'
-          } else if (parseInt(that.personRegionCode) === 2) {
+          } else if (parseInt(that.personRegioncode) === 2) {
             that.personRegion = '业主'
           } else {
             that.personRegion = '租户'
@@ -329,7 +337,6 @@ export default {
         that.personName = that.personMess.personName
         that.phoneNum = that.personMess.phoneNum
         that.personId = that.personMess.id
-
         that.getRepairList()
         that.getInviteList()
         that.getInfoList()
@@ -339,8 +346,8 @@ export default {
       } else {
         console.log('缓存中无room')
         that.getPersonMess()
+        hideLoading()
       }
-
     },
     // 图片路径拼接
     getImgUrl (img) {
@@ -374,7 +381,7 @@ export default {
               that.roomFullName = that.rooms[0].roomFullName
               that.infoText = that.rooms[0].notice
               that.isHouseholder = that.rooms[0].isHouseholder
-              that.personRegionCode = that.rooms[0].personRegionCode
+              that.personRegioncode = that.rooms[0].personRegioncode
               that.room = {
                 'roomId': that.rooms[0].roomId,
                 'roomFullName': that.rooms[0].roomFullName
@@ -384,19 +391,20 @@ export default {
           }
           if (parseInt(that.isHouseholder) === 1) {
             that.isOwner = true
+            that.currentTab = 0
             that.personRegion = '户主'
             // 住户列表
             that.getHouseHoldList()
           } else {
             that.isOwner = false
-            if (parseInt(that.personRegionCode) === 1) {
+            that.currentTab = 1
+            if (parseInt(that.personRegioncode) === 1) {
               that.personRegion = '物业'
-            } else if (parseInt(that.personRegionCode) === 2) {
+            } else if (parseInt(that.personRegioncode) === 2) {
               that.personRegion = '业主'
             } else {
               that.currentTab = 1
               that.personRegion = '租户'
-              // that.currentTab = 1
             }
           }
           if (parseInt(that.isInvitation) === 1) {
@@ -411,17 +419,16 @@ export default {
           that.getInviteList()
           // 通知列表
           that.getInfoList()
-          hideLoading()
+          // hideLoading()
         } else {
           // 没有绑定户址, 就是未审核通过
           that.isExamine = false
           showToast('您未审核通过')
-          console.log('未审核')
         }
-      }).catch(() => {
-        hideLoading('加载失败')
       })
-
+      // .catch(() => {
+      //   hideLoading()
+      // })
     },
     // 获取房间下住户
     getHouseHoldList () {
@@ -475,7 +482,7 @@ export default {
           'noticeTimeBegin': '',
           'noticeTimeEnd': '',
           'noticeTitle': '',
-          'roomIds': that.roomId
+          'roomIds': that.room.roomId
         }
       }).then(res => {
         that.infoList = res.data.data.rows
@@ -569,6 +576,7 @@ export default {
   }
   .examine {
     height: 100%;
+    background: #f5f6fa;
     .nav-bar {
       height: 64px;
     }

@@ -107,7 +107,7 @@
         </div>
       </div>
       <!-- 新增住户按钮 -->
-      <div class="submit-btn" @click="addHouserPerson">
+      <div class="submit-btn">
         <submit-btn btnText='确定' isActive></submit-btn>
       </div>
     </form>
@@ -142,12 +142,13 @@ export default {
       cardNum: '',
       phoneNum: '',
       personRegion: '',
-      personRegionCode: '',
+      personRegioncode: '',
       passRole: '',
       isPass: '',
       inviteRole: '',
       isInvitation: '',
       roomId: '',
+      roomFullName: '',
       car: [],
       carLen: 0,
       regPhotoFlag: false,
@@ -169,12 +170,12 @@ export default {
     // this.carLen = car.length
     if (personDetail.rooms.length !== 0) {
       that.roomId = personDetail.rooms[0].roomId
+      that.roomFullName = personDetail.rooms[0].roomFullName
     }
     if (getStorageSync('car')) {
       this.car = getStorageSync('car')
       this.carLen = this.car.length
     }
-
     console.log('car1', this.car)
   },
   onUnload () {
@@ -331,19 +332,15 @@ export default {
     choosePersonRegion () {
       let that = this
       wx.showActionSheet({
-        itemList: ['物业', '业主', '租户'],
+        itemList: ['业主', '租户'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.personRegion = '物业'
-            that.personRegionCode = res.tapIndex
+            that.personRegion = '业主'
+            that.personRegioncode = 2
             that.personRegionFlag = true
           } else if (res.tapIndex === 1) {
-            that.personRegion = '业主'
-            that.personRegionCode = res.tapIndex
-            that.personRegionFlag = true
-          } else if (res.tapIndex === 2) {
             that.personRegion = '租户'
-            that.personRegionCode = res.tapIndex
+            that.personRegioncode = 3
             that.personRegionFlag = true
           }
           // that.personRegionFlag = false
@@ -415,7 +412,10 @@ export default {
             'rooms': [
               {
                 'roomId': that.roomId,
-                'personRegioncode': that.personRegionCode
+                'personRegioncode': that.personRegioncode,
+                'isPass': that.isPass,
+                'isInvitation': that.isInvitation,
+                'roomFullName': that.roomFullName
               }],
             'personName': that.personName,
             'personSex': that.personSexNum,
@@ -423,24 +423,21 @@ export default {
             'phoneNum': that.phoneNum,
             'regPhoto': that.regPhoto,
             'car': that.car,
-            'isPass': that.isPass,
-            'isInvitation': that.isInvitation
+
           }
         }).then(res => {
           if (res.data.code === 200) {
-            mpvue.removeStorageSync('car')
+            let pages = getCurrentPages()
+            let beforePage = pages[pages.length - 1]
+            beforePage.onLoad()
             this.$router.go(-1)
-            // this.$router.push('../../pages/home/main')
             console.log('addPerson', res)
-          } else {
-            showToast(res.data.message)
           }
         })
       }
     },
     goBack () {
       mpvue.removeStorageSync('car')
-      // this.$router.push('../../pages/home/main')
       this.$router.go(-1)
     }
   }

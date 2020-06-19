@@ -49,7 +49,7 @@
             <!-- 步骤一输入框 -->
             <div class="step1-input">
               <span>邀请码</span>
-              <input type="text" name="inviteCode" placeholder-style="color: #BCC2E1" v-model="inviteCode"
+              <input type="text" name="inviteCode" placeholder-style="color: #BCC2E1" v-model="personInviteCode"
                 @focus="onInviteFocus" @blur="onInviteBlur" placeholder="请输入邀请码">
             </div>
             <!-- 聚焦下划线 -->
@@ -72,21 +72,21 @@
               <div class="houseHoldInput">
                 <span>户主姓名</span>
                 <input type="text" name="houseHoldName" placeholder-style="color: #BCC2E1" v-model="personName"
-                  @focus="onHouseHoldNameFocus" @blur="onHouseHoldNameBlur" placeholder="请输入姓名">
+                  @focus="onHouseHoldNameFocus" @blur="onHouseHoldNameBlur" placeholder="请输入姓名" maxlength="6">
               </div>
               <div :class="isHouseHoldNameFocus ? 'borderBlue' : 'borderWhite'"></div>
               <!-- 手机号输入框 -->
               <div class="houseHoldInput">
                 <span>手机号</span>
                 <input type="text" name="houseHoldTel" placeholder-style="color: #BCC2E1" v-model="phoneNum"
-                  @focus="onHouseHoldTelFocus" @blur="onHouseHoldTelBlur" placeholder="请输入手机号">
+                  @focus="onHouseHoldTelFocus" @blur="onHouseHoldTelBlur" placeholder="请输入手机号" maxlength="11">
               </div>
               <div :class="isHouseHoldTelFocus ? 'borderBlue' : 'borderWhite'"></div>
               <!-- 身份证号输入框 -->
               <div class="houseHoldInput">
                 <span>身份证号</span>
                 <input type="text" name="houseHoldIdCard" placeholder-style="color: #BCC2E1" v-model="cardNum"
-                  @focus="onHouseHoldIdCardFocus" @blur="onHouseHoldIdCardBlur" placeholder="请输入身份证号">
+                  @focus="onHouseHoldIdCardFocus" @blur="onHouseHoldIdCardBlur" placeholder="请输入身份证号" maxlength="18">
               </div>
               <div :class="isHouseHoldIdCardFocus ? 'borderBlue' : 'borderWhite'"></div>
               <!-- 性别选择框 -->
@@ -120,7 +120,7 @@
                 <div v-if="car.length !== 0">
                   <div v-for="(item, index) in car" :key="index">
                     <div class="car-msg">
-                      <div class="car-type">{{item.carType}}</div>
+                      <div class="car-type">{{carVals[item.carType-1]}}</div>
                       <div class="choose-icon">
                         <div class="triangle"></div>
                       </div>
@@ -141,7 +141,7 @@
                   <!-- 车辆输入框 -->
                   <div class="car-number">
                     <input type="text" placeholder="请输入车牌号" v-model="carObj.licensePlateNo" @input="inputCarNum"
-                      maxlength="8" confirm-type="done" @confirm='onConfirm' @change='onChange'
+                      maxlength="9" confirm-type="done" @confirm='onConfirm' @change='onChange'
                       @focus="onHouseHoldCarNumFocus" @blur="onHouseHoldCarBlur" placeholder-style="color: #BCC2E1">
                   </div>
                 </div>
@@ -210,20 +210,16 @@ export default {
   watch: {
     // 监听是否有车的变化
     hasCar (newVal) {
-      this.carTypeVal = '小汽车'
+      this.carTypeVal = '轿车'
       this.carType = 1
       this.carObj = {}
       this.car = []
     }
-    // 'houseHoldLoginForm.houseHoldCar' (curArr) {
-    //   this.houseHoldLoginForm.houseHoldCar = curArr
-    //   console.log(curArr)
-    // }
   },
   data () {
     return {
-      isStep1: true,
-      isStep2: false,
+      isStep1: false,
+      isStep2: true,
       isStep3: false,
       isInviteInputFocus: false,
       isHouseHoldNameFocus: false,
@@ -238,6 +234,7 @@ export default {
       houseHoldCarFlag: false,
       phoneCardFlag: false,
       carNumErrFlag: false,
+      regPhotoFlag: false,
       isCheckedImg: '../../static/images/isChecked.png',
       notCheckedImg: '../../static/images/notChecked.png',
       addCarIcon: '../../static/images/addCarIcon.png',
@@ -250,23 +247,24 @@ export default {
           isChecked: true
         },
         {
-          label: '',
+          label: '无车',
           value: '2',
           isChecked: false
         }
       ],
-      carTypeVal: '小汽车',
+      carTypeVal: '轿车',
       carType: 1,
       defaultImg: '../../static/images/default.png',
       cameraImg: '../../static/images/camera.png',
       choiceIcon: '../../static/images/choice.png',
       // 提交注册的人员信息
-      roomsObj: {},
-      rooms: [],
+      // roomsObj: {},
+      // rooms: [],
       roomId: '',
       roomFullName: '',
       placeId: '',
       inviteCode: '',
+      personInviteCode: '',
       id: '',
       personName: '',
       personSex: '',
@@ -278,11 +276,11 @@ export default {
       hasCar: '',
       carObj: {
         'carType': '1',
-        // 'carTypeVal': '小汽车',
         'licensePlateNo': ''
       },
       isExist: false,
-      car: []
+      car: [],
+      carVals: ['轿车', '电车', '载货汽车', '客车', '挂车'],
     }
   },
   methods: {
@@ -343,6 +341,7 @@ export default {
       } else {
         this.houseHoldIdCardFlag = true
       }
+      this.selectPerson()
     },
     // 性别聚焦
     onHouseHoldSexFocus () {
@@ -387,20 +386,28 @@ export default {
         this.isShowInput = true
       }
       this.radios[index].isChecked = true
-      console.log(this.hasCar)
     },
     // 选择车辆类型
     chooseCarType (res) {
       let that = this
       wx.showActionSheet({
-        itemList: ['小汽车', '大卡车'],
+        itemList: ['轿车', '电车', '载货汽车', '客车', '挂车'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.carTypeVal = '小汽车'
+            that.carTypeVal = '轿车'
             that.carType = 1
-          } else {
-            that.carTypeVal = '大卡车'
+          } else if (res.tapIndex === 1) {
+            that.carTypeVal = '电车'
             that.carType = 2
+          } else if (res.tapIndex === 2) {
+            that.carTypeVal = '载货汽车'
+            that.carType = 3
+          } else if (res.tapIndex === 3) {
+            that.carTypeVal = '客车'
+            that.carType = 4
+          } else if (res.tapIndex === 4) {
+            that.carTypeVal = '挂车'
+            that.carType = 5
           }
         }
       })
@@ -417,69 +424,78 @@ export default {
     onHouseHoldCarNumFocus () {
       this.isHouseHoldCarNumFocus = true
     },
-    // 输入框失去焦点, 验证车牌号,
+    // 输入框失去焦点, 验证车牌号
     onHouseHoldCarBlur (e) {
       let that = this
       this.carObj.licensePlateNo = e.mp.detail.value
       let carResult = isCarNum(this.carObj.licensePlateNo)
       if (carResult) {
-        // showToast(carResult)
+        if (this.car.length !== 0 && this.carObj.licensePlateNo) {
+          that.carNumErrFlag = true
+        } else {
+          that.carNumErrFlag = false
+          showToast(carResult)
+        }
         // that.carNumErrMsg = carResult
-        that.carNumErrFlag = false
       } else {
         that.houseHoldCarFlag = true
         that.carObj.licensePlateNo = carNumFormat(that.carObj.licensePlateNo)
-        that.carObj['carType'] = that.carTypeVal
-        that.carTypeVal = '小汽车'
+        that.carObj['carType'] = that.carType
+        that.carTypeVal = '轿车'
         that.submitCar()
       }
     },
     // 点击 增加车辆 按钮, 添加车辆记录输入框
     addCar () {
+      // this.submitCar()
       this.isCarInput = true
     },
     // 点击 增加车辆 按钮, 将新增的一条车辆信息push 到 车辆数组
     submitCar () {
       var that = this
+      console.log('this.isShowInput', this.isShowInput)
       // 未输入车牌号
-      if (!this.carObj.licensePlateNo) {
-        showToast('请检查车牌号')
-      } else {
-        // 已输入车牌号
-        // var carResult = isCarNum(that.carObj.licensePlateNo)
-        // 输入了正确的车牌号
-        // if (!carResult) {
-        if (that.car.length === 0) {
-          that.car.push(that.carObj)
-          that.carObj = {}
-          that.carTypeVal = '小汽车'
-          that.carType = 0
-          that.isCarInput = false
-          that.carNumErrFlag = true
+      if (this.isShowInput) {
+        if (!this.carObj.licensePlateNo) {
+          showToast('请检查车牌号')
         } else {
-          for (var carItem of that.car) {
-            if (that.carObj.carType === carItem.carType && that.carObj.licensePlateNo === carItem.licensePlateNo) {
-              showToast('您输入的车辆信息已存在')
-              that.isExist = true
-              // that.carObj.carType = ''
-              return false
-            } else {
-              that.isExist = false
-            }
-          }
-          if (!that.isExist) {
+          // 已输入车牌号
+          // var carResult = isCarNum(that.carObj.licensePlateNo)
+          // 输入了正确的车牌号
+          // if (!carResult) {
+          if (that.car.length === 0) {
             that.car.push(that.carObj)
-            console.log(that.car)
             that.carObj = {}
+            // that.carTypeVal = '轿车'
+            that.carType = 1
             that.isCarInput = false
             that.carNumErrFlag = true
-            // that.carType = '普通乘用车'
+          } else {
+            for (var carItem of that.car) {
+              if (that.carObj.carType === carItem.carType && that.carObj.licensePlateNo === carItem.licensePlateNo) {
+                showToast('您输入的车辆信息已存在')
+                that.isExist = true
+                // that.carObj.carType = ''
+                return false
+              } else {
+                that.isExist = false
+              }
+            }
+            if (!that.isExist) {
+              that.car.push(that.carObj)
+              console.log(that.car)
+              that.carObj = {}
+              that.isCarInput = false
+              that.carNumErrFlag = true
+            }
           }
+          // } else {
+          //   // 车牌号格式错误, 报错
+          //   showToast(carResult)
+          // }
         }
-        // } else {
-        //   // 车牌号格式错误, 报错
-        //   showToast(carResult)
-        // }
+      } else {
+        that.carNumErrFlag = true
       }
       console.log('addcar:', this.car)
     },
@@ -489,19 +505,19 @@ export default {
     toStep2 () {
       // 验证邀请码是否存在
       let that = this
-      if (this.inviteCode) {
+      if (this.personInviteCode) {
         checkCode({
           'data': {
-            'inviteCode': that.inviteCode
+            'inviteCode': that.personInviteCode
           }
         }).then(res => {
           const data = res.data
           // 根据邀请码 获取信息
           that.inviteCode = data.data.inviteCode
           that.placeId = data.data.placeId
-          that.roomsObj['roomId'] = data.data.roomId
-          that.roomsObj['roomFullName'] = data.data.fullName
-          that.rooms = that.rooms.push(that.roomsObj)
+          // that.roomsObj['roomId'] = data.data.roomId
+          // that.roomsObj['roomFullName'] = data.data.fullName
+          // that.rooms = that.rooms.push(that.roomsObj)
           that.roomId = data.data.roomId
           that.roomFullName = data.data.fullName
           console.log('data', data)
@@ -510,8 +526,6 @@ export default {
             that.isStep2 = true
           }
         })
-      } else {
-        showToast('请输入邀请码')
       }
     },
     // 通过身份证手机号查询人员是否存在
@@ -531,12 +545,11 @@ export default {
           if (data.id) {
             that.regPhoto = data.regPhoto
             that.tempPhoto = 'data:image/png;base64,' + data.regPhoto
-            that.phoneCardFlag = true
+            // that.phoneCardFlag = true
           } else {
-            that.phoneCardFlag = true
+            // that.phoneCardFlag = true
           }
         } else {
-          // return false
           that.phoneCardFlag = false
         }
         // const data = res.data
@@ -551,11 +564,11 @@ export default {
         // }
       })
     },
-
     // 去步骤三
     toStep3 () {
-      console.log('toStep3')
-      this.selectPerson()
+      if (!this.isShowInput) {
+        this.carNumErrFlag = true
+      }
       if (!this.houseHoldNameFlag) {
         showToast('请检查姓名')
       } else if (!this.houseHoldTelFlag) {
@@ -566,7 +579,7 @@ export default {
         showToast('请选择性别')
       } else if (!this.phoneCardFlag) {
         showToast('身份证号与手机号不匹配')
-      } else if (!this.carNumErrFlag) {
+      } else if (!this.carNumErrFlag && this.car.length === 0) {
         showToast('请检查车牌号')
       } else {
         this.isStep2 = false
@@ -609,6 +622,7 @@ export default {
             if (res.data.code === 200) {
               that.regPhoto = tempPhoto
               that.tempPhoto = 'data:image/png;base64,' + tempPhoto
+              that.regPhotoFlag = true
             }
           })
         })
@@ -617,25 +631,29 @@ export default {
     // 通过邀请码, 注册成功
     inviteCodeFormSubmit () {
       let that = this
-      personSave({
-        'data': {
-          'rooms': [{
-            'roomId': '01010101001001001001102',
-            'roomFullName': '01栋一单元一楼102室'
-          }],
-          'placeId': that.placeId,
-          'inviteCode': that.inviteCode,
-          'id': that.id,
-          'personName': that.personName,
-          'personSex': that.personSexNum,
-          'cardNum': that.cardNum,
-          'phoneNum': that.phoneNum,
-          'regPhoto': that.regPhoto,
-          'car': []
-        }
-      }).then(res => {
-        this.$router.push('../../pages/ownerLogin/main')
-      })
+      if (!this.regPhotoFlag) {
+        showToast('请上传人像照片')
+      } else {
+        personSave({
+          'data': {
+            'rooms': [{
+              'roomId': that.roomId,
+              'roomFullName': that.roomFullName
+            }],
+            'placeId': that.placeId,
+            'inviteCode': that.inviteCode,
+            'id': that.id,
+            'personName': that.personName,
+            'personSex': that.personSexNum,
+            'cardNum': that.cardNum,
+            'phoneNum': that.phoneNum,
+            'regPhoto': that.regPhoto,
+            'car': that.car
+          }
+        }).then(res => {
+          this.$router.push('../../pages/ownerLogin/main')
+        })
+      }
     },
     // 预览图片
     previewImage (e) {

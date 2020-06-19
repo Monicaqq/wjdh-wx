@@ -34,6 +34,7 @@ export default {
 .nav-bar-container {
   .left-arrow {
     .van-icon {
+      padding: 5px;
       color: rgba(51, 51, 51, 1);
     }
   }

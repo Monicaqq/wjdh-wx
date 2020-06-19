@@ -79,6 +79,9 @@ export default {
           }
         }).then(res => {
           console.log(res)
+          let pages = getCurrentPages()
+          let beforePage = pages[pages.length - 2]
+          beforePage.onLoad()
           this.$router.go(-1)
         })
       }

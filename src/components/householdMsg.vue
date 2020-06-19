@@ -48,7 +48,7 @@
         <div class="person-tel borderB1px person-item">
           <span class="color333">人员类型</span>
           <div class="tel-right" @click="choosePersonRegion">
-            <span class="color666">{{personRegionCode === 1 ? '物业' : personRegionCode === 2 ? '业主' : '租户'}}
+            <span class="color666">{{personRegioncode === 1 ? '物业' : personRegioncode === 2 ? '业主' : '租户'}}
             </span>
             <arrow-btn color='#9B9B9B'></arrow-btn>
           </div>
@@ -141,27 +141,31 @@ export default {
       cardNum: '',
       regPhoto: '../../static/images/timg.jpg',
       personRegion: '',
-      personRegionCode: '',
+      personRegioncode: '',
       passRole: '',
       isPass: '',
       inviteRole: '',
       isInvitation: '',
-      rooms: []
+      rooms: [],
+      passFlag: '',
+      inviteFlag: '',
+      regionFlag: ''
+      // regionList: ['物业', '业主', '租户'],
+
     }
   },
   watch: {
     rooms (newVal) {
-      // this.rooms = newVal
-      this.personRegionCode = parseInt(newVal.personRegioncode)
+      this.personRegioncode = parseInt(newVal.personRegioncode)
       this.isPass = parseInt(newVal.isPass)
       this.isInvitation = parseInt(newVal.isInvitation)
-      this.personRegioncode = parseInt(newVal.personRegionCode)
+      this.personRegioncode = parseInt(newVal.personRegioncode)
       // console.log('rooms', newVal)
       // console.log('isPass', this.isPass)
       // console.log('isInvitation', typeof (this.isInvitation))
-      // this.personRegionCode = newVal[0].personRegionCode
-      // console.log('人员类型', this.personRegionCode)
-      // console.log('人员类型', typeof (this.personRegionCode))
+      // this.personRegioncode = newVal[0].personRegioncode
+      // console.log('人员类型', this.personRegioncode)
+      // console.log('人员类型', typeof (this.personRegioncode))
       // this.isInvitation = newVal[0].isInvitation
       // this.isPass = newVal[0].isPass
     },
@@ -189,26 +193,20 @@ export default {
     choosePersonRegion () {
       let that = this
       wx.showActionSheet({
-        itemList: ['物业', '业主', '租户'],
+        itemList: ['业主', '租户'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.personRegion = '物业'
-            that.personRegionCode = 1
+            that.regionFlag = 2
           } else if (res.tapIndex === 1) {
-            that.personRegion = '业主'
-            that.personRegionCode = 2
-          } else if (res.tapIndex === 2) {
-            that.personRegion = '租户'
-            that.personRegionCode = 3
+            that.regionFlag = 3
           }
           mpvue.showModal({
             title: '提示',
             content: '您确定更改人员类型',
             success (res) {
               if (res.confirm) {
+                that.personRegioncode = that.regionFlag
                 that.updateHouseHold()
-              } else {
-                console.log('您已取消')
               }
             }
           })
@@ -222,22 +220,17 @@ export default {
         itemList: ['不可进出', '可进出'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.passRole = '不可进出'
-            that.personMsg.rooms[0].isPass = res.tapIndex
-            that.isPass = res.tapIndex
+            that.passFlag = res.tapIndex
           } else if (res.tapIndex === 1) {
-            that.passRole = '可进出'
-            that.personMsg.rooms[0].isPass = res.tapIndex
-            that.isPass = res.tapIndex
+            that.passFlag = res.tapIndex
           }
           mpvue.showModal({
             title: '提示',
             content: '您确定更进出权限',
             success (res) {
               if (res.confirm) {
+                that.isPass = that.passFlag
                 that.updateHouseHold()
-              } else {
-                console.log('您已取消')
               }
             }
           })
@@ -251,20 +244,17 @@ export default {
         itemList: ['禁止邀请访客', '允许邀请访客'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.inviteRole = '禁止邀请访客'
-            that.isInvitation = res.tapIndex
+            that.inviteFlag = res.tapIndex
           } else if (res.tapIndex === 1) {
-            that.inviteRole = '允许邀请访客'
-            that.isInvitation = res.tapIndex
+            that.inviteFlag = res.tapIndex
           }
           mpvue.showModal({
             title: '提示',
             content: '您确定更邀请权限',
             success (res) {
               if (res.confirm) {
+                that.isInvitation = that.inviteFlag
                 that.updateHouseHold()
-              } else {
-                console.log('您已取消')
               }
             }
           })

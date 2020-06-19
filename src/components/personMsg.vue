@@ -56,7 +56,7 @@
         <div class="person-tel person-item">
           <span class="color333">车辆</span>
           <div class="tel-right" @click="toCarView">
-            <span class="color666">{{carNum}}</span>
+            <span class="color666">{{carLen}}</span>
             <arrow-btn color='#9B9B9B'></arrow-btn>
           </div>
         </div>
@@ -85,17 +85,19 @@ export default {
       default: 0
     }
   },
-  created () {
+  mounted () {
     this.getPersonData()
   },
+  // onLoad () {
+  //   this.getPersonData()
+  // },
   data () {
     return {
       personData: {},
       roomFullName: '',
       personRegion: '',
       cardNum: '',
-      regPhoto: '../../static/images/timg.jpg',
-      carNum: ''
+      regPhoto: '../../static/images/default.png'
     }
   },
   watch: {
@@ -112,13 +114,13 @@ export default {
       // this.roomFullName = this.personData.rooms[0].roomFullName
       if (this.personData.rooms[0]) {
         const isHouseholder = parseInt(this.personData.rooms[0].isHouseholder)
-        const personRegionCode = parseInt(this.personData.rooms[0].personRegionCode)
+        const personRegioncode = parseInt(this.personData.rooms[0].personRegioncode)
         if (isHouseholder === 1) {
           that.personRegion = '户主'
         } else {
-          if (personRegionCode === 1) {
+          if (personRegioncode === 1) {
             that.personRegion = '物业'
-          } else if (personRegionCode === 2) {
+          } else if (personRegioncode === 2) {
             that.personRegion = '业主'
           } else {
             that.personRegion = '租户'
@@ -126,14 +128,8 @@ export default {
         }
       }
       // this.personRegioncode = this.personData.rooms[0].personRegioncode
-      this.carNum = this.personData.car.length
       this.regPhoto = ('data:image/png;base64,' + this.personData.regPhoto).replace(/[\r\n]/g, '')
       console.log('personData', this.personData)
-      // this.rooms = Array.from(this.personData.rooms)
-      // this.rooms = JSON.stringify(this.rooms)
-      // this.rooms = JSON.parse(this.rooms)
-      // this.car = this.carLen
-      // console.log('carLen', this.car)
     },
     // 跳转至手机号界面
     // toTelView () {

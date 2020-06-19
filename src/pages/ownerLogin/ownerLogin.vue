@@ -47,9 +47,14 @@ import { getCode } from '../../api/wechat'
 import { bindWechat } from '../../api/index'
 export default {
   components: { submitBtn },
-  mounted () {
+  onShow () {
     this.getCode()
     Object.assign(this.$data, this.$options.data())
+    mpvue.removeStorageSync('personMess')
+    mpvue.removeStorageSync('room')
+    // mpvue.removeStorageSync('personMess', 'room', 'token', 'appId')
+    // mpvue.removeStorageSync('personMess', 'room', 'token', 'appId')
+    // mpvue.clearStorageSync()
   },
   data () {
     return {
@@ -105,14 +110,12 @@ export default {
     },
     onAccountBlur () {
       this.isAccountFocus = false
-      // console.log(this.username)
     },
     onPasswdFocus () {
       this.isPasswdFocus = true
     },
     onPasswdBlur () {
       this.isPasswdFocus = false
-      // console.log(this.password)
     },
     // 邀请码登录
     invitedLogin () {
@@ -134,7 +137,7 @@ export default {
     margin-top: 44px;
     margin-bottom: 43px;
     margin-left: 37px;
-    font-size: 21px;
+    font-size: 24px;
     font-weight: 500;
   }
   .form-submit {
@@ -150,7 +153,7 @@ export default {
         flex-direction: row;
         align-items: center;
         padding-bottom: 19px;
-        font-size: 14px;
+        font-size: 18px;
         span {
           margin-right: 11px;
           white-space: nowrap;

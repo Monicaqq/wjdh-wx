@@ -4,11 +4,12 @@
     <!-- 二维码展示 -->
     <div class="qr-code">
       <div class="qrcode-img">
-        <img :src="qrCodeURL" v-if="notOver" mode='aspectFit'>
+        <img :src="qrCodeURL" v-if="notOver" mode='aspectFit' show-menu-by-longpress @longpress="handleLongPress">
         <img :src="qrCodeURL" v-else class="isOver" mode='aspectFit'>
       </div>
-      <div>
+      <div class="qrcode-info">
         <span>{{notOver == 0 ? '已过期' : '有效期24小时'}}</span>
+        <span class="info" v-if="notOver !== 0">长按图片保存或分享</span>
       </div>
 
     </div>
@@ -39,9 +40,9 @@
     </div>
     <!-- 保存二维码按钮 -->
     <div class="qrcode-btn-footer" v-if="notOver">
-      <button class="btn left" open-type='share'>分享二维码</button>
-      <button class="btn right" @click="saveQrCode" v-if='saveQrBtn'>保存二维码</button>
-      <button class='btn right' open-type="openSetting" @opensetting='handleSetting' v-else>去授权</button>
+      <!-- <button class="btn left" open-type='share'>分享二维码</button> -->
+      <!-- <button class="btn right" @click="saveQrCode" v-if='saveQrBtn'>保存二维码</button> -->
+      <!-- <button class='btn right' open-type="openSetting" @opensetting='handleSetting' v-else>去授权</button> -->
     </div>
   </div>
 </template>
@@ -63,7 +64,7 @@ export default {
     this.cardNum = cardNumHidden(this.inviteDetail.cardNum, 3, 3)
     console.log(this.inviteDetail)
     // 判断是否具有授权
-    this.isAuth()
+    // this.isAuth()
   },
   data () {
     return {
@@ -73,7 +74,7 @@ export default {
       qrCode: '',
       qrCodeURL: '',
       // openSettingBtn: true,
-      saveQrBtn: '',
+      saveQrBtn: true,
       imgUrl: '../../static/images/qrcode.jpg'
     }
   },
@@ -100,10 +101,9 @@ export default {
       path: `${wx.env.USER_DATA_PATH}/qrcode.png`,
       // 自定义转发图片
       // imageUrl: `${wx.env.USER_DATA_PATH}/qrcode.png`,
-      imageUrl: that.imgUrl,
+      // imageUrl: that.imgUrl,
       success (res) {
         // 返回目标源
-        console.log('1111')
         wx.showShareMenu({
           withShareTicket: true
         })
@@ -112,54 +112,22 @@ export default {
         console.log(err)
       }
     }
-
-    // var getFile = wx.getFileSystemManager()
-    // 写文件
-    // getFile.writeFile({
-    //   // 创建临时文件名
-    //   filePath: `${wx.env.USER_DATA_PATH}/qrcode.png`,
-    //   // 去除 data:image/png;base64
-    //   data: that.qrCodeURL.slice(22),
-    //   encoding: 'base64',
-    //   success (res) {
-    //     console.log('111', res)
-    //     if (res.from === 'button') {
-    //       console.log('from pages', res.target)
-    //     }
-    //     return {
-    //       // 自定义转发标题
-    //       title: '被邀人二维码',
-    //       // 图片地址
-    //       path: `${wx.env.USER_DATA_PATH}/qrcode.png`,
-    //       // 自定义转发图片
-    //       imageUrl: `${wx.env.USER_DATA_PATH}/qrcode.png`,
-    //       success (res) {
-    //         // 返回目标源
-    //         console.log('1111')
-    //         wx.showShareMenu({
-    //           withShareTicket: true
-    //         })
-    //       }
-    //     }
-    //   }, fail (err) {
-    //     console.log(err)
-    //   }
-    // })
   },
   methods: {
     goBack () {
-      var pages = getCurrentPages()
-      var beforePage = pages[pages.length - 2]
-      beforePage.onLoad()
       this.$router.go(-1)
     },
     drawImg () {
       var imgData = QR.drawImg(this.qrCode, {
         typeNumber: 4,
         errorCorrectLevel: 'M',
-        size: 500
+        size: 800
       })
       this.qrCodeURL = imgData
+    },
+    //  处理图片
+    handleLongPress (e) {
+      console.log(e)
     },
     // 分享二维码按钮
     // shareQrCode () {
@@ -184,14 +152,24 @@ export default {
       wx.getSetting({
         // 有保存到相册的权限
         success (res) {
+          // 用户已经授权
           if (res.authSetting['scope.writePhotosAlbum']) {
-            that.saveImg()
-            console.log('tosaveImg')
-          } else if (res.authSetting['scope.writePhotosAlbum'] === undefined) {
-            // 无权限,进行授权
-            that.saveQrBtn = false
-          } else {
             that.saveQrBtn = true
+            that.saveImg()
+          } else if (res.authSetting['scope.writePhotosAlbum'] === undefined) {
+            // 未进行授权
+            wx.authorize({
+              scope: 'scope.writePhotosAlbum',
+              // 同意授权后的回调
+              success: () => {
+                that.saveImg()
+              },
+              // 拒绝用户授权后的回调
+              fail () {
+                that.saveQrBtn = false
+              }
+            })
+            that.saveQrBtn = false
           }
         }
       })
@@ -260,22 +238,31 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 38%;
+    // height: 38%;
     .qrcode-img {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 137px;
-      height: 137px;
+      margin-top: 30px;
       background: #fff;
       img {
-        width: 110px;
-        height: 110px;
+        padding: 20px;
+        width: 190px;
+        height: 190px;
       }
       .isOver {
-        width: 110px;
-        height: 110px;
+        width: 190px;
+        height: 190px;
         opacity: 0.3;
+      }
+    }
+    .qrcode-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .info {
+        margin-top: 10px;
+        color: #ff6744;
       }
     }
     span {
@@ -285,7 +272,8 @@ export default {
     }
   }
   .invited-person-msg {
-    height: 62%;
+    // margin-top: ;
+    height: 50%;
     .person-item {
       display: flex;
       flex-direction: row;

@@ -5,11 +5,8 @@
       <!-- 地址列表 -->
       <div class="address-list">
         <div class="margin15">
-          <div class="address-item" v-for='(item, index ) in rooms' :key='index' @click="chooseRoom(index)">
+          <div class="address-item" v-for='(item, index ) in rooms' :key='index' @click="chooseRoom(item, index)">
             <!-- 单个地址展示 -->
-            <!-- <div :class="['personRegion', item.isHouseholder == 1 ? 'hz' : 'zh']">
-              <span>{{item.isHouseholder == 1 ? '户主' : '租户'}}</span>
-            </div> -->
             <div class="regionStyle">
               <div v-if="item.isHouseholder == 1" :class="['personRegion', 'hz']">
                 <span>户主</span>
@@ -20,13 +17,12 @@
                 <div v-if="item.personRegioncode == 3" :class="['personRegion', 'zh']"><span>租户</span></div>
               </div>
             </div>
-
             <!-- 地址对应人员类型 -->
             <!-- 地址 -->
             <div class="address-txt">
               {{item.roomFullName}}
             </div>
-            <div class="choose" v-if='currentId === index'>
+            <div class="choose" v-if="item.isShow">
               <img :src="chooseImg">
             </div>
             <div class="border1px"></div>
@@ -72,12 +68,22 @@ export default {
   components: { navBar },
   mounted () {
     Object.assign(this.$data, this.$options.data())
-    if (!getStorageSync('rooms')) {
-      const personMess = getStorageSync('personMess')
-      this.personId = personMess.id
-      this.rooms = personMess.rooms
+    const personMess = getStorageSync('personMess')
+    this.personId = personMess.id
+    this.rooms = personMess.rooms
+    this.rooms.forEach(element => {
+      element.isShow = false
+    })
+    let room = getStorageSync('room')
+    if (room) {
+      this.rooms.forEach((element, index) => {
+        if (room.id === element.id) {
+          this.rooms[index].isShow = true
+        }
+      })
     } else {
-      this.rooms = getStorageSync('rooms')
+      this.rooms[0].isShow === true
+      this.$set(this.rooms, this.rooms[0])
     }
   },
   data () {
@@ -85,7 +91,6 @@ export default {
       addIcon: '../../static/images/addIcon.png',
       chooseImg: '../../static/images/choose.png',
       codeImg: '../../static/images/codeImg.png',
-      currentId: '',
       showModal: false,
       errorInfo: '',
       inviteCode: '',
@@ -95,10 +100,17 @@ export default {
   },
   methods: {
     // 选择户址
-    chooseRoom (index) {
+    chooseRoom (item, index) {
       // this.chooseFlag = true
-      this.currentId = index
+      this.rooms.forEach((i) => {
+        i.isShow = false
+      })
+      item.isShow = true
+      this.$set(this.rooms, index, this.rooms[index])
       setStorageSync('room', this.rooms[index])
+      let pages = getCurrentPages()
+      let beforePage = pages[pages.length - 2]
+      beforePage.onLoad()
     },
     // 邀请码添加户址
     inviteCodeAdd () {
@@ -120,11 +132,12 @@ export default {
           }
         }).then(res => {
           if (res.data.code == 200) {
-            const roomObj = res.data.data
-            console.log('rooms0', that.rooms)
-            that.rooms = that.rooms.concat(roomObj)
-            setStorageSync('rooms', that.rooms)
-            console.log('rooms', that.rooms)
+            showToast('您已提交户址,请等待审核')
+            // const roomObj = res.data.data
+            // console.log('rooms0', that.rooms)
+            // that.rooms = that.rooms.concat(roomObj)
+            // setStorageSync('rooms', that.rooms)
+            // console.log('rooms', that.rooms)
             that.showModal = false
           }
         })
@@ -137,13 +150,7 @@ export default {
       this.showModal = false
     },
     goBack () {
-      var pages = getCurrentPages()
-      var beforePage = pages[pages.length - 2]
-      beforePage.onLoad()
       this.$router.go(-1)
-      // wx.navigateBack({
-      //   delta: 1
-      // })
     },
   },
 }

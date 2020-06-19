@@ -7,7 +7,7 @@
     <!-- 车牌列表 -->
     <div class="cars-list" v-for="(item, index) in car" :key="index">
       <div class="car-msg">
-        <div class="car-type">{{item.carType === 1 ? '小汽车' : '大卡车'}}</div>
+        <div class="car-type">{{carVals[item.carType-1]}}</div>
         <div class="choose-icon">
           <div class="triangle"></div>
         </div>
@@ -27,7 +27,7 @@
         </div>
         <!-- 车辆输入框 -->
         <div class="car-number">
-          <input type="text" placeholder="请输入车辆" v-model="carObj.licensePlateNo" @input="inputCarNum" maxlength="8"
+          <input type="text" placeholder="请输入车牌号" v-model="carObj.licensePlateNo" @input="inputCarNum" maxlength="9"
             confirm-type="done" @confirm='onConfirm' @change='onChange' @blur="onBlur">
           <!-- <div class="err" v-if="carNumErrFlag"><span>{{carNumErrMsg}}</span></div> -->
         </div>
@@ -68,8 +68,9 @@ export default {
       personMess: {},
       personId: '',
       isHouseholder: '',
-      carTypeVal: '小汽车',
+      carTypeVal: '轿车',
       carType: 1,
+      carVals: ['轿车', '电车', '载货汽车', '客车', '挂车'],
       // carList: [],
       car: [],
       carObj: {
@@ -109,7 +110,6 @@ export default {
           that.carNumErrFlag = true
           that.car.push(that.carObj)
           that.carObj = {}
-          that.carTypeVal = '小汽车'
           that.carType = 1
           that.isShowInput = false
         } else {
@@ -166,14 +166,23 @@ export default {
     chooseCarType (res) {
       let that = this
       wx.showActionSheet({
-        itemList: ['小汽车', '大卡车'],
+        itemList: ['轿车', '电车', '载货汽车', '客车', '挂车'],
         success (res) {
           if (res.tapIndex === 0) {
-            that.carTypeVal = '小汽车'
+            that.carTypeVal = '轿车'
             that.carType = 1
           } else if (res.tapIndex === 1) {
-            that.carTypeVal = '大卡车'
+            that.carTypeVal = '电车'
             that.carType = 2
+          } else if (res.tapIndex === 2) {
+            that.carTypeVal = '载货汽车'
+            that.carType = 3
+          } else if (res.tapIndex === 3) {
+            that.carTypeVal = '客车'
+            that.carType = 4
+          } else if (res.tapIndex === 4) {
+            that.carTypeVal = '挂车'
+            that.carType = 5
           }
         }
       })

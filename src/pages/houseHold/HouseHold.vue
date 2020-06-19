@@ -42,9 +42,9 @@ export default {
   },
   methods: {
     goBack () {
-      var pages = getCurrentPages()
-      var beforePage = pages[pages.length - 2]
-      beforePage.onLoad()
+      // var pages = getCurrentPages()
+      // var beforePage = pages[pages.length - 2]
+      // beforePage.onLoad()
       this.$router.go(-1)
     },
     getHouseHoldInfo () {
@@ -81,6 +81,9 @@ export default {
             }).then(res => {
               console.log('delHouseHold', res)
               if (res.data.code === 200) {
+                let pages = getCurrentPages()
+                let beforePage = pages[pages.length - 2]
+                beforePage.onLoad()
                 that.$router.go(-1)
               }
             })

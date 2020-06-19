@@ -1,11 +1,18 @@
 // 获取请求数据
 import { post, get } from '../utils/request'
-// const API_URL = 'https://angeasy.natapp4.cc/face-community-server'
+import { getStorageSync } from './wechat'
+
+// const API_URL = ''
 // const API_URL = 'http://192.168.1.101:8011'
-const API_URL = 'http://192.168.1.141:8848/face-community-server'
 // const APP_ID = 'wx0dca6b0ff2113744'
 // const APP_SECRET = '7d6f8947fdc99e7bf1c7874f21d024ac'
 
+let baseUrl = getStorageSync('base_url')
+if (baseUrl) {
+  const API_URL = getStorageSync('base_url')
+}
+const API_URL = 'http://192.168.1.141:8848/face-community-server'
+// const API_URL = getStorageSync('base_url')
 // 微信绑定
 export function bindWechat (params) {
   return post(`${API_URL}/app/bind`, params)

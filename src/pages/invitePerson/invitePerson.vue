@@ -175,18 +175,15 @@ export default {
           }
         }).then(res => {
           console.log('invitePerson', res)
+          let pages = getCurrentPages()
+          let beforePage = pages[pages.length - 2]
+          beforePage.onLoad()
           this.$router.go(-1)
-          // this.$router.push('../../pages/home/main')
-          // this.reload()
         })
       }
     },
     goBack () {
-      var pages = getCurrentPages()
-      var beforePage = pages[pages.length - 2]
-      beforePage.onLoad()
       this.$router.go(-1)
-      // this.$router.push('../../pages/home/main')
     }
   }
 }

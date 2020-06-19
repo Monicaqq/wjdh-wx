@@ -16,6 +16,9 @@ export default {
       isRouterAlive: true
     }
   },
+  // beforeDestroy () {
+  //   mpvue.removeStorageSync('personMess')
+  // },
   methods: {
     reload () {
       this.isRouterAlive = false
