@@ -18,15 +18,19 @@ import householdMsg from '@/components/householdMsg'
 import submitBtn from '@/components/submitBtn'
 import navBar from '@/components/navBar'
 import { getHouseHoldInfo, deleteHouseHold } from '../../api/index'
+import { getStorageSync, showLoading, hideLoading } from '../../api/wechat'
 export default {
   components: { householdMsg, submitBtn, navBar },
   mounted () {
+    this.baseUrl = getStorageSync('base_url')
     this.houId = this.$route.query.houId
     this.id = this.$route.query.personId
+    showLoading('正在加载')
     this.getHouseHoldInfo()
   },
   data () {
     return {
+      baseUrl: null,
       houseHoldDetail: {},
       regPhoto: '',
       car: [],
@@ -42,14 +46,12 @@ export default {
   },
   methods: {
     goBack () {
-      // var pages = getCurrentPages()
-      // var beforePage = pages[pages.length - 2]
-      // beforePage.onLoad()
       this.$router.go(-1)
+      Object.assign(this.$data, this.$options.data())
     },
     getHouseHoldInfo () {
       let that = this
-      getHouseHoldInfo({
+      getHouseHoldInfo(that.baseUrl, {
         'data': {
           'id': that.id,
           'houId': that.houId
@@ -64,6 +66,7 @@ export default {
         that.isPass = that.rooms.isPass
         that.isInvitation = that.rooms.isInvitation
         that.personName = that.houseHoldDetail.personName
+        hideLoading()
       })
     },
     delHousePerson () {
@@ -73,7 +76,7 @@ export default {
         content: '确定进行删除操作吗？',
         success (res) {
           if (res.confirm) {
-            deleteHouseHold({
+            deleteHouseHold(that.baseUrl, {
               'data': {
                 'id': that.houId,
                 'personId': that.id

@@ -1,5 +1,5 @@
 module.exports = {
   NODE_ENV: '"production"',
-  URL_NJ: '"http://192.168.1.141:8848/face-community-server"',
-  URL_ZJ: '"http://192.168.1.141:8848/face-community-server11"'
+  URL_NJ: '"https://angeasycloud.com/nanjing_server"',
+  URL_ZJ: '"https://angeasycloud.com/zhenjiang_server"'
 }

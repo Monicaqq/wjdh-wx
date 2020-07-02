@@ -5,7 +5,6 @@ export function getCode (onSuccess, onFail) {
     success (res) {
       let code = res.code
       if (code) {
-        console.log(code)
         onSuccess(code)
       } else {
         onFail(res)
@@ -15,22 +14,20 @@ export function getCode (onSuccess, onFail) {
 }
 
 // 获取token
-export function getToken (onSuccess, onFail) {
+export function getToken (url, onSuccess, onFail) {
   mpvue.login({
     success (res) {
       let code = res.code
       if (code) {
-        loginWechat({
+        loginWechat(url, {
           'data': {
             'code': code
           }
         }).then(res => {
-          console.log(res)
-          // onSuccess(res)
           if (res.data.code === 200) {
-            console.log('token', res)
             const token = res.data.data.jwt
             const appId = res.data.data.appId
+            console.log('token', token)
             setStorageSync('token', token)
             setStorageSync('appId', appId)
             onSuccess(token)
@@ -86,7 +83,6 @@ export function setStorageSync (key, data) {
   // 当前时间 > 2小时后, 缓存就过期了, 就清除缓存, 再重新获取缓存
   if (nowTime > expiration) {
     mpvue.clearStorageSync()
-    console.log('清除缓存')
     mpvue.setStorageSync(key, data)
   } else {
     mpvue.setStorageSync(key, data)

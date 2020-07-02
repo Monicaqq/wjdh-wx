@@ -51,15 +51,16 @@
 import submitBtn from '@/components/submitBtn'
 import { isCarNum, carNumFormat } from '../../utils/index'
 import { getStorageSync, showToast, setStorageSync } from '../../api/wechat'
-import { getPersonMess, updateCar } from '../../api/index'
 import navBar from '@/components/navBar'
 export default {
   components: { submitBtn, navBar },
   mounted () {
-    let that = this
     Object.assign(this.$data, this.$options.data())
+    if (this.$route.query.item) {
+      this.car = JSON.parse(this.$route.query.item)
+    }
     if (getStorageSync('car')) {
-      that.car = getStorageSync('car')
+      this.car = getStorageSync('car')
     }
   },
   inject: ['reload'],
@@ -71,7 +72,6 @@ export default {
       carTypeVal: '轿车',
       carType: 1,
       carVals: ['轿车', '电车', '载货汽车', '客车', '挂车'],
-      // carList: [],
       car: [],
       carObj: {
         'carType': 1,
@@ -89,7 +89,6 @@ export default {
   methods: {
     goBack () {
       this.$router.go(-1)
-      // this.$router.push('../../pages/addPerson/main')
     },
     // 展示车辆输入输入框
     showInput () {
@@ -206,7 +205,7 @@ export default {
           console.log(that.car)
         }
       } else {
-        showToast('请检查车牌号是否正确')
+        showToast('请检查车牌号')
       }
     }
   }

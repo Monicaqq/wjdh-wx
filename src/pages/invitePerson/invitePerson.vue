@@ -48,14 +48,15 @@ export default {
   components: { arrowBtn, submitBtn, navBar },
   mounted () {
     Object.assign(this.$data, this.$options.data())
+    this.baseUrl = getStorageSync('base_url')
     const personMess = getStorageSync('personMess')
     if (personMess.rooms.length !== 0) {
       this.roomId = personMess.rooms[0].roomId
     }
   },
-  // inject: ['reload'],
   data () {
     return {
+      baseUrl: null,
       cardNumHidden: '',
       personName: '',
       personSex: '',
@@ -165,7 +166,7 @@ export default {
       } else if (!this.phoneNumFlag) {
         showToast('请检查手机号是否正确')
       } else {
-        toInvite({
+        toInvite(that.baseUrl, {
           'data': {
             'roomId': that.roomId,
             'personName': that.personName,
@@ -174,7 +175,6 @@ export default {
             'phoneNum': that.phoneNum
           }
         }).then(res => {
-          console.log('invitePerson', res)
           let pages = getCurrentPages()
           let beforePage = pages[pages.length - 2]
           beforePage.onLoad()

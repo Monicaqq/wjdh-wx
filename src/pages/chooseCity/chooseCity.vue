@@ -42,7 +42,7 @@ export default {
       fistCityChose: '../../static/images/nanjing2.png',
       secondCity: '../../static/images/zhenjiang1.png',
       secondCityChose: '../../static/images/zhenjiang2.png',
-      currentId: null
+      currentId: '1'
     }
   },
   methods: {

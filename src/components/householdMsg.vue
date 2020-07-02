@@ -22,7 +22,7 @@
         </div>
         <div class="person-sex borderB1px person-item">
           <span class="color333">性别</span>
-          <span class="color666">{{personMsg.personSex == 0 ? '未知' : (personMsg.personSex == 1 ? '男' : '女')}}</span>
+          <span class="color666">{{personSex}}</span>
         </div>
         <div class="person-IDcard borderB1px person-item">
           <span class="color333">身份证号</span>
@@ -48,7 +48,7 @@
         <div class="person-tel borderB1px person-item">
           <span class="color333">人员类型</span>
           <div class="tel-right" @click="choosePersonRegion">
-            <span class="color666">{{personRegioncode === 1 ? '物业' : personRegioncode === 2 ? '业主' : '租户'}}
+            <span class="color666">{{personRegioncode}}
             </span>
             <arrow-btn color='#9B9B9B'></arrow-btn>
           </div>
@@ -75,7 +75,7 @@
           <span class="color333">进出权限</span>
           <div class="tel-right" @click="choosePassRole">
             <!-- <input type="text" class="color666" @click="choosePassRole" v-model="passRole" disabled> -->
-            <span class="color666">{{isPass === 0 ? '不可进出' : '可进出'}}</span>
+            <span class="color666">{{isPass}}</span>
             <arrow-btn color='#9B9B9B'></arrow-btn>
           </div>
         </div>
@@ -84,7 +84,7 @@
           <span class="color333">邀请权限</span>
           <div class="tel-right" @click="chooseInviteRole">
             <!-- <input type="text" class="color666" @click="chooseInviteRole" v-model="inviteRole" disabled> -->
-            <span class="color666">{{isInvitation === 0 ? '禁止邀请访客' : '允许邀请访客'}}</span>
+            <span class="color666">{{isInvitation}}</span>
             <arrow-btn color='#9B9B9B'></arrow-btn>
           </div>
         </div>
@@ -97,6 +97,7 @@ import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import { cardNumHidden } from '../utils/index'
 import { updateHouseHold } from '../api/index'
+import { getStorageSync } from '../api/wechat'
 export default {
   components: { avatorImg, arrowBtn },
   props:
@@ -130,28 +131,34 @@ export default {
       default: ''
     }
   },
-  created () {
-    this.getPersonData()
+  // created () {
+  //   this.getPersonData()
+  // },
+  mounted () {
+    this.baseUrl = getStorageSync('base_url')
   },
   data () {
     return {
+      baseUrl: null,
       personData: {},
       car: [],
       carLen: '',
       cardNum: '',
       regPhoto: '../../static/images/timg.jpg',
+      personSex: 0,
       personRegion: '',
       personRegioncode: '',
-      passRole: '',
+      passCode: '',
       isPass: '',
-      inviteRole: '',
+      inviteCode: '',
       isInvitation: '',
       rooms: [],
       passFlag: '',
       inviteFlag: '',
-      regionFlag: ''
-      // regionList: ['物业', '业主', '租户'],
-
+      regionFlag: '',
+      personRegionList: ['业主', '租户'],
+      passList: ['不可进出', '可进出'],
+      inviationList: ['禁止邀请访客', '允许邀请访客']
     }
   },
   watch: {
@@ -159,18 +166,12 @@ export default {
       this.personRegioncode = parseInt(newVal.personRegioncode)
       this.isPass = parseInt(newVal.isPass)
       this.isInvitation = parseInt(newVal.isInvitation)
-      this.personRegioncode = parseInt(newVal.personRegioncode)
-      // console.log('rooms', newVal)
-      // console.log('isPass', this.isPass)
-      // console.log('isInvitation', typeof (this.isInvitation))
-      // this.personRegioncode = newVal[0].personRegioncode
-      // console.log('人员类型', this.personRegioncode)
-      // console.log('人员类型', typeof (this.personRegioncode))
-      // this.isInvitation = newVal[0].isInvitation
-      // this.isPass = newVal[0].isPass
+      this.isPass = this.isPass === 0 ? '不可进出' : '可进出'
+      this.isInvitation = this.isInvitation === 0 ? '禁止邀请访客' : '允许邀请访客'
+      this.personRegioncode = this.personRegioncode === 1 ? '物业' : this.personRegioncode === 2 ? '业主' : '租户'
+      this.roomId = newVal.roomId
     },
     cardNum (newVal) {
-      // console.log('cardNum', newVal)
       this.cardNum = cardNumHidden(newVal, 3, 3)
     },
     car (newVal) {
@@ -181,14 +182,21 @@ export default {
     },
     id (newVal) {
       this.id = newVal
+    },
+    'personMsg.personSex' (newVal) {
+      if (parseInt(newVal) === 0) {
+        this.personSex = '未知'
+      } else if (parseInt(newVal) === 1) {
+        this.personSex = '男'
+      } else if (parseInt(newVal) === 2) {
+        this.personSex = '女'
+      }
     }
   },
   methods: {
     // 获取父组件中数据
-    getPersonData () {
-      this.personData = this.personMsg
-      console.log('人员', this.personData)
-    },
+    // getPersonData () {
+    // },
     // 选择人员类型
     choosePersonRegion () {
       let that = this
@@ -205,7 +213,8 @@ export default {
             content: '您确定更改人员类型',
             success (res) {
               if (res.confirm) {
-                that.personRegioncode = that.regionFlag
+                that.personRegioncode = that.personRegionList[that.regionFlag - 2]
+                that.personRegion = that.regionFlag
                 that.updateHouseHold()
               }
             }
@@ -229,7 +238,8 @@ export default {
             content: '您确定更进出权限',
             success (res) {
               if (res.confirm) {
-                that.isPass = that.passFlag
+                that.isPass = that.passList[that.passFlag]
+                that.passCode = that.passFlag
                 that.updateHouseHold()
               }
             }
@@ -253,7 +263,8 @@ export default {
             content: '您确定更邀请权限',
             success (res) {
               if (res.confirm) {
-                that.isInvitation = that.inviteFlag
+                that.isInvitation = that.inviationList[that.inviteFlag]
+                that.inviteCode = that.inviteFlag
                 that.updateHouseHold()
               }
             }
@@ -263,7 +274,11 @@ export default {
     },
     // 去车辆界面
     toCarView () {
-      this.$router.push('../../pages/houseHoldCar/main')
+      let that = this
+      this.$router.push({
+        path: '../../pages/houseHoldCar/main',
+        query: { item: JSON.stringify(that.car) }
+      })
     },
     // 预览图片
     previewImg (e) {
@@ -276,21 +291,19 @@ export default {
     // 更改住户信息
     updateHouseHold () {
       let that = this
-      // let child = this.$refs.child
-      // this.isPass = child.isPass
-      // this.isInvitation = child.isInvitation
-      // this.personRegioncode = child.personRegioncode
-      // console.log(child.isPass)
-      updateHouseHold({
+      updateHouseHold(that.baseUrl, {
         'data': {
           'houId': that.houId,
           'personId': that.id,
           'roomId': that.roomId,
-          'isPass': that.isPass,
-          'isInvitation': that.isInvitation,
-          'personRegioncode': that.personRegioncode
+          'isPass': that.passCode,
+          'isInvitation': that.inviteCode,
+          'personRegioncode': that.personRegion
         }
       }).then(res => {
+        let pages = getCurrentPages()
+        let beforePage = pages[pages.length - 1]
+        beforePage.onLoad()
         // this.$router.go(-1)
         // that.$router.push('../../pages/home/main')
         console.log('更新人员类型', res)

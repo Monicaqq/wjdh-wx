@@ -10,7 +10,7 @@
       <div class="login-input">
         <div class="account-input">
           <span>账号/手机号</span>
-          <input type="text" placeholder-style="color: #BCC2E1" v-model="username" @focus="onAccountFocus"
+          <input type="tel" placeholder-style="color: #BCC2E1" v-model="username" @focus="onAccountFocus"
             @blur="onAccountBlur" name="account" placeholder="请输入">
         </div>
         <!-- 输入框聚焦失焦下划线样式 -->
@@ -18,7 +18,7 @@
         </div>
         <div class="password-input">
           <span>密码/身份证后4位</span>
-          <input type="text" password placeholder-style="color: #BCC2E1" v-model="password" @focus="onPasswdFocus"
+          <input type="password" password placeholder-style="color: #BCC2E1" v-model="password" @focus="onPasswdFocus"
             @blur="onPasswdBlur" name="password" placeholder="请输入">
         </div>
         <!-- 输入框聚焦失焦下划线样式 -->
@@ -43,21 +43,23 @@
 </template>
 <script>
 import submitBtn from '@/components/submitBtn'
-import { getCode } from '../../api/wechat'
+import { getCode, getStorageSync } from '../../api/wechat'
 import { bindWechat } from '../../api/index'
 export default {
   components: { submitBtn },
   onShow () {
-    this.getCode()
+    // mpvue.clearStorage()
     Object.assign(this.$data, this.$options.data())
+    this.baseUrl = getStorageSync('base_url')
     mpvue.removeStorageSync('personMess')
     mpvue.removeStorageSync('room')
-    // mpvue.removeStorageSync('personMess', 'room', 'token', 'appId')
-    // mpvue.removeStorageSync('personMess', 'room', 'token', 'appId')
-    // mpvue.clearStorageSync()
+    mpvue.removeStorageSync('token')
+    mpvue.removeStorageSync('appId')
+    this.getCode()
   },
   data () {
     return {
+      baseUrl: null,
       isAccountFocus: false,
       isPasswdFocus: false,
       username: '',
@@ -68,7 +70,6 @@ export default {
   computed: {
     ActiveLoginBtn () {
       if (this.username && this.password) {
-        // that.ActiveLoginBtn = true
         return true
       } else {
         return false
@@ -82,24 +83,21 @@ export default {
       getCode(
         (code) => {
           that.code = code
-          console.log('that.code', that.code)
-        }, () => {
-          console.log('获取code失败')
         })
     },
     // 账号密码登录
     formSubmit () {
       let that = this
-      bindWechat({
+      bindWechat(that.baseUrl, {
         'data': {
           'username': that.username,
           'password': that.password,
           'code': that.code
         }
       }).then(res => {
+        console.log(res)
         // 第一次获取绑定, 拿到jwt
         if (res.data.code === 200) {
-          console.log('login')
           this.$router.push('../../pages/home/main')
         }
       })
@@ -126,6 +124,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .owner-login-container {
+  max-width: 100%;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   width: 100%;

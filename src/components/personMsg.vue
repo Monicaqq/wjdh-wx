@@ -49,7 +49,6 @@
           <span class="color333">人员类型</span>
           <div class="tel-right">
             <span class="color666">{{personRegion}}</span>
-            <!-- <arrow-btn @arrowClick='choosePersonType' color='#9B9B9B'></arrow-btn> -->
           </div>
         </div>
         <!-- 车辆 -->
@@ -88,9 +87,6 @@ export default {
   mounted () {
     this.getPersonData()
   },
-  // onLoad () {
-  //   this.getPersonData()
-  // },
   data () {
     return {
       personData: {},
@@ -110,8 +106,6 @@ export default {
     getPersonData () {
       let that = this
       this.personData = this.personMsg
-      // this.rooms = this.personData.rooms
-      // this.roomFullName = this.personData.rooms[0].roomFullName
       if (this.personData.rooms[0]) {
         const isHouseholder = parseInt(this.personData.rooms[0].isHouseholder)
         const personRegioncode = parseInt(this.personData.rooms[0].personRegioncode)
@@ -126,10 +120,10 @@ export default {
             that.personRegion = '租户'
           }
         }
+      } else {
+        that.personRegion = '未知'
       }
-      // this.personRegioncode = this.personData.rooms[0].personRegioncode
       this.regPhoto = ('data:image/png;base64,' + this.personData.regPhoto).replace(/[\r\n]/g, '')
-      console.log('personData', this.personData)
     },
     // 跳转至手机号界面
     // toTelView () {

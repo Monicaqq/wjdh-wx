@@ -132,6 +132,7 @@ export default {
   },
   data () {
     return {
+      baseUrl: null,
       defaultImg: '../../static/images/avator.png',
       regPhoto: '',
       tempPhoto: '',
@@ -163,11 +164,11 @@ export default {
   },
   mounted () {
     Object.assign(this.$data, this.$options.data())
+    this.baseUrl = getStorageSync('base_url')
   },
   onShow () {
     let that = this
     const personDetail = getStorageSync('personMess')
-    // this.carLen = car.length
     if (personDetail.rooms.length !== 0) {
       that.roomId = personDetail.rooms[0].roomId
       that.roomFullName = personDetail.rooms[0].roomFullName
@@ -209,12 +210,11 @@ export default {
           // const tempPhoto = 'data:image/png;base64,' + res.data
           const tempPhoto = res.data
           // 上传图片后进行人脸检测
-          faceDetect({
+          faceDetect(that.baseUrl, {
             'data': {
               'photo': tempPhoto
             }
           }).then(res => {
-            console.log('照片检查', res)
             if (res.data.code === 200) {
               that.regPhotoFlag = true
               that.regPhoto = tempPhoto
@@ -389,17 +389,16 @@ export default {
     },
     addHouserPerson () {
       let that = this
-      // this.car = getStorageSync('car')
       if (!this.regPhotoFlag) {
         showToast('请上传人像照片')
       } else if (!this.nameFlag) {
-        showToast('请检查姓名是否正确')
+        showToast('请检查姓名')
       } else if (!this.sexFlag) {
         showToast('请选择性别')
       } else if (!this.cardNumFlag) {
-        showToast('请检查身份证号是否正确')
+        showToast('请检查身份证号')
       } else if (!this.phoneNumFlag) {
-        showToast('请检查手机号是否正确')
+        showToast('请检查手机号')
       } else if (!this.personRegionFlag) {
         showToast('请选择人员类型')
       } else if (!this.passFlag) {
@@ -407,7 +406,7 @@ export default {
       } else if (!this.inviteFlag) {
         showToast('请选择邀请权限')
       } else {
-        addPerson({
+        addPerson(that.baseUrl, {
           'data': {
             'rooms': [
               {
@@ -422,8 +421,7 @@ export default {
             'cardNum': that.cardNum,
             'phoneNum': that.phoneNum,
             'regPhoto': that.regPhoto,
-            'car': that.car,
-
+            'car': that.car
           }
         }).then(res => {
           if (res.data.code === 200) {

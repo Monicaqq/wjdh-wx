@@ -16,9 +16,9 @@ import { getPersonMess } from '../../api/index'
 export default {
   components: { avatorImg, arrowBtn, personMsg, navBar },
   onLoad () {
-    // const personMess = getStorageSync('personMess')
     this.personDetail = getStorageSync('personMess')
     this.carLen = this.personDetail.car.length
+    this.baseUrl = getStorageSync('base_url')
   },
   onShow () {
     this.getPersonMess()
@@ -30,8 +30,8 @@ export default {
   },
   data () {
     return {
+      baseUrl: null,
       personDetail: getStorageSync('personMess'),
-      // personMess: {},
       carLen: 0
     }
   },
@@ -39,14 +39,14 @@ export default {
     // 获取个人信息
     getPersonMess () {
       let that = this
-      getPersonMess().then(res => {
+      getPersonMess(that.baseUrl).then(res => {
         that.personMess = res.data.data
         setStorageSync('personMess', that.personMess)
       })
     },
     // 返回上一页
     goBack () {
-      this.$router.go(-1)
+      this.$router.push('../../pages/home/main')
     },
     // 去车辆界面
     toCarView () {

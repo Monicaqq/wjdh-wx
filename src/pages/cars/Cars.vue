@@ -53,23 +53,24 @@
 import submitBtn from '@/components/submitBtn'
 import { isCarNum, carNumFormat } from '../../utils/index'
 import { getStorageSync, showToast, setStorageSync } from '../../api/wechat'
-import { getPersonMess, updateCar } from '../../api/index'
+import { updateCar } from '../../api/index'
 import navBar from '@/components/navBar'
 export default {
   components: { submitBtn, navBar },
   mounted () {
     Object.assign(this.$data, this.$options.data())
+    this.baseUrl = getStorageSync('base_url')
     this.getCarData()
   },
   inject: ['reload'],
   data () {
     return {
+      baseUrl: null,
       personMess: {},
       personId: '',
       isHouseholder: '',
       carTypeVal: '轿车',
       carType: 1,
-      // carList: [],
       carVals: ['轿车', '电车', '载货汽车', '客车', '挂车'],
       car: [],
       carObj: {
@@ -89,7 +90,6 @@ export default {
   methods: {
     goBack () {
       this.$router.go(-1)
-      // this.$router.push('../../pages/owner/main')
     },
     // 获取汽车数据
     getCarData () {
@@ -105,7 +105,6 @@ export default {
         showToast('请检查车牌号')
       } else {
         // 已输入车牌号
-        // var carResult = isCarNum(that.carObj.licensePlateNo)
         // 输入了正确的车牌号
         // if (!carResult) {
         if (that.car.length === 0) {
@@ -218,21 +217,15 @@ export default {
         // 是住户就发送添加车辆请求, 不是住户,把车辆信息存至缓存,作为发送添加住户的请求
         // 车辆不为空
         if (that.car.length !== 0 && that.carNumErrFlag) {
-          updateCar({
+          updateCar(that.baseUrl, {
             'data': {
               'id': that.personId,
               'roomId': that.roomId,
               'car': that.car
             }
           }).then(res => {
-            console.log(res)
             if (res.data.code === 200) {
-              this.$router.push(
-                {
-                  path: '../../pages/owner/main',
-                  query: { carLen: that.car.length }
-                }
-              )
+              this.$router.push('../../pages/owner/main')
               const personMess = getStorageSync('personMess')
               personMess.car = that.car
               setStorageSync('personMess', personMess)

@@ -34,6 +34,7 @@ export default {
   mounted () {
     Object.assign(this.$data, this.$options.data())
     const personMess = getStorageSync('personMess')
+    this.baseUrl = getStorageSync('base_url')
     this.roomId = personMess.rooms[0].roomId
   },
   data () {
@@ -71,14 +72,13 @@ export default {
       if (trim(that.repairContent).length === 0) {
         showToast('报修内容不能为空')
       } else {
-        saveRepair({
+        saveRepair(that.baseUrl, {
           'data': {
             'repairType': that.repairTypeCode,
             'repairContent': that.repairContent,
             'roomId': that.roomId
           }
         }).then(res => {
-          console.log(res)
           let pages = getCurrentPages()
           let beforePage = pages[pages.length - 2]
           beforePage.onLoad()

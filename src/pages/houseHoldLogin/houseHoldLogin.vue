@@ -198,7 +198,7 @@
   </div>
 </template>
 <script>
-import { showToast, chooseWxImage, transformBase64 } from '../../api/wechat'
+import { showToast, chooseWxImage, transformBase64, getStorageSync } from '../../api/wechat'
 import { isName, isIdCard, isPhone, isCarNum, carNumFormat } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
 import { checkCode, selectPerson, faceDetect, personSave } from '../../api/index'
@@ -206,6 +206,7 @@ export default {
   components: { submitBtn },
   mounted () {
     Object.assign(this.$data, this.$options.data())
+    this.baseUrl = getStorageSync('base_url')
   },
   watch: {
     // 监听是否有车的变化
@@ -218,8 +219,9 @@ export default {
   },
   data () {
     return {
-      isStep1: false,
-      isStep2: true,
+      baseUrl: null,
+      isStep1: true,
+      isStep2: false,
       isStep3: false,
       isInviteInputFocus: false,
       isHouseHoldNameFocus: false,
@@ -506,7 +508,7 @@ export default {
       // 验证邀请码是否存在
       let that = this
       if (this.personInviteCode) {
-        checkCode({
+        checkCode(that.baseUrl, {
           'data': {
             'inviteCode': that.personInviteCode
           }
@@ -531,7 +533,7 @@ export default {
     // 通过身份证手机号查询人员是否存在
     selectPerson () {
       let that = this
-      selectPerson({
+      selectPerson(that.baseUrl, {
         'data': {
           'cardNum': that.cardNum,
           'phoneNum': that.phoneNum
@@ -613,7 +615,7 @@ export default {
           // const tempPhoto = 'data:image/png;base64,' + res.data
           const tempPhoto = res.data
           // 上传图片后进行人脸检测
-          faceDetect({
+          faceDetect(that.baseUrl, {
             'data': {
               'photo': tempPhoto
             }
@@ -634,7 +636,7 @@ export default {
       if (!this.regPhotoFlag) {
         showToast('请上传人像照片')
       } else {
-        personSave({
+        personSave(that.baseUrl, {
           'data': {
             'rooms': [{
               'roomId': that.roomId,

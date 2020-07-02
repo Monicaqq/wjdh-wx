@@ -68,6 +68,7 @@ export default {
   components: { navBar },
   mounted () {
     Object.assign(this.$data, this.$options.data())
+    this.baseUrl = getStorageSync('base_url')
     const personMess = getStorageSync('personMess')
     this.personId = personMess.id
     this.rooms = personMess.rooms
@@ -82,12 +83,15 @@ export default {
         }
       })
     } else {
-      this.rooms[0].isShow === true
-      this.$set(this.rooms, this.rooms[0])
+      if (this.rooms[0]) {
+        this.rooms[0].isShow === true
+        this.$set(this.rooms, this.rooms[0])
+      }
     }
   },
   data () {
     return {
+      baseUrl: null,
       addIcon: '../../static/images/addIcon.png',
       chooseImg: '../../static/images/choose.png',
       codeImg: '../../static/images/codeImg.png',
@@ -122,10 +126,9 @@ export default {
     },
     // 提交邀请码
     confirm (e) {
-      console.log(e)
       let that = this
       if (this.inviteCode) {
-        qrCodeAdd({
+        qrCodeAdd(that.baseUrl, {
           'data': {
             'inviteCode': that.inviteCode,
             'personId': that.personId

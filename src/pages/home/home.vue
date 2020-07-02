@@ -218,23 +218,23 @@ import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
 import tabLists from '@/components/tabLists'
 import { getToken, setStorageSync, showLoading, hideLoading, getStorageSync, showToast } from '../../api/wechat'
-import { API_URL, getPersonMess, getHouseHoldList, getInviteList, getRepairList, getInfoList } from '../../api/index'
+import { getPersonMess, getHouseHoldList, getInviteList, getRepairList, getInfoList } from '../../api/index'
 export default {
   components: { avatorImg, arrowBtn, submitBtn, tabLists },
   mounted () {
+    this.baseUrl = getStorageSync('base_url')
     showLoading('加载中')
-    this.getToken()
-    let that = this
+    this.getTokenFn(this.baseUrl)
     mpvue.removeStorageSync('car')
   },
   onLoad () {
     if (this.isOwner) {
-      this.getHouseHoldList()
+      this.getHouseHoldList(this.baseUrl)
     }
     if (this.room.roomId) {
-      this.getRepairList()
-      this.getInviteList()
-      this.getInfoList()
+      this.getRepairList(this.baseUrl)
+      this.getInviteList(this.baseUrl)
+      this.getInfoList(this.baseUrl)
     }
     if (getStorageSync('room')) {
       this.getRoom()
@@ -242,6 +242,7 @@ export default {
   },
   data () {
     return {
+      baseUrl: null,
       // 是否授权
       isAuth: true,
       // 是否是户主
@@ -279,22 +280,20 @@ export default {
   // 下拉刷新
   onPullDownRefresh () {
     showLoading('加载中')
-    this.getToken()
-    let that = this
+    this.getTokenFn(this.baseUrl)
     //调用微信停止下拉刷新的函数
     wx.stopPullDownRefresh()
   },
   methods: {
     // 获取token
-    getToken () {
-      let that = this
-      // showLoading('加载中')
-      getToken(() => {
-        that.getRoom()
-        that.isAuth = true
+    getTokenFn (url) {
+      showLoading('加载中')
+      getToken(url, () => {
+        this.getRoom()
+        this.isAuth = true
       }, () => {
-        that.isAuth = false
-        that.$router.push('../../pages/ownerLogin/main')
+        this.isAuth = false
+        this.$router.push('../../pages/ownerLogin/main')
       }
       )
     },
@@ -315,7 +314,7 @@ export default {
         that.isHouseholder = that.room.isHouseholder
         that.personRegioncode = that.room.personRegioncode
         if (parseInt(that.isHouseholder) === 1) {
-          that.getHouseHoldList()
+          that.getHouseHoldList(this.baseUrl)
           that.isOwner = true
           that.currentTab = 0
           that.personRegion = '户主'
@@ -337,30 +336,32 @@ export default {
         that.personName = that.personMess.personName
         that.phoneNum = that.personMess.phoneNum
         that.personId = that.personMess.id
-        that.getRepairList()
-        that.getInviteList()
-        that.getInfoList()
+        that.getRepairList(that.baseUrl)
+        that.getInviteList(that.baseUrl)
+        that.getInfoList(that.baseUrl)
         console.log('缓存中room')
-        hideLoading()
+        // hideLoading()
         return false
       } else {
         console.log('缓存中无room')
-        that.getPersonMess()
+        that.getPersonMess(that.baseUrl)
         hideLoading()
       }
     },
     // 图片路径拼接
     getImgUrl (img) {
-      return `${API_URL}${img}`
+      return `${this.baseUrl}${img}`
     },
     // 获取首页人员信息
-    getPersonMess () {
+    getPersonMess (baseUrl) {
       let that = this
-      getPersonMess().then(res => {
+      getPersonMess(baseUrl).then(res => {
         that.personMess = res.data.data
         console.log('人员详情', that.personMess)
         setStorageSync('personMess', that.personMess)
-        that.regPhoto = ('data:image/png;base64,' + that.personMess.regPhoto).replace(/[\r\n]/g, '')
+        that.regPhoto = that.personMess.regPhoto
+        console.log(that.regPhoto)
+        // that.regPhoto = ('data:image/png;base64,' + that.personMess.regPhoto).replace(/[\r\n]/g, '')
         that.personName = that.personMess.personName
         that.phoneNum = that.personMess.phoneNum
         that.personId = that.personMess.id
@@ -394,7 +395,7 @@ export default {
             that.currentTab = 0
             that.personRegion = '户主'
             // 住户列表
-            that.getHouseHoldList()
+            that.getHouseHoldList(that.baseUrl)
           } else {
             that.isOwner = false
             that.currentTab = 1
@@ -414,26 +415,28 @@ export default {
           }
 
           // 报修列表
-          that.getRepairList()
+          that.getRepairList(that.baseUrl)
           // 邀请列表
-          that.getInviteList()
+          that.getInviteList(that.baseUrl)
           // 通知列表
-          that.getInfoList()
-          // hideLoading()
+          that.getInfoList(that.baseUrl)
+          hideLoading()
         } else {
           // 没有绑定户址, 就是未审核通过
           that.isExamine = false
+          that.currentTab = 1
           showToast('您未审核通过')
         }
       })
       // .catch(() => {
       //   hideLoading()
       // })
+      // hideLoading()
     },
     // 获取房间下住户
-    getHouseHoldList () {
+    getHouseHoldList (baseUrl) {
       let that = this
-      getHouseHoldList({
+      getHouseHoldList(baseUrl, {
         'data': {
           'roomId': that.room.roomId,
           'personId': that.personId
@@ -444,9 +447,9 @@ export default {
       })
     },
     // 报修列表
-    getRepairList () {
+    getRepairList (baseUrl) {
       let that = this
-      getRepairList({
+      getRepairList(baseUrl, {
         'data': {
           'pageNo': 1,
           'pageSize': 10,
@@ -458,9 +461,9 @@ export default {
       })
     },
     // 邀请列表
-    getInviteList () {
+    getInviteList (baseUrl) {
       let that = this
-      getInviteList({
+      getInviteList(baseUrl, {
         'data': {
           'pageNo': 1,
           'pageSize': 20,
@@ -473,9 +476,9 @@ export default {
       })
     },
     // 通知列表
-    getInfoList () {
+    getInfoList (baseUrl) {
       let that = this
-      getInfoList({
+      getInfoList(baseUrl, {
         'data': {
           'pageNo': 1,
           'pageSize': 10,
@@ -549,7 +552,9 @@ export default {
     },
     // 跳转至新增户址页面
     toAddress () {
-      this.$router.push('../../pages/address/main')
+      if (this.isExamine) {
+        this.$router.push('../../pages/address/main')
+      }
     }
   }
 }

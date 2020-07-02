@@ -64,15 +64,17 @@
 import arrowBtn from '@/components/arrowBtn'
 import navBar from '@/components/navBar'
 import { handleRepair, cancelRepair } from '../../api/index'
+import { getStorageSync } from '../../api/wechat'
 export default {
   components: { arrowBtn, navBar },
   mounted () {
     this.repairDetail = JSON.parse(this.$route.query.item)
     this.id = this.repairDetail.id
+    this.baseUrl = getStorageSync('base_url')
   },
-  // inject: ['reload'],
   data () {
     return {
+      baseUrl: null,
       repairDetail: {},
       id: '',
       repairBg1: '../../static/images/repairBg1.png',
@@ -90,7 +92,7 @@ export default {
         content: '确认该维修数据已被处理？',
         success (res) {
           if (res.confirm) {
-            handleRepair({
+            handleRepair(that.baseUrl, {
               'data': {
                 'id': that.id
               }
@@ -114,7 +116,7 @@ export default {
         content: '确认取消该维修信息吗？',
         success (res) {
           if (res.confirm) {
-            cancelRepair({
+            cancelRepair(that.baseUrl, {
               'data': {
                 'id': that.id
               }
