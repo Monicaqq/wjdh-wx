@@ -202,7 +202,6 @@ export default {
         if (that.carNumErrFlag) {
           setStorageSync('car', that.car)
           this.$router.go(-1)
-          console.log(that.car)
         }
       } else {
         showToast('请检查车牌号')

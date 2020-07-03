@@ -58,7 +58,7 @@ export default {
         }
       }).then(res => {
         that.houseHoldDetail = res.data.data
-        that.regPhoto = ('data:image/png;base64,' + this.houseHoldDetail.regPhoto).replace(/[\r\n]/g, '')
+        that.regPhoto = this.baseUrl + this.houseHoldDetail.regPhoto
         that.car = that.houseHoldDetail.car
         that.rooms = that.houseHoldDetail.rooms[0]
         that.cardNum = that.houseHoldDetail.cardNum

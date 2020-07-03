@@ -67,6 +67,7 @@
 import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import { cardNumHidden } from '../utils/index'
+import { getStorageSync } from '../api/wechat'
 export default {
   components: { avatorImg, arrowBtn },
   props:
@@ -123,7 +124,8 @@ export default {
       } else {
         that.personRegion = '未知'
       }
-      this.regPhoto = ('data:image/png;base64,' + this.personData.regPhoto).replace(/[\r\n]/g, '')
+      this.baseUrl = getStorageSync('base_url')
+      this.regPhoto = this.baseUrl + this.personData.regPhoto
     },
     // 跳转至手机号界面
     // toTelView () {

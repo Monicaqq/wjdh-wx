@@ -275,6 +275,7 @@ export default {
       phoneNum: '',
       tempPhoto: '',
       regPhoto: '',
+      id: '',
       hasCar: '',
       carObj: {
         'carType': '1',
@@ -328,6 +329,7 @@ export default {
       } else {
         this.houseHoldTelFlag = true
       }
+      this.selectPerson()
     },
     // 身份证号聚焦
     onHouseHoldIdCardFocus () {
@@ -438,7 +440,6 @@ export default {
           that.carNumErrFlag = false
           showToast(carResult)
         }
-        // that.carNumErrMsg = carResult
       } else {
         that.houseHoldCarFlag = true
         that.carObj.licensePlateNo = carNumFormat(that.carObj.licensePlateNo)
@@ -455,7 +456,7 @@ export default {
     // 点击 增加车辆 按钮, 将新增的一条车辆信息push 到 车辆数组
     submitCar () {
       var that = this
-      console.log('this.isShowInput', this.isShowInput)
+      // console.log('this.isShowInput', this.isShowInput)
       // 未输入车牌号
       if (this.isShowInput) {
         if (!this.carObj.licensePlateNo) {
@@ -485,21 +486,15 @@ export default {
             }
             if (!that.isExist) {
               that.car.push(that.carObj)
-              console.log(that.car)
               that.carObj = {}
               that.isCarInput = false
               that.carNumErrFlag = true
             }
           }
-          // } else {
-          //   // 车牌号格式错误, 报错
-          //   showToast(carResult)
-          // }
         }
       } else {
         that.carNumErrFlag = true
       }
-      console.log('addcar:', this.car)
     },
     // 去步骤二
     // 点击下一步 会发送请求, 邀请码作为请求参数 验证是否存在邀请码
@@ -544,12 +539,13 @@ export default {
         if (data.code === 200) {
           that.phoneCardFlag = true
           // id为空,则该人未注册过, 下一步上传照片.id 不为空, 拿到id,带出照片
-          if (data.id) {
-            that.regPhoto = data.regPhoto
-            that.tempPhoto = 'data:image/png;base64,' + data.regPhoto
-            // that.phoneCardFlag = true
+          if (data.data.id) {
+            that.id = res.data.data.id
+            that.regPhoto = data.data.regPhoto
+            that.tempPhoto = that.baseUrl + data.data.regPhoto
+            that.regPhotoFlag = true
           } else {
-            // that.phoneCardFlag = true
+            that.id = ''
           }
         } else {
           that.phoneCardFlag = false
@@ -620,7 +616,6 @@ export default {
               'photo': tempPhoto
             }
           }).then(res => {
-            console.log('照片检查', res)
             if (res.data.code === 200) {
               that.regPhoto = tempPhoto
               that.tempPhoto = 'data:image/png;base64,' + tempPhoto
@@ -653,7 +648,9 @@ export default {
             'car': that.car
           }
         }).then(res => {
-          this.$router.push('../../pages/ownerLogin/main')
+          if (res.data.code == 200) {
+            this.$router.push('../../pages/ownerLogin/main')
+          }
         })
       }
     },

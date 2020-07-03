@@ -359,8 +359,7 @@ export default {
         that.personMess = res.data.data
         console.log('人员详情', that.personMess)
         setStorageSync('personMess', that.personMess)
-        that.regPhoto = that.personMess.regPhoto
-        console.log(that.regPhoto)
+        that.regPhoto = that.baseUrl + that.personMess.regPhoto
         // that.regPhoto = ('data:image/png;base64,' + that.personMess.regPhoto).replace(/[\r\n]/g, '')
         that.personName = that.personMess.personName
         that.phoneNum = that.personMess.phoneNum

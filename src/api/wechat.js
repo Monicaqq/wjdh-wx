@@ -27,7 +27,6 @@ export function getToken (url, onSuccess, onFail) {
           if (res.data.code === 200) {
             const token = res.data.data.jwt
             const appId = res.data.data.appId
-            console.log('token', token)
             setStorageSync('token', token)
             setStorageSync('appId', appId)
             onSuccess(token)
