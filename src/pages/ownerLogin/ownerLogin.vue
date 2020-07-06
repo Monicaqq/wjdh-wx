@@ -45,10 +45,10 @@
 import submitBtn from '@/components/submitBtn'
 import { getCode, getStorageSync } from '../../api/wechat'
 import { bindWechat } from '../../api/index'
+const log = require('../../log')
 export default {
   components: { submitBtn },
   onShow () {
-    // mpvue.clearStorage()
     Object.assign(this.$data, this.$options.data())
     this.baseUrl = getStorageSync('base_url')
     mpvue.removeStorageSync('personMess')
@@ -56,6 +56,18 @@ export default {
     mpvue.removeStorageSync('token')
     mpvue.removeStorageSync('appId')
     this.getCode()
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
+  },
+  onHide () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
   },
   data () {
     return {

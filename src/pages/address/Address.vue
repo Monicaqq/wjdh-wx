@@ -64,6 +64,7 @@
 import navBar from '@/components/navBar'
 import { getStorageSync, setStorageSync, showToast } from '../../api/wechat'
 import { qrCodeAdd } from '../../api/index'
+const log = require('../../log')
 export default {
   components: { navBar },
   mounted () {
@@ -88,6 +89,13 @@ export default {
         this.$set(this.rooms, this.rooms[0])
       }
     }
+  },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
   },
   data () {
     return {
@@ -136,11 +144,6 @@ export default {
         }).then(res => {
           if (res.data.code == 200) {
             showToast('您已提交户址,请等待审核')
-            // const roomObj = res.data.data
-            // console.log('rooms0', that.rooms)
-            // that.rooms = that.rooms.concat(roomObj)
-            // setStorageSync('rooms', that.rooms)
-            // console.log('rooms', that.rooms)
             that.showModal = false
           }
         })

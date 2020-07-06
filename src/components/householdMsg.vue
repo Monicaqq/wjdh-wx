@@ -166,6 +166,9 @@ export default {
       this.personRegioncode = parseInt(newVal.personRegioncode)
       this.isPass = parseInt(newVal.isPass)
       this.isInvitation = parseInt(newVal.isInvitation)
+      this.personRegion = this.personRegioncode
+      this.passCode = this.isPass
+      this.inviteCode = this.isInvitation
       this.isPass = this.isPass === 0 ? '不可进出' : '可进出'
       this.isInvitation = this.isInvitation === 0 ? '禁止邀请访客' : '允许邀请访客'
       this.personRegioncode = this.personRegioncode === 1 ? '物业' : this.personRegioncode === 2 ? '业主' : '租户'
@@ -276,7 +279,7 @@ export default {
     toCarView () {
       let that = this
       this.$router.push({
-        path: '../../pages/houseHoldCar/main',
+        path: '../../pages/carDetail/main',
         query: { item: JSON.stringify(that.car) }
       })
     },

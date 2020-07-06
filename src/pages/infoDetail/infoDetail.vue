@@ -19,10 +19,18 @@
 </template>
 <script>
 import navBar from '@/components/navBar'
+const log = require('../../log')
 export default {
   components: { navBar },
   mounted () {
     this.infoDetail = JSON.parse(this.$route.query.item)
+  },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
   },
   data () {
     return {

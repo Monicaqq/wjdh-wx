@@ -29,6 +29,7 @@ import navBar from '@/components/navBar'
 import { saveRepair } from '../../api/index'
 import { getStorageSync, showToast } from '../../api/wechat'
 import { trim } from '../../utils/index'
+const log = require('../../log')
 export default {
   components: { arrowBtn, submitBtn, navBar },
   mounted () {
@@ -36,6 +37,13 @@ export default {
     const personMess = getStorageSync('personMess')
     this.baseUrl = getStorageSync('base_url')
     this.roomId = personMess.rooms[0].roomId
+  },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
   },
   data () {
     return {

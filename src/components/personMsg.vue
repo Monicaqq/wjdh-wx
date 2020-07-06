@@ -107,6 +107,7 @@ export default {
     getPersonData () {
       let that = this
       this.personData = this.personMsg
+      console.log('getPersonData', this.personData)
       if (this.personData.rooms[0]) {
         const isHouseholder = parseInt(this.personData.rooms[0].isHouseholder)
         const personRegioncode = parseInt(this.personData.rooms[0].personRegioncode)

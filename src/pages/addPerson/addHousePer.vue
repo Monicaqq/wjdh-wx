@@ -121,6 +121,7 @@ import avatorImg from '@/components/avatorImg'
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
 import navBar from '@/components/navBar'
+const log = require('../../log')
 export default {
   components: { avatorImg, arrowBtn, submitBtn, navBar },
   props: {
@@ -167,6 +168,11 @@ export default {
     this.baseUrl = getStorageSync('base_url')
   },
   onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
     let that = this
     const personDetail = getStorageSync('personMess')
     if (personDetail.rooms.length !== 0) {
@@ -177,7 +183,6 @@ export default {
       this.car = getStorageSync('car')
       this.carLen = this.car.length
     }
-    console.log('car1', this.car)
   },
   onUnload () {
     mpvue.removeStorageSync('car')

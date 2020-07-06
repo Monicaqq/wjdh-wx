@@ -171,7 +171,6 @@
                 </scroll-view>
               </div>
             </div>
-
           </div>
         </div>
         <!-- 页面下方提交按钮 -->
@@ -219,8 +218,16 @@ import submitBtn from '@/components/submitBtn'
 import tabLists from '@/components/tabLists'
 import { getToken, setStorageSync, showLoading, hideLoading, getStorageSync, showToast } from '../../api/wechat'
 import { getPersonMess, getHouseHoldList, getInviteList, getRepairList, getInfoList } from '../../api/index'
+const log = require('../../log')
 export default {
   components: { avatorImg, arrowBtn, submitBtn, tabLists },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
+  },
   mounted () {
     this.baseUrl = getStorageSync('base_url')
     showLoading('加载中')
@@ -228,6 +235,7 @@ export default {
     mpvue.removeStorageSync('car')
   },
   onLoad () {
+    showLoading('加载中')
     if (this.isOwner) {
       this.getHouseHoldList(this.baseUrl)
     }
@@ -235,6 +243,7 @@ export default {
       this.getRepairList(this.baseUrl)
       this.getInviteList(this.baseUrl)
       this.getInfoList(this.baseUrl)
+      hideLoading()
     }
     if (getStorageSync('room')) {
       this.getRoom()
@@ -287,14 +296,18 @@ export default {
   methods: {
     // 获取token
     getTokenFn (url) {
-      showLoading('加载中')
-      getToken(url, () => {
-        this.getRoom()
-        this.isAuth = true
-      }, () => {
-        this.isAuth = false
-        this.$router.push('../../pages/ownerLogin/main')
-      }
+      console.log('getToken')
+      getToken(
+        url,
+        () => {
+          this.getRoom()
+          this.isAuth = true
+        },
+        (err) => {
+          // console.log(err)
+          this.isAuth = false
+          this.$router.push('../../pages/ownerLogin/main')
+        }
       )
     },
     // 获取缓存中 room
@@ -303,7 +316,7 @@ export default {
       if (getStorageSync('room')) {
         that.room = getStorageSync('room')
         that.roomFullName = that.room.roomFullName
-        that.infoText = that.room.notice
+        that.infoText = that.room.notice || that.infoText
         that.isInvitation = that.room.isInvitation
         if (parseInt(that.isInvitation) === 1) {
           that.isInvitation = true
@@ -332,7 +345,7 @@ export default {
         }
         that.isExamine = true
         that.personMess = getStorageSync('personMess')
-        that.regPhoto = ('data:image/png;base64,' + that.personMess.regPhoto).replace(/[\r\n]/g, '')
+        that.regPhoto = that.baseUrl + that.personMess.regPhoto
         that.personName = that.personMess.personName
         that.phoneNum = that.personMess.phoneNum
         that.personId = that.personMess.id
@@ -340,13 +353,12 @@ export default {
         that.getInviteList(that.baseUrl)
         that.getInfoList(that.baseUrl)
         console.log('缓存中room')
-        // hideLoading()
         return false
       } else {
         console.log('缓存中无room')
         that.getPersonMess(that.baseUrl)
-        hideLoading()
       }
+      hideLoading()
     },
     // 图片路径拼接
     getImgUrl (img) {
@@ -370,7 +382,7 @@ export default {
           for (var roomItem of that.rooms) {
             if (roomItem.isDefault === 1) {
               that.roomFullName = roomItem.roomFullName
-              that.infoText = roomItem.notice
+              that.infoText = roomItem.notice || that.infoText
               that.isHouseholder = roomItem.isHouseholder
               that.room = {
                 'roomId': roomItem.roomId,
@@ -379,7 +391,7 @@ export default {
               that.isInvitation = roomItem.isInvitation
             } else {
               that.roomFullName = that.rooms[0].roomFullName
-              that.infoText = that.rooms[0].notice
+              that.infoText = that.rooms[0].notice || that.infoText
               that.isHouseholder = that.rooms[0].isHouseholder
               that.personRegioncode = that.rooms[0].personRegioncode
               that.room = {
@@ -419,7 +431,6 @@ export default {
           that.getInviteList(that.baseUrl)
           // 通知列表
           that.getInfoList(that.baseUrl)
-          hideLoading()
         } else {
           // 没有绑定户址, 就是未审核通过
           that.isExamine = false
@@ -430,7 +441,7 @@ export default {
       // .catch(() => {
       //   hideLoading()
       // })
-      // hideLoading()
+      hideLoading()
     },
     // 获取房间下住户
     getHouseHoldList (baseUrl) {

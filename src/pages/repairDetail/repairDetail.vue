@@ -65,12 +65,20 @@ import arrowBtn from '@/components/arrowBtn'
 import navBar from '@/components/navBar'
 import { handleRepair, cancelRepair } from '../../api/index'
 import { getStorageSync } from '../../api/wechat'
+const log = require('../../log')
 export default {
   components: { arrowBtn, navBar },
   mounted () {
     this.repairDetail = JSON.parse(this.$route.query.item)
     this.id = this.repairDetail.id
     this.baseUrl = getStorageSync('base_url')
+  },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
   },
   data () {
     return {

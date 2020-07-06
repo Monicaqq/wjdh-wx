@@ -34,8 +34,23 @@
 <script>
 import navBar from '@/components/navBar'
 import { setStorageSync } from '@/api/wechat'
+const log = require('../../log')
 export default {
   components: { navBar },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
+  },
+  onHide () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
+  },
   data () {
     return {
       fistCity: '../../static/images/nanjing1.png',

@@ -4,6 +4,7 @@
     "pages/houseHoldLogin/main",
     "pages/home/main",
     "pages/houseHold/main",
+    "pages/carDetail/main",
     "pages/ownerLogin/main",
     "pages/owner/main",
     "pages/addPerson/main",

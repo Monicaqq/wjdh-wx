@@ -4,14 +4,14 @@
     <!-- 二维码展示 -->
     <div class="qr-code">
       <div class="qrcode-img">
-        <img :src="qrCodeURL" v-if="notOver" mode='aspectFit' show-menu-by-longpress @longpress="handleLongPress">
+        <!-- <img :src="qrCodeURL" v-if="notOver" mode='aspectFit' show-menu-by-longpress @longpress="handleLongPress"> -->
+        <img :src="qrCodeURL" v-if="notOver" mode='aspectFit'>
         <img :src="qrCodeURL" v-else class="isOver" mode='aspectFit'>
       </div>
       <div class="qrcode-info">
         <span>{{notOver == 0 ? '已过期' : '有效期24小时'}}</span>
-        <span class="info" v-if="notOver !== 0">长按图片保存或分享</span>
+        <!-- <span class="info" v-if="notOver !== 0">长按图片保存或分享</span> -->
       </div>
-
     </div>
     <!-- 被邀人信息 -->
     <div class="invited-person-msg">
@@ -37,13 +37,20 @@
           <span class="color666">{{inviteDetail.phoneNum}}</span>
         </div>
       </div>
+      <!-- 保存二维码按钮 -->
+      <div class="qrcode-btn-footer" v-if="notOver">
+        <div @click="saveQrCode" v-if='saveQrBtn'>
+          <submit-btn btnText='保存二维码' isActive></submit-btn>
+        </div>
+        <div @click="saveQrCode" @opensetting='handleSetting' open-type="openSetting" v-else>
+          <submit-btn btnText='保存二维码' isActive></submit-btn>
+        </div>
+        <!-- <button class="btn left" open-type='share'>分享二维码</button> -->
+
+        <!-- <submit-btn open-type="openSetting" @opensetting='handleSetting' v-else>去授权</submit-btn> -->
+      </div>
     </div>
-    <!-- 保存二维码按钮 -->
-    <div class="qrcode-btn-footer" v-if="notOver">
-      <!-- <button class="btn left" open-type='share'>分享二维码</button> -->
-      <!-- <button class="btn right" @click="saveQrCode" v-if='saveQrBtn'>保存二维码</button> -->
-      <!-- <button class='btn right' open-type="openSetting" @opensetting='handleSetting' v-else>去授权</button> -->
-    </div>
+
   </div>
 </template>
 <script>
@@ -52,6 +59,7 @@ import submitBtn from '@/components/submitBtn'
 import navBar from '@/components/navBar'
 import { showToast, showLoading, hideLoading, getStorageSync, setStorageSync } from '../../api/wechat'
 const QR = require('@/utils/weapp-qrcode.js')
+const log = require('../../log')
 export default {
   components: { submitBtn, navBar },
   mounted () {
@@ -62,9 +70,16 @@ export default {
     this.drawImg()
     hideLoading()
     this.cardNum = cardNumHidden(this.inviteDetail.cardNum, 3, 3)
-    console.log(this.inviteDetail)
+    // console.log(this.inviteDetail)
     // 判断是否具有授权
     // this.isAuth()
+  },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
   },
   data () {
     return {
@@ -272,7 +287,9 @@ export default {
     }
   }
   .invited-person-msg {
-    // margin-top: ;
+    display: flex;
+    flex-direction: column;
+    position: relative;
     height: 50%;
     .person-item {
       display: flex;
@@ -317,16 +334,19 @@ export default {
     }
   }
   .qrcode-btn-footer {
-    display: flex;
-    flex-direction: row;
+    // display: flex;
+    // flex-direction: row;
     width: 100%;
     position: absolute;
-    height: 45px;
+    // height: 45px;
     bottom: 0;
-    .btn {
-      border-radius: 0;
-      font-size: 16px;
-    }
+    // .btn {
+    //   width: 100%;
+    //   border-radius: 0;
+    //   font-size: 16px;
+    //   color: #667dfa;
+    //   border: 0.5px solid rgba(102, 125, 250, 1);
+    // }
     .btn:active {
       top: 2px;
     }

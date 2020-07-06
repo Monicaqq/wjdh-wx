@@ -44,6 +44,7 @@ import { toInvite } from '../../api/index'
 import arrowBtn from '@/components/arrowBtn'
 import submitBtn from '@/components/submitBtn'
 import navBar from '@/components/navBar'
+const log = require('../../log')
 export default {
   components: { arrowBtn, submitBtn, navBar },
   mounted () {
@@ -53,6 +54,13 @@ export default {
     if (personMess.rooms.length !== 0) {
       this.roomId = personMess.rooms[0].roomId
     }
+  },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
   },
   data () {
     return {

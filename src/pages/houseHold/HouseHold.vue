@@ -19,6 +19,7 @@ import submitBtn from '@/components/submitBtn'
 import navBar from '@/components/navBar'
 import { getHouseHoldInfo, deleteHouseHold } from '../../api/index'
 import { getStorageSync, showLoading, hideLoading } from '../../api/wechat'
+const log = require('../../log')
 export default {
   components: { householdMsg, submitBtn, navBar },
   mounted () {
@@ -27,6 +28,13 @@ export default {
     this.id = this.$route.query.personId
     showLoading('正在加载')
     this.getHouseHoldInfo()
+  },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
   },
   data () {
     return {

@@ -13,6 +13,7 @@ import personMsg from '@/components/personMsg'
 import navBar from '@/components/navBar'
 import { getStorageSync, setStorageSync } from '../../api/wechat'
 import { getPersonMess } from '../../api/index'
+const log = require('../../log')
 export default {
   components: { avatorImg, arrowBtn, personMsg, navBar },
   onLoad () {
@@ -22,6 +23,12 @@ export default {
   },
   onShow () {
     this.getPersonMess()
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
+
   },
   watch: {
     carLen (newVal) {

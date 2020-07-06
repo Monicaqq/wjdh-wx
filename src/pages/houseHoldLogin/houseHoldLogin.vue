@@ -202,11 +202,19 @@ import { showToast, chooseWxImage, transformBase64, getStorageSync } from '../..
 import { isName, isIdCard, isPhone, isCarNum, carNumFormat } from '../../utils/index'
 import submitBtn from '@/components/submitBtn'
 import { checkCode, selectPerson, faceDetect, personSave } from '../../api/index'
+const log = require('../../log')
 export default {
   components: { submitBtn },
   mounted () {
     Object.assign(this.$data, this.$options.data())
     this.baseUrl = getStorageSync('base_url')
+  },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
   },
   watch: {
     // 监听是否有车的变化

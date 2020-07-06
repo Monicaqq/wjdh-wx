@@ -55,12 +55,20 @@ import { isCarNum, carNumFormat } from '../../utils/index'
 import { getStorageSync, showToast, setStorageSync } from '../../api/wechat'
 import { updateCar } from '../../api/index'
 import navBar from '@/components/navBar'
+const log = require('../../log')
 export default {
   components: { submitBtn, navBar },
   mounted () {
     Object.assign(this.$data, this.$options.data())
     this.baseUrl = getStorageSync('base_url')
     this.getCarData()
+  },
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
   },
   inject: ['reload'],
   data () {

@@ -52,6 +52,7 @@ import submitBtn from '@/components/submitBtn'
 import { isCarNum, carNumFormat } from '../../utils/index'
 import { getStorageSync, showToast, setStorageSync } from '../../api/wechat'
 import navBar from '@/components/navBar'
+const log = require('../../log')
 export default {
   components: { submitBtn, navBar },
   mounted () {
@@ -63,7 +64,13 @@ export default {
       this.car = getStorageSync('car')
     }
   },
-  inject: ['reload'],
+  onShow () {
+    log.info('hello test')
+    log.warn('warn')
+    log.error('error')
+    log.setFilterMsg('filterkeyword')
+    log.setFilterMsg('addfilterkeyword')
+  },
   data () {
     return {
       personMess: {},
